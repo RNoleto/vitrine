@@ -6,5 +6,3 @@ import Login from './components/Login.vue';
     <Login />
 </template>
 
-<style scoped>
-</style>
