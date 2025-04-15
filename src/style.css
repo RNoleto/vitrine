@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+body{
+    background: #cecece;
+    min-height: 100vh;
+}
+
+section{
+    margin: auto;
+    max-width: 1200px;
+    background: #ececec;
+    padding: 4rem 0;
+}
