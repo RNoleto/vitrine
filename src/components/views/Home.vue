@@ -3,6 +3,6 @@
 
 <template>
     <div>
-        Home
+        Página com resumos dos dados
     </div>
 </template>
