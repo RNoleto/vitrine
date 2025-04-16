@@ -1,8 +1,16 @@
 <script setup>
 import { ref } from 'vue'
+import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
+import Button from '../ui/Button.vue'
 
 const loja = ref('')
+const lojaStore = useLojaStore()
+
+function cadastrarLoja(){
+    lojaStore.adicionarLoja(loja.value)
+    loja.value = ''
+}
 </script>
 
 <template>
@@ -14,28 +22,23 @@ const loja = ref('')
         <p>Cadastrar Loja</p>
 
         <Input
-          type="text"
-          name="loja"
-          id="loja"
-          autocomplete="loja"
-          required
-          placeholder="Nome da loja"
           v-model="loja"
+          placeholder="Digite o nome da loja"
+          id="loja"
+          name="loja"
+          type="text"
+          autocomplete="off"
+          required
         />
-
-        <button
-          type="submit"
-          class="mt-1 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Cadastrar
-        </button>
+        <Button type="submit" @click="cadastrarLoja">Cadastrar</Button>
       </div>
 
       <div>
         <p>Lojas cadastradas</p>
         <ul>
-          <li>Loja 1</li>
-          <li>Loja 2</li>
+          <li v-for="(nome, index) in lojaStore.lojas" :key="index">
+            {{ nome }}
+          </li>
         </ul>
       </div>
     </div>
