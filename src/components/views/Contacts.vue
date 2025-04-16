@@ -46,8 +46,8 @@ function cadastrarContato() {
     <p class="font-semibold">Cadastrar Contato</p>
 
     <div class="space-y-3 mt-5">
-      <Input v-model="nome" placeholder="Nome do contato" />
-      <Input v-model="contato" placeholder="Telefone ou email" />
+      <Input id="name" name="name" v-model="nome" placeholder="Nome do contato" />
+      <Input id="contact" name="contact" v-model="contato" placeholder="Telefone ou email" />
 
       <!-- Upload de foto -->
       <input
