@@ -64,24 +64,41 @@ function cadastrarLoja() {
         <div class="space-y-3 mt-10">
             <div>
                 <p class="font-semibold">Cadastrar Loja</p>
-
-                <Input v-model="loja" placeholder="Digite o nome da loja" id="loja" name="loja" type="text"
-                    autocomplete="off" required />
-
-                <!-- Campo para upload do logo -->
-                <input type="file" accept=".svg" @change="handleFileUpload" class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-                 file:rounded-md file:border-0 file:text-sm file:font-semibold
-                 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
-
-                <!-- Adicionar links -->
-                <div class="flex gap-2 flex-wrap">
-                    <Input id="buttonIcon" name="buttonIcon" v-model="novoIcone" placeholder="Ícone (ex: ⭐)" :input-class="'flex-1 ' + inputBaseClass"/>
-                    <Input id="buttonText" name="buttonText" v-model="novoTexto" placeholder="Texto do botão" :input-class="'flex-1 ' + inputBaseClass" />
-                    <Input id="buttonUrl" name="buttonUrl" v-model="novaUrl" placeholder="URL (ex: https://...)" :input-class="'flex-1 ' + inputBaseClass" />
-                    <Button @click="adicionarLink">Adicionar</Button>
+                <div class="mt-2">
+                    <Input v-model="loja" placeholder="Digite o nome da loja" id="loja" name="loja" type="text"
+                        autocomplete="off" required />
+    
+                    <!-- Campo para upload do logo -->
+                    <input type="file" accept=".svg" @change="handleFileUpload" class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                     file:rounded-md file:border-0 file:text-sm file:font-semibold
+                     file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
                 </div>
 
-                <Button type="submit" @click="cadastrarLoja">Cadastrar Loja</Button>
+                <!-- Adicionar links -->
+                <p class="font-semibold">Links da página</p>
+                <div class="mt-2 flex flex-col gap-2 flex-wrap sm:flex-row">
+                    <Input id="buttonIcon" name="buttonIcon" v-model="novoIcone" placeholder="Ícone (ex: fa-brands fa-apple)"
+                        :input-class="'flex-1 ' + inputBaseClass" />
+                    <Input id="buttonText" name="buttonText" v-model="novoTexto" placeholder="Texto do botão"
+                        :input-class="'flex-1 ' + inputBaseClass" />
+                    <Input id="buttonUrl" name="buttonUrl" v-model="novaUrl" placeholder="URL (ex: https://...)"
+                        :input-class="'flex-1 ' + inputBaseClass" />
+                    <Button @click="adicionarLink">Adicionar Link</Button>
+                </div>
+
+                <!-- Mostrar links antes de salvar -->
+                <div v-if="links && links.length" class="mt-4">
+                    <p class="font-semibold">Links Adicionados:</p>
+                    <ul class="space-y-2">
+                        <li v-for="(link, index) in links" :key="index" class="flex items-center gap-2">
+                            <i :class="link.icone"></i>
+                            <span class="text-sm font-medium">{{ link.texto }}</span>
+                            <span class="text-xs text-gray-500">{{ link.url }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <Button type="submit" @click="cadastrarLoja">Finalizar Cadastro da Loja</Button>
             </div>
 
             <div>
