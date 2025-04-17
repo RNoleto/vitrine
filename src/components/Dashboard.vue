@@ -8,7 +8,7 @@ function toggleSidebar() {
 }
 
 const links = [
-  { name: 'Home', route: '/' },
+  { name: 'Home', route: '/home' },
   { name: 'Empresas', route: '/stores' },
   { name: 'Contatos', route: '/contacts' },
   // Adicione mais links conforme necessário
