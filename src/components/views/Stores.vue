@@ -87,9 +87,22 @@ function selecionarIcone(icone) {
                         autocomplete="off" required />
 
                     <!-- Campo para upload do logo -->
-                    <input type="file" accept=".svg" @change="handleFileUpload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-                     file:rounded-md file:border-0 file:text-sm file:font-semibold
-                     file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                    <input
+                      type="file"
+                      id="upload-logo"
+                      accept=".svg"
+                      @change="handleFileUpload"
+                      class="hidden"
+                    />
+
+                    <!-- Label como botão -->
+                    <label
+                      for="upload-logo"
+                      class="cursor-pointer inline-block rounded-md bg-indigo-50 border-indigo-100 border-1 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100"
+                    >
+                      Enviar logo da loja (.svg)
+                    </label>
+                    <p v-if="logo" class="text-sm text-gray-600 mt-1">Arquivo selecionado</p>
                 </div>
                 <div class="divider"></div>
                 <!-- Adicionar links -->
