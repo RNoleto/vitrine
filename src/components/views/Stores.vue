@@ -4,58 +4,122 @@ import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
 import Button from '../ui/Button.vue'
 
-const loja = ref('')
-const logo = ref(null)
 const lojaStore = useLojaStore()
 
+// criação de loja
+const novaLojaNome = ref('')
+const novaLojaLogo = ref(null)
+const novaLinks = ref([])
 const novoIcone = ref('')
 const novoTexto = ref('')
 const novaUrl = ref('')
-const links = ref([])
 
 const inputBaseClass = 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'
 
-
 function handleFileUpload(event) {
-    const file = event.target.files[0]
-    if (file && file.type === 'image/svg+xml') {
-        const reader = new FileReader()
-        reader.onload = () => {
-            logo.value = reader.result // base64 do svg
-        }
-        reader.readAsDataURL(file)
-    } else {
-        alert('Por favor, envie um arquivo SVG válido.')
-    }
+  const file = event.target.files[0]
+  if (file && file.type === 'image/svg+xml') {
+    const reader = new FileReader()
+    reader.onload = () => novaLojaLogo.value = reader.result
+    reader.readAsDataURL(file)
+  } else {
+    alert('Por favor, envie um arquivo SVG válido.')
+  }
 }
 
 function adicionarLink() {
-    if (!novoIcone.value || !novoTexto.value || !novaUrl.value) {
-        alert('Preencha ícone, texto e URL do link.')
-        return
-    }
-    links.value.push({
-        icone: novoIcone.value,
-        texto: novoTexto.value,
-        url: novaUrl.value,
-    })
-    novoIcone.value = ''
-    novoTexto.value = ''
-    novaUrl.value = ''
+  if (!novoIcone.value || !novoTexto.value || !novaUrl.value) {
+    alert('Preencha ícone, texto e URL do link.')
+    return
+  }
+  novaLinks.value.push({ icone: novoIcone.value, texto: novoTexto.value, url: novaUrl.value })
+  novoIcone.value = ''
+  novoTexto.value = ''
+  novaUrl.value = ''
 }
 
 function cadastrarLoja() {
-    if (!loja.value || !logo.value) {
-        alert('Preencha todos os campos.')
-        return
-    }
-
-    lojaStore.adicionarLoja(loja.value, logo.value, links.value)
-    loja.value = ''
-    logo.value = null
-    links.value = []
+  if (!novaLojaNome.value || !novaLojaLogo.value) {
+    alert('Preencha nome e logo da loja.')
+    return
+  }
+  lojaStore.adicionarLoja(novaLojaNome.value, novaLojaLogo.value, [...novaLinks.value])
+  novaLojaNome.value = ''
+  novaLojaLogo.value = null
+  novaLinks.value = []
 }
 
+// modal edição
+const isEditModalOpen = ref(false)
+const editIndex = ref(null)
+const editNome = ref('')
+const editLogo = ref('')
+const editLinks = ref([])
+const editIcone = ref('')
+const editTexto = ref('')
+const editUrl = ref('')
+
+function onFileChange(event) {
+  const file = event.target.files[0]
+  if (file && file.type === 'image/svg+xml') {
+    const reader = new FileReader()
+    reader.onload = () => editLogo.value = reader.result
+    reader.readAsDataURL(file)
+  } else {
+    alert('Por favor, envie um arquivo SVG válido.')
+  }
+}
+
+function openEditModal(index) {
+  const loja = lojaStore.lojas[index]
+  editIndex.value = index
+  editNome.value = loja.nome
+  editLogo.value = loja.logo
+  editLinks.value = loja.links.map(l => ({ ...l }))
+  // limpar campos de novo link
+  editIcone.value = ''
+  editTexto.value = ''
+  editUrl.value = ''
+  isEditModalOpen.value = true
+}
+
+function closeEditModal() {
+  isEditModalOpen.value = false
+  editIndex.value = null
+  editLinks.value = []
+}
+
+function adicionarLinkEdit() {
+  if (!editIcone.value || !editTexto.value || !editUrl.value) {
+    alert('Preencha ícone, texto e URL do link.')
+    return
+  }
+  editLinks.value.push({ icone: editIcone.value, texto: editTexto.value, url: editUrl.value })
+  editIcone.value = ''
+  editTexto.value = ''
+  editUrl.value = ''
+}
+
+function removerLinkEdit(i) {
+  editLinks.value.splice(i, 1)
+}
+
+function salvarEdicao() {
+  lojaStore.editarLoja(editIndex.value, {
+    nome: editNome.value,
+    logo: editLogo.value,
+    links: [...editLinks.value]
+  })
+  closeEditModal()
+}
+
+function deletarLoja(index) {
+  if (confirm('Deseja realmente excluir esta loja?')) {
+    lojaStore.removerLoja(lojaStore.lojas[index].id)
+  }
+}
+
+// opções de ícones
 const opcoesIcones = [
   { label: 'Facebook', value: 'fa-brands fa-facebook' },
   { label: 'Instagram', value: 'fa-brands fa-instagram' },
@@ -65,118 +129,109 @@ const opcoesIcones = [
   { label: 'Website', value: 'fa-solid fa-globe' },
   { label: 'Localização', value: 'fa-solid fa-location-dot' }
 ]
-
-const dropdownAtivo = ref(false)
-
-function selecionarIcone(icone) {
-  novoIcone.value = icone
-  dropdownAtivo.value = false
-}
 </script>
 
 <template>
-    <div>
-        <p>Lojas cadastradas e ação para salvar novas Lojas</p>
-
-        <div class="space-y-3 mt-10">
-            <div>
-                <p class="font-semibold">Cadastrar Loja</p>
-                <div class="mt-2 flex flex-col gap-2">
-                    <Input v-model="loja" placeholder="Digite o nome da loja" id="loja" name="loja" type="text"
-                        autocomplete="off" required />
-
-                    <!-- Campo para upload do logo -->
-                    <input
-                      type="file"
-                      id="upload-logo"
-                      accept=".svg"
-                      @change="handleFileUpload"
-                      class="hidden"
-                    />
-
-                    <!-- Label como botão -->
-                    <label
-                      for="upload-logo"
-                      class="cursor-pointer inline-block rounded-md bg-indigo-50 border-indigo-100 border-1 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100"
-                    >
-                      Enviar logo da loja (.svg)
-                    </label>
-                    <p v-if="logo" class="text-sm text-gray-600 mt-1">Arquivo selecionado</p>
-                </div>
-                <div class="divider"></div>
-                <!-- Adicionar links -->
-                <p class="font-semibold">Links da página</p>
-                <div class="my-2 flex flex-col gap-2 flex-wrap sm:flex-row">
-                    <div class="relative flex-1">
-                      <button @click="dropdownAtivo = !dropdownAtivo" type="button"
-                        class="w-full flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm hover:border-indigo-500">
-                        <span class="flex items-center gap-2">
-                          <i v-if="novoIcone" :class="novoIcone"></i>
-                          {{ novoIcone ? opcoesIcones.find(i => i.value === novoIcone)?.label : 'Selecione um ícone' }}
-                        </span>
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                  
-                      <ul v-show="dropdownAtivo"
-                        class="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg max-h-60 overflow-auto">
-                        <li v-for="opcao in opcoesIcones" :key="opcao.value" @click="selecionarIcone(opcao.value)"
-                          class="cursor-pointer px-3 py-2 hover:bg-indigo-100 flex items-center gap-2 text-sm">
-                          <i :class="opcao.value"></i>
-                          {{ opcao.label }}
-                        </li>
-                      </ul>
-                    </div>
-                    <Input id="buttonText" name="buttonText" v-model="novoTexto" placeholder="Texto do botão"
-                        :input-class="'flex-1 ' + inputBaseClass" />
-                    <Input id="buttonUrl" name="buttonUrl" v-model="novaUrl" placeholder="URL (ex: https://...)"
-                        :input-class="'flex-1 ' + inputBaseClass" />
-                    <Button @click="adicionarLink">Adicionar Link</Button>
-                </div>
-
-                <!-- Mostrar links antes de salvar -->
-                <div v-if="links && links.length" class="mt-4">
-                    <p class="font-semibold">Links Adicionados:</p>
-                    <ul class="space-y-2">
-                        <li v-for="(link, index) in links" :key="index" class="flex items-center gap-2">
-                            <i :class="link.icone"></i>
-                            <span class="text-sm font-medium">{{ link.texto }}</span>
-                            <span class="text-xs text-gray-500">{{ link.url }}</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <Button type="submit" @click="cadastrarLoja">Finalizar Cadastro da Loja</Button>
-            </div>
-
-            <div class="divider"></div>
-            
-            <!-- Lista de lojas cadastradas -->
-
-            <div>
-                <p class="font-semibold">Lojas cadastradas</p>
-                <ul class="space-y-2">
-                    <li v-for="(loja, index) in lojaStore.lojas" :key="index" class="border rounded-md p-2" @click="$router.push({ name: 'StoreDetail', params: {id: index}})">
-                        <div class="flex items-center space-x-3">
-                            <img :src="loja.logo" alt="Logo" class="w-8 h-8" />
-                            <span class="font-medium">{{ loja.nome }}</span>
-                        </div>
-                        <div v-if="loja.links?.length" class="mt-2 pl-4">
-                            <p class="text-xs font-semibold">Links:</p>
-                            <ul class="flex flex-wrap gap-2 mt-2">
-                                <li v-for="(link, i) in loja.links" :key="i">
-                                    <a :href="link.url" target="_blank" rel="noopener"
-                                        class="inline-flex items-center gap-1 px-3 py-1 rounded-md text-sm bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition">
-                                        <i :class="link.icone"></i>
-                                        <span>{{ link.texto }}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+  <div>
+    <!-- Formulário de cadastro -->
+    <h3 class="text-lg font-bold text-zinc-800">Cadastro de Lojas</h3>
+    <div class="space-y-3 mb-6">
+      <Input v-model="novaLojaNome" placeholder="Nome da loja" id="nova-loja" name="nova-loja" />
+      <div>
+        <input id="upload-logo" type="file" accept=".svg" @change="handleFileUpload" class="hidden" />
+        <label for="upload-logo" class="cursor-pointer inline-block rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
+          Enviar logo (.svg)
+        </label>
+        <span v-if="novaLojaLogo" class="ml-2 text-sm text-gray-600">Arquivo pronto</span>
+      </div>
+      <div class="space-y-2">
+        <p class="font-semibold">Links da página</p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <select v-model="novoIcone" class="flex-1 border p-2 rounded">
+            <option disabled value="">Selecione um ícone</option>
+            <option v-for="opt in opcoesIcones" :key="opt.value" :value="opt.value">
+              {{ opt.label }}
+            </option>
+          </select>
+          <Input id="text-new" name="text-new" v-model="novoTexto" placeholder="Texto do botão" :input-class="inputBaseClass" />
+          <Input id="url-new" name="url-new" v-model="novaUrl" placeholder="URL" :input-class="inputBaseClass" />
+          <Button @click="adicionarLink">Adicionar</Button>
         </div>
+        <ul class="mt-2 space-y-1">
+          <li v-for="(l, i) in novaLinks" :key="i" class="flex items-center gap-2">
+            <i :class="l.icone"></i>
+            <span>{{ l.texto }}</span>
+            <button @click="novaLinks.splice(i,1)" class="text-red-500">✖</button>
+          </li>
+        </ul>
+      </div>
+      <Button @click="cadastrarLoja">Cadastrar Loja</Button>
     </div>
+
+    <div class="divider"></div>
+
+    <!-- Listagem de lojas -->
+    <h3 class="text-lg font-semibold mb-3">Lojas Cadastradas</h3>
+    <ul class="space-y-2">
+      <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id" class="border p-3 rounded flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <img :src="loja.logo" alt="logo" class="w-8 h-8 object-contain" />
+          <span class="font-medium">{{ loja.nome }}</span>
+        </div>
+        <div class="flex gap-2">
+          <Button size="sm" @click="openEditModal(idx)">Editar</Button>
+          <Button size="sm" variant="danger" @click="deletarLoja(idx)">Excluir</Button>
+        </div>
+      </li>
+    </ul>
+
+    <!-- Modal de edição -->
+    <div v-if="isEditModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg w-full max-w-lg space-y-4">
+        <h4 class="text-lg font-semibold">Editar Loja</h4>
+        <!-- preview da logo editável -->
+        <div class="flex items-center gap-4">
+          <img :src="editLogo" alt="Logo Editada" class="w-16 h-16 object-contain rounded" />
+          <input id="edit-upload-logo" type="file" accept=".svg" @change="onFileChange" class="hidden" />
+          <label for="edit-upload-logo" class="cursor-pointer rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
+            Alterar logo (.svg)
+          </label>
+        </div>
+        <Input v-model="editNome" placeholder="Nome da loja" id="edit-nome" name="edit-nome" />
+
+        <!-- Inputs para adicionar novo link -->
+        <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+          <select v-model="editIcone" class="flex-1 border p-2 rounded">
+            <option disabled value="">Ícone</option>
+            <option v-for="opt in opcoesIcones" :key="opt.value" :value="opt.value">
+              {{ opt.label }}
+            </option>
+          </select>
+          <Input id="edit-texto-new" name="edit-texto-new" v-model="editTexto" placeholder="Texto" :input-class="inputBaseClass" />
+          <Input id="edit-url-new" name="edit-url-new" v-model="editUrl" placeholder="URL" :input-class="inputBaseClass" />
+          <Button size="sm" @click="adicionarLinkEdit">+ Adicionar Link</Button>
+        </div>
+
+        <!-- Lista de links editáveis -->
+        <div class="space-y-2">
+          <div v-for="(l, i) in editLinks" :key="i" class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+            <select v-model="l.icone" class="flex-1 border p-2 rounded">
+              <option disabled value="">Ícone</option>
+              <option v-for="opt in opcoesIcones" :key="opt.value" :value="opt.value">
+                {{ opt.label }}
+              </option>
+            </select>
+            <Input :id="`edit-texto-${i}`" :name="`edit-texto-${i}`" v-model="l.texto" placeholder="Texto" :input-class="inputBaseClass" />
+            <Input :id="`edit-url-${i}`" :name="`edit-url-${i}`" v-model="l.url" placeholder="URL" :input-class="inputBaseClass" />
+            <button @click="removerLinkEdit(i)" class="text-red-500">✖</button>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4">
+          <Button variant="secondary" @click="closeEditModal">Cancelar</Button>
+          <Button @click="salvarEdicao">Salvar</Button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
