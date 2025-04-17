@@ -1,10 +1,13 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
 import Button from '../ui/Button.vue'
 import EditStoreModal from '../ui/EditStoreModal.vue'
 import IconSelect from '../ui/IconSelect.vue'
+
+const router = useRouter()
 
 const lojaStore = useLojaStore()
 
@@ -131,6 +134,10 @@ const opcoesIcones = [
     { label: 'Website', value: 'fa-solid fa-globe' },
     { label: 'Localização', value: 'fa-solid fa-location-dot' }
 ]
+
+function acessarLoja(id) {
+  router.push(`/stores/${id}`)
+}
 </script>
 
 <template>
@@ -185,6 +192,7 @@ const opcoesIcones = [
                     <span class="font-medium">{{ loja.nome }}</span>
                 </div>
                 <div class="flex gap-2">
+                    <Button size="sm" variant="secondary" @click="acessarLoja(loja.id)">Acessar</Button>
                     <Button size="sm" @click="openEditModal(idx)">Editar</Button>
                     <Button size="sm" variant="danger" @click="deletarLoja(idx)">Excluir</Button>
                 </div>
