@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 export const useLojaStore = defineStore('loja', () => {
   const lojas = ref([])
-  let proximoId = 0
+  let proximoId = 1
 
   function adicionarLoja(nome, logo, links = [], contatos = []) {
     lojas.value.push({
