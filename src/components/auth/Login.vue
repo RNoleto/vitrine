@@ -10,7 +10,7 @@
       <!-- Ilustração -->
       <div class="flex justify-center">
         <img
-          src="https://www.svgrepo.com/show/475656/login.svg"
+          src="/public/vitrine.png"
           alt="Login Illustration"
           class="w-28 h-28"
         />
@@ -21,7 +21,7 @@
         <Button
           @click="login"
           :disabled="auth.isLoading"
-          class="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50"
+          class="w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50"
         >
           <i class="fa-brands fa-google text-lg"></i>
           {{ auth.isLoading ? 'Entrando…' : 'Entrar com Google' }}
