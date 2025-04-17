@@ -10,3 +10,10 @@ body{
     /* max-width: 1200px; */
     margin: auto;
 }
+
+.divider{
+    height: 1px;
+    width: 100%;
+    background: #ececec;
+    margin: 1rem 0;
+}

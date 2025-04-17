@@ -45,7 +45,7 @@ function cadastrarContato() {
   <div>
     <p class="font-semibold">Cadastrar Contato</p>
 
-    <div class="space-y-3 mt-5">
+    <div class="flex flex-col gap-2 mt-5">
       <Input id="name" name="name" v-model="nome" placeholder="Nome do contato" />
       <Input id="contact" name="contact" v-model="contato" placeholder="Telefone ou email" />
 
@@ -70,8 +70,9 @@ function cadastrarContato() {
       <Button @click="cadastrarContato">Cadastrar</Button>
     </div>
 
+    <div class="divider"></div>
     <!-- Lista de contatos cadastrados -->
-    <div class="mt-8">
+    <div>
       <p class="font-semibold">Contatos cadastrados</p>
       <ul class="space-y-3 mt-4">
         <li v-for="(c, i) in contactStore.contact" :key="i" class="flex items-center space-x-4">

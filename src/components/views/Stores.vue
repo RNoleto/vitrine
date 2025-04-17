@@ -55,6 +55,24 @@ function cadastrarLoja() {
     logo.value = null
     links.value = []
 }
+
+const opcoesIcones = [
+  { label: 'Facebook', value: 'fa-brands fa-facebook' },
+  { label: 'Instagram', value: 'fa-brands fa-instagram' },
+  { label: 'Twitter', value: 'fa-brands fa-twitter' },
+  { label: 'YouTube', value: 'fa-brands fa-youtube' },
+  { label: 'LinkedIn', value: 'fa-brands fa-linkedin' },
+  { label: 'Website', value: 'fa-solid fa-globe' },
+  { label: 'Whatsapp', value: 'fa-brands fa-whatsapp' },
+  { label: 'Localização', value: 'fa-solid fa-location-pin' }
+]
+
+const dropdownAtivo = ref(false)
+
+function selecionarIcone(icone) {
+  novoIcone.value = icone
+  dropdownAtivo.value = false
+}
 </script>
 
 <template>
@@ -64,21 +82,40 @@ function cadastrarLoja() {
         <div class="space-y-3 mt-10">
             <div>
                 <p class="font-semibold">Cadastrar Loja</p>
-                <div class="mt-2">
+                <div class="mt-2 flex flex-col gap-2">
                     <Input v-model="loja" placeholder="Digite o nome da loja" id="loja" name="loja" type="text"
                         autocomplete="off" required />
-    
+
                     <!-- Campo para upload do logo -->
-                    <input type="file" accept=".svg" @change="handleFileUpload" class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                    <input type="file" accept=".svg" @change="handleFileUpload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
                      file:rounded-md file:border-0 file:text-sm file:font-semibold
                      file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
                 </div>
-
+                <div class="divider"></div>
                 <!-- Adicionar links -->
                 <p class="font-semibold">Links da página</p>
-                <div class="mt-2 flex flex-col gap-2 flex-wrap sm:flex-row">
-                    <Input id="buttonIcon" name="buttonIcon" v-model="novoIcone" placeholder="Ícone (ex: fa-brands fa-apple)"
-                        :input-class="'flex-1 ' + inputBaseClass" />
+                <div class="my-2 flex flex-col gap-2 flex-wrap sm:flex-row">
+                    <div class="relative flex-1">
+                      <button @click="dropdownAtivo = !dropdownAtivo" type="button"
+                        class="w-full flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm hover:border-indigo-500">
+                        <span class="flex items-center gap-2">
+                          <i v-if="novoIcone" :class="novoIcone"></i>
+                          {{ novoIcone ? opcoesIcones.find(i => i.value === novoIcone)?.label : 'Selecione um ícone' }}
+                        </span>
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                  
+                      <ul v-show="dropdownAtivo"
+                        class="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg max-h-60 overflow-auto">
+                        <li v-for="opcao in opcoesIcones" :key="opcao.value" @click="selecionarIcone(opcao.value)"
+                          class="cursor-pointer px-3 py-2 hover:bg-indigo-100 flex items-center gap-2 text-sm">
+                          <i :class="opcao.value"></i>
+                          {{ opcao.label }}
+                        </li>
+                      </ul>
+                    </div>
                     <Input id="buttonText" name="buttonText" v-model="novoTexto" placeholder="Texto do botão"
                         :input-class="'flex-1 ' + inputBaseClass" />
                     <Input id="buttonUrl" name="buttonUrl" v-model="novaUrl" placeholder="URL (ex: https://...)"
@@ -100,6 +137,8 @@ function cadastrarLoja() {
 
                 <Button type="submit" @click="cadastrarLoja">Finalizar Cadastro da Loja</Button>
             </div>
+
+            <div class="divider"></div>
 
             <div>
                 <p class="font-semibold">Lojas cadastradas</p>
