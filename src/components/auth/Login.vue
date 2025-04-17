@@ -19,7 +19,7 @@
   async function login() {
     try {
       await auth.loginWithGoogle()
-      router.push({ path: '/stores' })
+      router.push({ path: '/home' })
     } catch (e) {
       alert('Falha no login: ' + e.message)
     }
