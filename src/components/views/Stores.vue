@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
 import Button from '../ui/Button.vue'
-
 import EditStoreModal from '../ui/EditStoreModal.vue'
+import IconSelect from '../ui/IconSelect.vue'
 
 const lojaStore = useLojaStore()
 
@@ -150,12 +150,12 @@ const opcoesIcones = [
             <div class="space-y-2">
                 <p class="font-semibold">Links da página</p>
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <select v-model="novoIcone" class="flex-1 border p-2 rounded">
-                        <option disabled value="">Selecione um ícone</option>
-                        <option v-for="opt in opcoesIcones" :key="opt.value" :value="opt.value">
-                            {{ opt.label }}
-                        </option>
-                    </select>
+                    <IconSelect
+                      v-model="novoIcone"
+                      :options="opcoesIcones"
+                      placeholder="Ícone"
+                      class="flex-1"
+                    />
                     <Input id="text-new" name="text-new" v-model="novoTexto" placeholder="Texto do botão"
                         :input-class="inputBaseClass" />
                     <Input id="url-new" name="url-new" v-model="novaUrl" placeholder="URL"
@@ -200,7 +200,6 @@ const opcoesIcones = [
             lojaStore.editarLoja(editIndex, dados)
             closeEditModal()
         }" @cancel="closeEditModal" />
-
 
     </div>
 </template>
