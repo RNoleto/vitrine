@@ -1,99 +1,3 @@
-<template>
-  <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg w-full max-w-lg space-y-4">
-      <h4 class="text-lg font-semibold">Editar Loja</h4>
-
-      <!-- Logo Preview & Upload -->
-      <div class="flex items-center gap-4">
-        <img :src="editLogo" alt="Logo Editada" class="w-16 h-16 object-contain rounded" />
-        <input
-          id="edit-upload-logo"
-          type="file"
-          accept=".svg"
-          @change="onFileChange"
-          class="hidden"
-        />
-        <label
-          for="edit-upload-logo"
-          class="cursor-pointer rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100"
-        >
-          Alterar logo (.svg)
-        </label>
-      </div>
-
-      <!-- Nome -->
-      <Input
-        v-model="editNome"
-        placeholder="Nome da loja"
-        id="edit-nome"
-        name="edit-nome"
-      />
-
-      <!-- Novo Link -->
-      <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-        <IconSelect
-          v-model="editIcone"
-          :options="opcoesIcones"
-          placeholder="Ícone"
-          class="flex-1"
-        />
-        <Input
-          id="new-texto"
-          name="new-texto"
-          v-model="editTexto"
-          placeholder="Texto"
-          :input-class="inputBaseClass"
-        />
-        <Input
-          id="new-url"
-          name="new-url"
-          v-model="editUrl"
-          placeholder="URL"
-          :input-class="inputBaseClass"
-        />
-        <Button size="sm" @click="addLink">+ Adicionar Link</Button>
-      </div>
-
-      <!-- Lista de Links -->
-      <div class="space-y-2">
-        <div
-          v-for="(link, i) in editLinks"
-          :key="i"
-          class="flex flex-col sm:flex-row gap-2 items-start sm:items-center"
-        >
-          <IconSelect
-            v-model="link.icone"
-            :options="opcoesIcones"
-            placeholder="Ícone"
-            class="flex-1"
-          />
-          <Input
-            :id="`texto-${i}`"
-            :name="`texto-${i}`"
-            v-model="link.texto"
-            placeholder="Texto"
-            :input-class="inputBaseClass"
-          />
-          <Input
-            :id="`url-${i}`"
-            :name="`url-${i}`"
-            v-model="link.url"
-            placeholder="URL"
-            :input-class="inputBaseClass"
-          />
-          <button @click="removeLink(i)" class="text-red-500">✖</button>
-        </div>
-      </div>
-
-      <!-- Ações -->
-      <div class="flex justify-end gap-2 pt-4">
-        <Button variant="secondary" @click="$emit('cancel')">Cancelar</Button>
-        <Button @click="saveLocal">Salvar</Button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref, watch } from 'vue'
 import Input from '../ui/Input.vue'
@@ -167,3 +71,99 @@ function saveLocal() {
   })
 }
 </script>
+
+<template>
+  <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-lg space-y-4">
+      <h4 class="text-lg font-semibold">Editar Loja</h4>
+
+      <!-- Logo Preview & Upload -->
+      <div class="flex items-center gap-4">
+        <img :src="editLogo" alt="Logo Editada" class="w-16 h-16 object-contain rounded" />
+        <input
+          id="edit-upload-logo"
+          type="file"
+          accept=".svg"
+          @change="onFileChange"
+          class="hidden"
+        />
+        <label
+          for="edit-upload-logo"
+          class="cursor-pointer rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100"
+        >
+          Alterar logo (.svg)
+        </label>
+      </div>
+
+      <!-- Nome -->
+      <Input
+        v-model="editNome"
+        placeholder="Nome da loja"
+        id="edit-nome"
+        name="edit-nome"
+      />
+
+      <!-- Novo Link -->
+      <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+        <IconSelect
+          v-model="editIcone"
+          :options="opcoesIcones"
+          placeholder="Ícone"
+          class="min-w-[135px] flex-1"
+        />
+        <Input
+          id="new-texto"
+          name="new-texto"
+          v-model="editTexto"
+          placeholder="Texto"
+          :input-class="inputBaseClass"
+        />
+        <Input
+          id="new-url"
+          name="new-url"
+          v-model="editUrl"
+          placeholder="URL"
+          :input-class="inputBaseClass"
+        />
+        <Button size="sm" @click="addLink">+ Adicionar Link</Button>
+      </div>
+
+      <!-- Lista de Links -->
+      <div class="space-y-2">
+        <div
+          v-for="(link, i) in editLinks"
+          :key="i"
+          class="flex flex-col sm:flex-row gap-2 items-start sm:items-center"
+        >
+          <IconSelect
+            v-model="link.icone"
+            :options="opcoesIcones"
+            placeholder="Ícone"
+            class="flex-1"
+          />
+          <Input
+            :id="`texto-${i}`"
+            :name="`texto-${i}`"
+            v-model="link.texto"
+            placeholder="Texto"
+            :input-class="inputBaseClass"
+          />
+          <Input
+            :id="`url-${i}`"
+            :name="`url-${i}`"
+            v-model="link.url"
+            placeholder="URL"
+            :input-class="inputBaseClass"
+          />
+          <button @click="removeLink(i)" class="text-red-500">✖</button>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="flex justify-end gap-2 pt-4">
+        <Button variant="secondary" @click="$emit('cancel')">Cancelar</Button>
+        <Button @click="saveLocal">Salvar</Button>
+      </div>
+    </div>
+  </div>
+</template>
