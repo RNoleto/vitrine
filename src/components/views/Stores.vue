@@ -196,10 +196,10 @@ function acessarDetalheLoja(id) {
                     <span class="font-medium">{{ loja.nome }}</span>
                 </div>
                 <div class="flex gap-2 mt-2">
-                    <Button size="sm" variant="secondary" @click="acessarDetalheLoja(loja.id)">Acessar Detalhe</Button>
-                    <Button size="sm" variant="secondary" @click="acessarLoja(loja.id)">Acessar</Button>
-                    <Button size="sm" @click="openEditModal(idx)">Editar</Button>
-                    <Button size="sm" variant="danger" @click="deletarLoja(idx)">Excluir</Button>
+                    <Button size="sm" variant="acessar" @click="acessarLoja(loja.id)">Acessar</Button>
+                    <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.id)">Detalhe</Button>
+                    <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>
+                    <Button size="sm" variant="excluir" @click="deletarLoja(idx)">Excluir</Button>
                 </div>
             </li>
         </ul>

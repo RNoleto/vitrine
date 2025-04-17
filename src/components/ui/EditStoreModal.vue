@@ -161,7 +161,7 @@ function saveLocal() {
 
       <!-- Ações -->
       <div class="flex justify-end gap-2 pt-4">
-        <Button variant="secondary" @click="$emit('cancel')">Cancelar</Button>
+        <Button variant="cancelar" @click="$emit('cancel')">Cancelar</Button>
         <Button @click="saveLocal">Salvar</Button>
       </div>
     </div>
