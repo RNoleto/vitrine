@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useContactStore } from '../../stores/contactStore'
 import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
@@ -12,6 +12,7 @@ const nome = ref('')
 const contato = ref('')
 const foto = ref(null)
 const empresaSelecionada = ref('')
+const editIndex = ref(null)
 
 function handleFotoUpload(event) {
   const file = event.target.files[0]
@@ -32,14 +33,38 @@ function cadastrarContato() {
     return
   }
 
-  contactStore.addContact(nome.value, foto.value, contato.value, empresaSelecionada.value)
+  if (editIndex.value !== null) {
+    contactStore.updateContact(editIndex.value, nome.value, foto.value, contato.value, empresaSelecionada.value)
+  } else {
+    contactStore.addContact(nome.value, foto.value, contato.value, empresaSelecionada.value)
+  }
 
+  resetForm()
+}
+
+function editarContato(index) {
+  const c = contactStore.contact[index]
+  nome.value = c.nome
+  contato.value = c.contato
+  foto.value = c.foto
+  empresaSelecionada.value = c.empresa
+  editIndex.value = index
+}
+
+function excluirContato(index) {
+  contactStore.deleteContact(index)
+  resetForm()
+}
+
+function resetForm() {
   nome.value = ''
   contato.value = ''
   foto.value = null
   empresaSelecionada.value = ''
+  editIndex.value = null
 }
 </script>
+
 
 <template>
   <div>
@@ -63,7 +88,10 @@ function cadastrarContato() {
       </select>
 
 
-      <Button @click="cadastrarContato">Cadastrar</Button>
+      <Button @click="cadastrarContato">
+        {{ editIndex !== null ? 'Atualizar' : 'Cadastrar' }}
+      </Button>
+
     </div>
 
     <div class="divider"></div>
@@ -75,16 +103,20 @@ function cadastrarContato() {
           <img :src="c.foto" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
           <div>
             <p class="font-semibold">{{ c.nome }}</p>
+            <p class="text-sm">{{ c.contato }}</p>
             <p class="text-sm text-indigo-600 italic">
-              Empresa:
-              {{
+              Empresa: {{
                 lojaStore.lojas.find(loja => loja.id === c.empresa)?.nome || 'Empresa não encontrada'
               }}
             </p>
-            <!-- <p class="text-sm text-indigo-600 italic">Empresa: {{ c.empresa }}</p> -->
+          </div>
+          <div class="ml-auto flex space-x-2">
+            <button class="text-blue-600 hover:underline" @click="editarContato(i)">Editar</button>
+            <button class="text-red-600 hover:underline" @click="excluirContato(i)">Excluir</button>
           </div>
         </li>
       </ul>
+
     </div>
   </div>
 </template>
