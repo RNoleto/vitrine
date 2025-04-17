@@ -50,37 +50,38 @@ function cadastrarContato() {
       <Input id="contact" name="contact" v-model="contato" placeholder="Telefone ou email" />
 
       <!-- Upload de foto -->
-      <input
-        type="file"
-        accept="image/*"
-        @change="handleFotoUpload"
-        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+      <input type="file" accept="image/*" @change="handleFotoUpload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
                file:rounded-md file:border-0 file:text-sm file:font-semibold
-               file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-      />
+               file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
 
       <!-- Select de loja -->
       <select v-model="empresaSelecionada" class="w-full px-3 py-2 border rounded-md">
         <option disabled value="">Selecione a empresa</option>
-        <option v-for="(loja, index) in lojaStore.lojas" :key="index" :value="loja.nome">
+        <option v-for="(loja, index) in lojaStore.lojas" :key="index" :value="loja.id">
           {{ loja.nome }}
         </option>
       </select>
+
 
       <Button @click="cadastrarContato">Cadastrar</Button>
     </div>
 
     <div class="divider"></div>
     <!-- Lista de contatos cadastrados -->
-    <div>
+    <div class="mt-8">
       <p class="font-semibold">Contatos cadastrados</p>
       <ul class="space-y-3 mt-4">
         <li v-for="(c, i) in contactStore.contact" :key="i" class="flex items-center space-x-4">
           <img :src="c.foto" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
           <div>
             <p class="font-semibold">{{ c.nome }}</p>
-            <p class="text-sm text-gray-500">{{ c.contato }}</p>
-            <p class="text-sm text-indigo-600 italic">Empresa: {{ c.empresa }}</p>
+            <p class="text-sm text-indigo-600 italic">
+              Empresa:
+              {{
+                lojaStore.lojas.find(loja => loja.id === c.empresa)?.nome || 'Empresa não encontrada'
+              }}
+            </p>
+            <!-- <p class="text-sm text-indigo-600 italic">Empresa: {{ c.empresa }}</p> -->
           </div>
         </li>
       </ul>
