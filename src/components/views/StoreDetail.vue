@@ -83,18 +83,18 @@ function onFotoContatoChange(e, i) {
 
     <div class="space-y-4">
       <!-- Logo e Nome -->
-      <div class="flex items-center  gap-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div class="relative">
-          <img :src="editando ? logoEditada : loja.logo" alt="Logo da loja" class="w-16 h-16 rounded" />
-          <div v-if="editando" class="mt-1">
+          <img :src="editando ? logoEditada : loja.logo" alt="Logo da loja" class="w-20 h-20 object-contain object-center rounded" />
+          <div v-if="editando" class="mt-2">
             <input type="file" @change="onFileChange" class="text-sm" />
           </div>
         </div>
 
-        <div>
-          <div v-if="editando">
-            <label for="name">Nome da Loja</label>
-            <input v-model="nomeEditado" name="name" class="border rounded p-1 w-full" placeholder="Nome da loja" />
+        <div class="w-full sm:w-auto">
+          <div v-if="editando" class="w-full">
+            <label for="name" class="text-sm block mb-1">Nome da Loja</label>
+            <input v-model="nomeEditado" name="name" class="border rounded p-2 w-full" placeholder="Nome da loja" />
           </div>
           <h3 v-else class="text-lg font-semibold">{{ loja.nome }}</h3>
         </div>
@@ -104,11 +104,11 @@ function onFotoContatoChange(e, i) {
       <div>
         <h4 class="font-medium">Links</h4>
         <div v-if="editando" class="space-y-2 mt-2">
-          <div v-for="(link, i) in linksEditados" :key="i" class="flex gap-2 items-center">
-            <input v-model="link.texto" placeholder="Texto" class="border p-1 rounded w-1/4" />
-            <input v-model="link.url" placeholder="URL" class="border p-1 rounded w-1/2" />
-            <input v-model="link.icone" placeholder="Classe do ícone" class="border p-1 rounded w-1/4" />
-            <button @click="removerLink(i)" class="text-red-500 text-sm">✖</button>
+          <div v-for="(link, i) in linksEditados" :key="i" class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+            <input v-model="link.texto" placeholder="Texto" class="border p-2 rounded w-full sm:w-1/4" />
+            <input v-model="link.url" placeholder="URL" class="border p-2 rounded w-full sm:w-1/2" />
+            <input v-model="link.icone" placeholder="Classe do ícone" class="border p-2 rounded w-full sm:w-1/4" />
+            <button @click="removerLink(i)" class="text-red-500 text-sm mt-1 sm:mt-0">✖</button>
           </div>
           <button @click="adicionarLink" class="text-blue-500 text-sm mt-2">+ Adicionar link</button>
         </div>
@@ -126,11 +126,11 @@ function onFotoContatoChange(e, i) {
       <div v-if="loja.contatos && loja.contatos.length">
         <h4 class="font-medium">Contatos</h4>
         <div v-if="editando" class="space-y-2 mt-2">
-          <div v-for="(contato, i) in contatosEditados" :key="i" class="flex items-center gap-2">
+          <div v-for="(contato, i) in contatosEditados" :key="i" class="flex flex-col sm:flex-row items-center gap-2">
             <img :src="contato.foto" class="w-8 h-8 rounded-full" />
             <input type="file" @change="(e) => onFotoContatoChange(e, i)" class="text-sm" />
-            <input v-model="contato.nome" placeholder="Nome" class="border p-1 rounded w-1/4" />
-            <input v-model="contato.telefone" placeholder="Telefone" class="border p-1 rounded w-1/4" />
+            <input v-model="contato.nome" placeholder="Nome" class="border p-2 rounded w-full sm:w-1/4" />
+            <input v-model="contato.telefone" placeholder="Telefone" class="border p-2 rounded w-full sm:w-1/4" />
             <button @click="removerContato(i)" class="text-red-500 text-sm">✖</button>
           </div>
           <button @click="adicionarContato" class="text-blue-500 text-sm mt-2">+ Adicionar contato</button>
@@ -147,23 +147,24 @@ function onFotoContatoChange(e, i) {
       </div>
 
       <!-- Botões -->
-      <div class="mt-4 flex gap-3">
-        <button v-if="!editando" class="bg-yellow-400 text-white px-4 py-2 rounded-md" @click="editando = true">
+      <div class="mt-4 flex flex-col sm:flex-row gap-2">
+        <button v-if="!editando" class="bg-yellow-400 text-white px-4 py-2 rounded-md w-full sm:w-auto" @click="editando = true">
           Editar
         </button>
-        <button v-else class="bg-green-500 text-white px-4 py-2 rounded-md" @click="salvarEdicao">
+        <button v-else class="bg-green-500 text-white px-4 py-2 rounded-md w-full sm:w-auto" @click="salvarEdicao">
           Salvar
         </button>
-        <button v-if="editando" class="bg-gray-400 text-white px-4 py-2 rounded-md" @click="editando = false">
+        <button v-if="editando" class="bg-gray-400 text-white px-4 py-2 rounded-md w-full sm:w-auto" @click="editando = false">
           Cancelar
         </button>
-        <button class="bg-red-500 text-white px-4 py-2 rounded-md" @click="deletarLoja">
+        <button class="bg-red-500 text-white px-4 py-2 rounded-md w-full sm:w-auto" @click="deletarLoja">
           Excluir
         </button>
-        <button class="bg-gray-300 px-4 py-2 rounded-md" @click="router.push('/stores')">
+        <button v-if="!editando" class="bg-gray-300 px-4 py-2 rounded-md w-full sm:w-auto" @click="router.push('/stores')">
           Voltar
         </button>
       </div>
     </div>
   </div>
 </template>
+
