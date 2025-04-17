@@ -138,6 +138,10 @@ const opcoesIcones = [
 function acessarLoja(id) {
   router.push(`/stores/${id}`)
 }
+
+function acessarDetalheLoja(id) {
+  router.push(`/stores/${id}/detail`)
+}
 </script>
 
 <template>
@@ -186,12 +190,13 @@ function acessarLoja(id) {
         <h3 class="text-lg font-semibold mb-3">Lojas Cadastradas</h3>
         <ul class="space-y-2">
             <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
-                class="border p-3 rounded flex justify-between items-center">
+                class="border p-3 rounded flex flex-col justify-between ">
                 <div class="flex items-center gap-3">
                     <img :src="loja.logo" alt="logo" class="w-8 h-8 object-contain" />
                     <span class="font-medium">{{ loja.nome }}</span>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 mt-2">
+                    <Button size="sm" variant="secondary" @click="acessarDetalheLoja(loja.id)">Acessar Detalhe</Button>
                     <Button size="sm" variant="secondary" @click="acessarLoja(loja.id)">Acessar</Button>
                     <Button size="sm" @click="openEditModal(idx)">Editar</Button>
                     <Button size="sm" variant="danger" @click="deletarLoja(idx)">Excluir</Button>
