@@ -14,9 +14,19 @@ export const useLojaStore = defineStore('loja', () => {
     }
   }
 
+  function removerLoja(id) {
+    lojas.value = lojas.value.filter(loja => loja.id !== id)
+  }
+
+  function atualizarLoja(id, dadosAtualizados) {
+    lojas.value[id] = { ...lojas.value[id], ...dadosAtualizados }
+  }
+
   return {
     lojas,
     adicionarLoja,
-    adicionarLinkParaLoja
+    adicionarLinkParaLoja,
+    removerLoja,
+    atualizarLoja
   }
 })

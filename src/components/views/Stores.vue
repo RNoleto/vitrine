@@ -63,8 +63,7 @@ const opcoesIcones = [
   { label: 'YouTube', value: 'fa-brands fa-youtube' },
   { label: 'LinkedIn', value: 'fa-brands fa-linkedin' },
   { label: 'Website', value: 'fa-solid fa-globe' },
-  { label: 'Whatsapp', value: 'fa-brands fa-whatsapp' },
-  { label: 'Localização', value: 'fa-solid fa-location-pin' }
+  { label: 'Localização', value: 'fa-solid fa-location-dot' }
 ]
 
 const dropdownAtivo = ref(false)
@@ -152,11 +151,13 @@ function selecionarIcone(icone) {
             </div>
 
             <div class="divider"></div>
+            
+            <!-- Lista de lojas cadastradas -->
 
             <div>
                 <p class="font-semibold">Lojas cadastradas</p>
                 <ul class="space-y-2">
-                    <li v-for="(loja, index) in lojaStore.lojas" :key="index" class="border rounded-md p-2">
+                    <li v-for="(loja, index) in lojaStore.lojas" :key="index" class="border rounded-md p-2" @click="$router.push({ name: 'StoreDetail', params: {id: index}})">
                         <div class="flex items-center space-x-3">
                             <img :src="loja.logo" alt="Logo" class="w-8 h-8" />
                             <span class="font-medium">{{ loja.nome }}</span>
