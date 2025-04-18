@@ -35,7 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Atualiza o estado local com o usuário do Firebase
       user.value = firebaseUser
-      localStorage.setItem('user', JSON.stringify(firebaseUser))
+      localStorage.setItem('firebaseToken', idToken)
 
     } catch(err){
       console.error('Erro no login com o backend:', err)

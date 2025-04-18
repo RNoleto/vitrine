@@ -9,38 +9,32 @@ export const useLojaStore = defineStore('loja', () => {
 
   // Função para adicionar uma loja
   async function adicionarLoja(loja) {
-    carregando.value = true // Inicia o carregamento
-
+    carregando.value = true
     try {
       const formData = new FormData()
-
-      // Corrigido: o nome deve vir de loja.name
       formData.append('name', loja.name)
-
-      // Convertendo base64 para Blob, se houver logo
       if (loja.logoBase64) {
-        const blob = await fetch(loja.logoBase64).then(res => res.blob())
-        formData.append('logo', blob, 'logo.png') // Nome fictício
-      }
-
-      // Adiciona links se for um array
+        const blob = await fetch(loja.logoBase64).then(r => r.blob())
+        const mimeType = blob.type // tipo MIME da imagem
+        const extension = mimeType.split('/')[1] // ex: "svg+xml" → "svg+xml"
+        const filename = `logo.${extension.replace('+xml', '')}` // ex: svg+xml → svg
+      
+        formData.append('logo', blob, filename)
+      }      
       if (Array.isArray(loja.links)) {
-        loja.links.forEach((link, index) => {
-          formData.append(`links[${index}]`, link)
+        loja.links.forEach((link, i) => {
+          formData.append(`links[${i}][icone]`, link.icone)
+          formData.append(`links[${i}][texto]`, link.texto)
+          formData.append(`links[${i}][url]`, link.url)
         })
-      }
+      }      
 
-      const response = await api.post('/stores', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${idToken}`,
-        },
-      })
-
-      lojas.value.push(response.data)
+      // usa o interceptor para injetar o token
+      const { data } = await api.post('/stores', formData)
+      lojas.value.push(data)
       erro.value = null
     } catch (e) {
-      erro.value = e.response ? e.response.data.error : 'Erro ao criar loja'
+      erro.value = e.response?.data?.error || 'Erro ao criar loja'
     } finally {
       carregando.value = false
     }

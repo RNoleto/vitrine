@@ -23,12 +23,17 @@ const inputBaseClass = 'block w-full rounded-md bg-white px-3 py-1.5 text-base t
 
 function handleFileUpload(event) {
     const file = event.target.files[0]
-    if (file && file.type === 'image/svg+xml') {
+
+    const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp']
+
+    if (file && allowedTypes.includes(file.type)) {
         const reader = new FileReader()
-        reader.onload = () => novaLojaLogo.value = reader.result
+        reader.onload = () => {
+            novaLojaLogo.value = reader.result
+        }
         reader.readAsDataURL(file)
     } else {
-        alert('Por favor, envie um arquivo SVG válido.')
+        alert('Por favor, envie uma imagem válida (SVG, PNG, JPEG ou WebP).')
     }
 }
 
@@ -48,7 +53,12 @@ function cadastrarLoja() {
         alert('Preencha nome e logo da loja.')
         return
     }
-    lojaStore.adicionarLoja(novaLojaNome.value, novaLojaLogo.value, [...novaLinks.value])
+    // lojaStore.adicionarLoja(novaLojaNome.value, novaLojaLogo.value, [...novaLinks.value])
+    lojaStore.adicionarLoja({
+      name: novaLojaNome.value,
+      logoBase64: novaLojaLogo.value,
+      links: novaLinks.value
+    })
     novaLojaNome.value = ''
     novaLojaLogo.value = null
     novaLinks.value = []
