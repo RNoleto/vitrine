@@ -7,6 +7,12 @@ import api from '../services/api'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const isLoading = ref(true)
+  const storedUser = localStorage.getItem('user')
+
+  if(storedUser){
+    user.value = JSON.parse(storedUser)
+    isLoading.value = false
+  }
 
   // escuta mudanças de estado
   onAuthStateChanged(auth, u => {
@@ -27,10 +33,9 @@ export const useAuthStore = defineStore('auth', () => {
         idToken,
       })
 
-      console.log('Usuário do backend:', res.data.user)
-
       // Atualiza o estado local com o usuário do Firebase
       user.value = firebaseUser
+      localStorage.setItem('user', JSON.stringify(firebaseUser))
 
     } catch(err){
       console.error('Erro no login com o backend:', err)
@@ -43,6 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     await signOut(auth)
     user.value = null
+    localStorage.removeItem('user')
   }
 
   const isLoggedIn = () => !!user.value
