@@ -1,13 +1,8 @@
 // src/stores/authStore.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import {
-  auth,
-  googleProvider,
-  onAuthStateChanged,
-  signInWithPopup,
-  signOut,
-} from '../services/firebase'
+import { auth, googleProvider, onAuthStateChanged, signInWithPopup, signOut } from '../services/firebase'
+import api from '../services/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
@@ -23,7 +18,23 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true
     try {
       const result = await signInWithPopup(auth, googleProvider)
-      user.value = result.user
+      const firebaseUser = result.user
+
+      const idToken = await firebaseUser.getIdToken()
+
+      // Envia o token para o backend
+      const res = await api.post('/login', {
+        idToken,
+      })
+
+      console.log('Usuário do backend:', res.data.user)
+
+      // Atualiza o estado local com o usuário do Firebase
+      user.value = firebaseUser
+
+    } catch(err){
+      console.error('Erro no login com o backend:', err)
+      throw err
     } finally {
       isLoading.value = false
     }
