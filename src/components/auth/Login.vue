@@ -10,7 +10,7 @@
       <!-- Ilustração -->
       <div class="flex justify-center">
         <img
-          src="/public/vitrine.png"
+          src="/vitrine.png"
           alt="Login Illustration"
           class="w-28 h-28"
         />
