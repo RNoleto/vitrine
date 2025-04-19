@@ -1,10 +1,11 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useContactStore } from '../../stores/contactStore'
 
 const route = useRoute()
+const router = useRouter()
 const lojaStore = useLojaStore()
 const contactStore = useContactStore()
 
@@ -58,11 +59,25 @@ function abrirLink(url) {
 function irParaContatos() {
   window.location.href = `/contacts/${lojaId}`
 }
+
+const back = () => {
+  router.push('/stores');
+};
 </script>
 
 <template>
   <div v-if="loja" class="max-w-4xl mx-auto py-8 px-4 space-y-10">
     <h1 class="text-3xl font-bold">Detalhes da Loja</h1>
+
+    <!-- Logo e Nome -->
+    <section class="flex flex-col items-center justify-center gap-2">
+      <img
+        :src="loja.logo_url"
+        alt="Logo da Loja"
+        class="w-24 h-24 object-contain"
+      />
+      <h2 class="text-2xl font-semibold">{{ loja.name }}</h2>
+    </section>
 
     <!-- Compartilhamento -->
     <section>
@@ -81,7 +96,9 @@ function irParaContatos() {
         </button>
       </div>
       <div class="mt-4 text-center">
-        <img :src="qrCodeUrl" alt="QR Code da loja" class="mx-auto" />
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+          <img :src="qrCodeUrl" alt="QR Code da loja" class="mx-auto" />
+        </div>
         <div class="mt-2">
           <a
             :href="qrCodeUrl"
@@ -92,16 +109,6 @@ function irParaContatos() {
           </a>
         </div>
       </div>
-    </section>
-
-    <!-- Logo e Nome -->
-    <section class="flex items-center gap-6">
-      <img
-        :src="loja.logo_url"
-        alt="Logo da Loja"
-        class="w-24 h-24 object-contain"
-      />
-      <h2 class="text-2xl font-semibold">{{ loja.name }}</h2>
     </section>
 
     <!-- Links da Loja -->
@@ -129,7 +136,7 @@ function irParaContatos() {
     <!-- Contatos da Loja -->
     <section>
       <h3 class="text-xl font-bold mb-4">Contatos</h3>
-      <div v-if="contatosDaLoja.length" class="space-y-3">
+      <div v-if="contatosDaLoja.length" class="space-y-3 mb-2">
         <div
           v-for="contato in contatosDaLoja"
           :key="contato.nome"
@@ -146,9 +153,10 @@ function irParaContatos() {
           </div>
         </div>
       </div>
-      <p v-else class="text-gray-500">
+      <p v-else class="text-gray-500 mb-2">
         Nenhum contato atribuído a esta loja.
       </p>
+      <button @click="back" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">← Voltar</button>
     </section>
   </div>
 
