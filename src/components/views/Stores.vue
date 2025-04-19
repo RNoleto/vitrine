@@ -202,8 +202,8 @@ function acessarDetalheLoja(id) {
             <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
                 class="border p-3 rounded flex flex-col justify-between ">
                 <div class="flex items-center gap-3">
-                    <img :src="loja.logo" alt="logo" class="w-8 h-8 object-contain" />
-                    <span class="font-medium">{{ loja.nome }}</span>
+                    <img :src="loja.logo_url" alt="logo" class="w-8 h-8 object-contain" />
+                    <span class="font-medium">{{ loja.name }}</span>
                 </div>
                 <div class="flex gap-2 mt-2">
                     <Button size="sm" variant="acessar" @click="acessarLoja(loja.id)">Acessar</Button>

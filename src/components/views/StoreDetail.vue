@@ -97,11 +97,11 @@ function irParaContatos() {
     <!-- Logo e Nome -->
     <section class="flex items-center gap-6">
       <img
-        :src="loja.logo"
+        :src="loja.logo_url"
         alt="Logo da Loja"
         class="w-24 h-24 object-contain"
       />
-      <h2 class="text-2xl font-semibold">{{ loja.nome }}</h2>
+      <h2 class="text-2xl font-semibold">{{ loja.name }}</h2>
     </section>
 
     <!-- Links da Loja -->
