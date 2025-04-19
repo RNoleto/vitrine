@@ -10,13 +10,13 @@ export const useLojaStore = defineStore('loja', () => {
 
   async function adicionarLoja(loja) {
     const authStore = useAuthStore()
-    const uid = authStore.user?.uid
+    const firebase_uid = authStore.user?.firebase_uid
 
     carregando.value = true
     try {
       const formData = new FormData()
       formData.append('name', loja.name)
-      formData.append('firebase_uid', uid)
+      formData.append('firebase_uid', firebase_uid)
 
       if (loja.logoBase64) {
         const blob = await fetch(loja.logoBase64).then(r => r.blob())
