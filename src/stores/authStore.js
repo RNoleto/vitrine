@@ -18,6 +18,12 @@ export const useAuthStore = defineStore('auth', () => {
   onAuthStateChanged(auth, u => {
     user.value = u
     isLoading.value = false
+  
+    if (u) {
+      localStorage.setItem('user', JSON.stringify(u))
+    } else {
+      localStorage.removeItem('user')
+    }
   })
 
   async function loginWithGoogle() {
@@ -35,6 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Atualiza o estado local com o usuário do Firebase
       user.value = firebaseUser
+      localStorage.setItem('user', JSON.stringify(firebaseUser))
       localStorage.setItem('firebaseToken', idToken)
 
     } catch(err){
