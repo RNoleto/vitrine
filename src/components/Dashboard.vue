@@ -1,5 +1,10 @@
 <script setup>
 import { ref } from 'vue'
+import { useAuthStore } from '../stores/authStore'
+
+import Button from '@/components/ui/Button.vue'
+
+const authStore = useAuthStore()
 
 const sidebarOpen = ref(false)
 
@@ -13,6 +18,10 @@ const links = [
   { name: 'Contatos', route: '/contacts' },
   // Adicione mais links conforme necessário
 ]
+
+function logout() {
+  authStore.logout()
+}
 </script>
 
 <template>
@@ -30,10 +39,10 @@ const links = [
 
     <div class="flex flex-1 overflow-hidden">
       <!-- Sidebar -->
-      <aside :class="['bg-white p-4 border-r border-gray-300 w-64 transition-all duration-300',
+      <aside :class="['flex flex-col bg-white p-4 border-r border-gray-300 w-64 transition-all duration-300',
         sidebarOpen ? 'block' : 'hidden', 'md:block']">
         <h1 class="text-xl font-bold text-gray-800 mb-6">Dashboard</h1>
-        <nav>
+        <nav class="flex-1">
           <ul>
             <li v-for="link in links" :key="link.name" class="mb-3">
               <router-link :to="link.route" class="block p-2 rounded text-gray-700 hover:bg-gray-200">
@@ -42,6 +51,7 @@ const links = [
             </li>
           </ul>
         </nav>
+        <Button @click="logout()">Logout</Button>
       </aside>
 
       <!-- Área Principal -->

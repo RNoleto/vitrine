@@ -1,11 +1,13 @@
 // src/stores/authStore.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { auth, googleProvider, onAuthStateChanged, signInWithPopup, signOut } from '../services/firebase'
 import api from '../services/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
+  const router = useRouter()
   const isLoading = ref(true)
   const storedUser = localStorage.getItem('user')
 
@@ -65,10 +67,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    await signOut(auth)
-    user.value = null
-    localStorage.removeItem('user')
-    localStorage.removeItem('firebaseToken')
+    try {
+      await signOut(auth)      
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    } finally {
+      user.value = null
+      localStorage.removeItem('user')
+      localStorage.removeItem('firebaseToken')
+      router.push('/')
+    }
   }
 
   const isLoggedIn = () => !!user.value
