@@ -3,11 +3,11 @@ import { ref } from 'vue'
 import api from '../services/api'
 
 export const useLojaStore = defineStore('loja', () => {
-  const lojas = ref([]) // Para armazenar as lojas
-  const carregando = ref(false) // Para saber se a requisição está em andamento
-  const erro = ref(null) // Para armazenar erros, caso ocorram
+  const lojas = ref([])
+  const carregando = ref(false)
+  const erro = ref(null)
 
-  // Função para adicionar uma loja
+  
   async function adicionarLoja(loja) {
     carregando.value = true
     try {
@@ -29,7 +29,6 @@ export const useLojaStore = defineStore('loja', () => {
         })
       }      
 
-      // usa o interceptor para injetar o token
       const { data } = await api.post('/stores', formData)
       lojas.value.push(data)
       erro.value = null
@@ -40,7 +39,23 @@ export const useLojaStore = defineStore('loja', () => {
     }
   }
 
-  // Função para editar uma loja
+  async function listarLojas(){
+    carregando.value = true
+    try{
+      const response = await api.get('/lojas', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+      lojas.value = response.data
+      erro.value = null
+    } catch (e) {
+      erro.value = e.response ? e.response.data.error : 'Erro ao listar lojas'
+    } finally {
+      carregando.value = false
+    }
+  }
+
   async function editarLoja(id, dadosAtualizados) {
     carregando.value = true
 
@@ -69,6 +84,7 @@ export const useLojaStore = defineStore('loja', () => {
     erro,
     carregando,
     adicionarLoja,
+    listarLojas,
     editarLoja
   }
 })

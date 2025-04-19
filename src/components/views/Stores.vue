@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
@@ -88,8 +88,8 @@ function onFileChange(event) {
 function openEditModal(index) {
     const loja = lojaStore.lojas[index]
     editIndex.value = index
-    editNome.value = loja.nome
-    editLogo.value = loja.logo
+    editNome.value = loja.name
+    editLogo.value = loja.logo_url
     editLinks.value = loja.links.map(l => ({ ...l }))
     // limpar campos de novo link
     editIcone.value = ''
@@ -152,6 +152,10 @@ function acessarLoja(id) {
 function acessarDetalheLoja(id) {
   router.push(`/stores/${id}/detail`)
 }
+
+onMounted(() => {
+    lojaStore.listarLojas()
+})
 </script>
 
 <template>
@@ -198,7 +202,9 @@ function acessarDetalheLoja(id) {
 
         <!-- Listagem de lojas -->
         <h3 class="text-lg font-semibold mb-3">Lojas Cadastradas</h3>
-        <ul class="space-y-2">
+        <div v-if="lojaStore.carregando">Carregando lojas...</div>
+        <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
+        <ul v-else class="space-y-2">
             <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
                 class="border p-3 rounded flex flex-col justify-between ">
                 <div class="flex items-center gap-3">
