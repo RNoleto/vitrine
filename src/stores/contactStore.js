@@ -1,21 +1,52 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import api from "../services/api";
 
 export const useContactStore = defineStore('contact', () => {
     const contact = ref ([])
 
-    function addContact(nome, foto, contatoInfo, empresa){
-        contact.value.push({nome, foto, contato: contatoInfo, empresa})
-    }
+    async function addContact(nome, fotoBase64, contatoInfo, empresaId){
+        const formData = new FormData();
+        formData.append('name', nome);
+        formData.append('whatsapp', contatoInfo);
+        formData.append('store_id', empresaId);
 
-    function updateContact(index, nome, foto, contatoInfo, empresa){
-        if(contact.value[index]){
-            contact.value[index] = { nome, foto, contato: contatoInfo, empresa};
+        if(fotoBase64){
+            const blob = await fetch(fotoBase64).then(r => r.blob());
+            const mimeType = blob.type;
+            const extension = mimeType.split('/')[1];
+            const filename = `foto.${extension.replace('+xml', '')}`;
+            formData.append('photo', blob, filename);
+            
+            console.log('Dados enviados ao backend:');
+            for (let pair of formData.entries()) {
+              console.log(`${pair[0]}:`, pair[1]);
+            }
+
+        } try {
+            const { data } = await api.post('/contacts', formData);
+
+            contact.value.push({
+                id: data.id,
+                nome: data.name,
+                contato: data.whatsapp,
+                foto: data.photo,
+                empresa: data.store_id,
+            });
+        } catch(error){
+            console.error('Erro ao adicionar contato:', error.response?.data || error);
+
+            throw error;
         }
+
     }
 
-    function deleteContact(index){
-        contact.value.splice(index, 1);
+    function updateContact(){
+        
+    }
+
+    function deleteContact(){
+        
     }
 
     return{

@@ -83,7 +83,7 @@ function resetForm() {
       <select v-model="empresaSelecionada" class="w-full px-3 py-2 border rounded-md">
         <option disabled value="">Selecione a empresa</option>
         <option v-for="(loja, index) in lojaStore.lojas" :key="index" :value="loja.id">
-          {{ loja.nome }}
+          {{ loja.name }}
         </option>
       </select>
 
