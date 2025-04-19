@@ -1,33 +1,39 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '../services/api'
+import { useAuthStore } from './authStore'
 
 export const useLojaStore = defineStore('loja', () => {
   const lojas = ref([])
   const carregando = ref(false)
   const erro = ref(null)
 
-  
   async function adicionarLoja(loja) {
+    const authStore = useAuthStore()
+    const uid = authStore.user?.uid
+
     carregando.value = true
     try {
       const formData = new FormData()
       formData.append('name', loja.name)
+      formData.append('firebase_uid', uid)
+
       if (loja.logoBase64) {
         const blob = await fetch(loja.logoBase64).then(r => r.blob())
-        const mimeType = blob.type // tipo MIME da imagem
-        const extension = mimeType.split('/')[1] // ex: "svg+xml" → "svg+xml"
-        const filename = `logo.${extension.replace('+xml', '')}` // ex: svg+xml → svg
-      
+        const mimeType = blob.type
+        const extension = mimeType.split('/')[1]
+        const filename = `logo.${extension.replace('+xml', '')}`
+
         formData.append('logo', blob, filename)
-      }      
+      }
+
       if (Array.isArray(loja.links)) {
         loja.links.forEach((link, i) => {
           formData.append(`links[${i}][icone]`, link.icone)
           formData.append(`links[${i}][texto]`, link.texto)
           formData.append(`links[${i}][url]`, link.url)
         })
-      }      
+      }
 
       const { data } = await api.post('/stores', formData)
       lojas.value.push(data)
@@ -39,15 +45,28 @@ export const useLojaStore = defineStore('loja', () => {
     }
   }
 
-  async function listarLojas(){
+  async function listarLojas() {
+    const authStore = useAuthStore()
+    const userId = authStore.user?.id
+    // console.log(userId);
+    if (!userId) {
+      erro.value = 'Usuário não autenticado'
+      return
+    }
+
     carregando.value = true
-    try{
+    try {
       const response = await api.get('/lojas', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       })
-      lojas.value = response.data
+
+      // Filtra somente as lojas do usuário atual e ativas
+      lojas.value = response.data.filter(loja =>
+        loja.user_id === userId && loja.ativo === 1
+      )
+
       erro.value = null
     } catch (e) {
       erro.value = e.response ? e.response.data.error : 'Erro ao listar lojas'
@@ -85,6 +104,6 @@ export const useLojaStore = defineStore('loja', () => {
     carregando,
     adicionarLoja,
     listarLojas,
-    editarLoja
+    editarLoja,
   }
 })

@@ -9,21 +9,31 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoading = ref(true)
   const storedUser = localStorage.getItem('user')
 
-  if(storedUser){
+  if (storedUser) {
     user.value = JSON.parse(storedUser)
     isLoading.value = false
   }
 
-  // escuta mudanças de estado
-  onAuthStateChanged(auth, u => {
-    user.value = u
-    isLoading.value = false
-  
-    if (u) {
-      localStorage.setItem('user', JSON.stringify(u))
+  onAuthStateChanged(auth, async (firebaseUser) => {
+    if (firebaseUser) {
+      try {
+        // Busca o usuário no backend pelo UID
+        const res = await api.get(`/usuarios/firebase/${firebaseUser.uid}`)
+        const backendUser = res.data
+
+        user.value = backendUser
+        localStorage.setItem('user', JSON.stringify(backendUser))
+      } catch (error) {
+        console.error('Erro ao buscar usuário pelo Firebase UID:', error)
+        user.value = null
+        localStorage.removeItem('user')
+      }
     } else {
+      user.value = null
       localStorage.removeItem('user')
     }
+
+    isLoading.value = false
   })
 
   async function loginWithGoogle() {
@@ -34,18 +44,20 @@ export const useAuthStore = defineStore('auth', () => {
 
       const idToken = await firebaseUser.getIdToken()
 
-      // Envia o token para o backend
-      const res = await api.post('/login', {
-        idToken,
-      })
+      // Envia token para o backend (se necessário, mas parece que já está cuidando disso)
+      await api.post('/login', { idToken })
 
-      // Atualiza o estado local com o usuário do Firebase
-      user.value = firebaseUser
-      localStorage.setItem('user', JSON.stringify(firebaseUser))
+      // Busca o usuário completo pelo firebase UID
+      const res = await api.get(`/usuarios/firebase/${firebaseUser.uid}`)
+      const backendUser = res.data
+
+      // Atualiza store e localStorage com usuário completo (incluindo ID)
+      user.value = backendUser
+      localStorage.setItem('user', JSON.stringify(backendUser))
       localStorage.setItem('firebaseToken', idToken)
 
-    } catch(err){
-      console.error('Erro no login com o backend:', err)
+    } catch (err) {
+      console.error('Erro no login com Google/backend:', err)
       throw err
     } finally {
       isLoading.value = false
@@ -56,6 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
     await signOut(auth)
     user.value = null
     localStorage.removeItem('user')
+    localStorage.removeItem('firebaseToken')
   }
 
   const isLoggedIn = () => !!user.value
