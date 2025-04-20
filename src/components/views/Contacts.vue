@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useContactStore } from '../../stores/contactStore'
 import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
@@ -63,6 +63,10 @@ function resetForm() {
   empresaSelecionada.value = ''
   editIndex.value = null
 }
+
+onMounted(() => {
+  contactStore.fetchContacts();
+})
 </script>
 
 
@@ -99,23 +103,22 @@ function resetForm() {
     <div class="mt-8">
       <p class="font-semibold">Contatos cadastrados</p>
       <ul class="space-y-3 mt-4">
-        <li v-for="(c, i) in contactStore.contact" :key="i" class="flex items-center space-x-4">
-          <img :src="c.foto" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
-          <div>
-            <p class="font-semibold">{{ c.nome }}</p>
-            <p class="text-sm">{{ c.contato }}</p>
-            <p class="text-sm text-indigo-600 italic">
-              Empresa: {{
-                lojaStore.lojas.find(loja => loja.id === c.empresa)?.nome || 'Empresa não encontrada'
-              }}
-            </p>
-          </div>
-          <div class="ml-auto flex space-x-2">
-            <button class="text-blue-600 hover:underline" @click="editarContato(i)">Editar</button>
-            <button class="text-red-600 hover:underline" @click="excluirContato(i)">Excluir</button>
-          </div>
-        </li>
-      </ul>
+  <li v-for="(c, i) in contactStore.contacts" :key="i" class="flex items-center space-x-4">
+    <img :src="c.foto" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
+    <div>
+      <p class="font-semibold">{{ c.nome }}</p>
+      <p class="text-sm">{{ c.contato }}</p>
+      <p class="text-sm text-indigo-600 italic">
+        Empresa:
+        {{ lojaStore.lojas.find(loja => loja.id === c.empresa)?.nome || 'Empresa não encontrada' }}
+      </p>
+    </div>
+    <div class="ml-auto flex space-x-2">
+      <button class="text-blue-600 hover:underline" @click="editarContato(i)">Editar</button>
+      <button class="text-red-600 hover:underline" @click="excluirContato(i)">Excluir</button>
+    </div>
+  </li>
+</ul>
 
     </div>
   </div>
