@@ -100,7 +100,7 @@ const back = () => {
         target="_blank"
         class="inline-block mt-4 text-blue-600 hover:underline"
       >
-        Ver página pública
+        Veja como sua vitrine está ficando
       </a>
       <div class="mt-4 text-center">
         <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">

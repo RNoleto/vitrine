@@ -130,7 +130,7 @@ function salvarEdicao() {
 
 function deletarLoja(index) {
     if (confirm('Deseja realmente excluir esta loja?')) {
-        lojaStore.removerLoja(lojaStore.lojas[index].id)
+        lojaStore.excluirLoja(lojaStore.lojas[index].id)
     }
 }
 

@@ -93,27 +93,65 @@ export const useLojaStore = defineStore('loja', {
       }
     },
 
-    async editarLoja(id, dadosAtualizados) {
+    async editarLoja(id, loja) {
       this.carregando = true
-
       try {
-        const response = await api.put(`/stores/${id}`, dadosAtualizados, {
+        const formData = new FormData()
+        formData.append('name', loja.name)
+        formData.append('ativo', loja.ativo ?? 1)
+    
+        if (loja.logoBase64) {
+          const contentType = loja.logoBase64.split(';')[0].split(':')[1]
+          const blob = base64ToBlob(loja.logoBase64, contentType)
+          formData.append('logo', blob, 'logo.png')
+        }
+    
+        if (Array.isArray(loja.links)) {
+          loja.links.forEach((link, i) => {
+            formData.append(`links[${i}][icone]`, link.icone)
+            formData.append(`links[${i}][texto]`, link.texto)
+            formData.append(`links[${i}][url]`, link.url)
+          })
+        }
+    
+        const response = await api.post(`/stores/${id}?_method=PUT`, formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         })
-
+    
         const index = this.lojas.findIndex(loja => loja.id === id)
         if (index !== -1) {
           this.lojas[index] = response.data
         }
-
+    
         this.erro = null
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao editar loja'
       } finally {
         this.carregando = false
       }
-    }
+    },
+    async excluirLoja(id) {
+      this.carregando = true
+    
+      try {
+        await api.delete(`/stores/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
+    
+        // Remove a loja do estado local
+        const loja = this.lojas.find(loja => loja.id === id)
+        if (loja) {
+          loja.ativo = 0
+        }
+      } catch (e) {
+        this.erro = e.response?.data?.error || 'Erro ao excluir loja'
+      } finally {
+        this.carregando = false
+      }
+    }        
   }
 })
