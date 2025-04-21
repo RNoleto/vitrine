@@ -65,11 +65,12 @@ export const useLojaStore = defineStore('loja', {
       const authStore = useAuthStore()
       const userId = authStore.user?.id
 
-      // Verificação de usuário autenticado
       if (!userId) {
         this.erro = 'Usuário não autenticado'
         return
       }
+
+      if (this.lojas.length > 0) return
 
       this.carregando = true
       try {
@@ -79,69 +80,92 @@ export const useLojaStore = defineStore('loja', {
           },
         })
 
-        // Filtra lojas do usuário atual e ativas
         this.lojas = response.data.filter(loja =>
           loja.user_id === userId && loja.ativo === 1
         )
 
         this.erro = null
       } catch (e) {
-        // Captura erro e exibe mensagem de erro
         this.erro = e.response?.data?.error || 'Erro ao listar lojas'
       } finally {
         this.carregando = false
       }
     },
 
-    async editarLoja(id, loja) {
+    async editarLoja(id, dadosAtualizados) {
+      const authStore = useAuthStore()
+      const firebase_uid = authStore.user?.firebase_uid
+
       this.carregando = true
+      this.erro = null
+
       try {
         const formData = new FormData()
-        formData.append('name', loja.name)
-        formData.append('ativo', loja.ativo ?? 1)
-    
-        if (loja.logoBase64) {
-          const contentType = loja.logoBase64.split(';')[0].split(':')[1]
-          const blob = base64ToBlob(loja.logoBase64, contentType)
-          formData.append('logo', blob, 'logo.png')
+
+        // Campos básicos
+        if (dadosAtualizados.name) {
+          formData.append('name', dadosAtualizados.name)
         }
-    
-        if (Array.isArray(loja.links)) {
-          loja.links.forEach((link, i) => {
+
+        if (dadosAtualizados.ativo !== undefined) {
+          formData.append('ativo', dadosAtualizados.ativo)
+        }
+
+        // Logo: se for base64 (imagem nova), converter para blob e enviar
+        if (
+          dadosAtualizados.logoBase64 &&
+          typeof dadosAtualizados.logoBase64 === 'string' &&
+          dadosAtualizados.logoBase64.startsWith('data:')
+        ) {
+          const contentType = dadosAtualizados.logoBase64.split(';')[0].split(':')[1]
+          const blob = base64ToBlob(dadosAtualizados.logoBase64, contentType)
+          formData.append('logo', blob, `logo.${contentType.split('/')[1]}`)
+        }
+
+        // Links
+        if (Array.isArray(dadosAtualizados.links)) {
+          dadosAtualizados.links.forEach((link, i) => {
             formData.append(`links[${i}][icone]`, link.icone)
             formData.append(`links[${i}][texto]`, link.texto)
             formData.append(`links[${i}][url]`, link.url)
           })
         }
-    
-        const response = await api.post(`/stores/${id}?_method=PUT`, formData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
-    
-        const index = this.lojas.findIndex(loja => loja.id === id)
-        if (index !== -1) {
-          this.lojas[index] = response.data
-        }
-    
-        this.erro = null
+
+        // Requisição PUT com FormData
+        const response = await api.post(
+          `/stores/${id}?_method=PUT`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        )
+
+        const lojaAtualizada = response.data
+        const idx = this.lojas.findIndex(l => l.id === id)
+        if (idx !== -1) this.lojas[idx] = lojaAtualizada
+
       } catch (e) {
-        this.erro = e.response?.data?.error || 'Erro ao editar loja'
+        this.erro = 'Erro ao editar loja.'
+        console.error(e)
       } finally {
         this.carregando = false
       }
     },
+
+
     async excluirLoja(id) {
       this.carregando = true
-    
+
       try {
         await api.delete(`/stores/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         })
-    
+
         // Remove a loja do estado local
         const loja = this.lojas.find(loja => loja.id === id)
         if (loja) {
@@ -152,6 +176,6 @@ export const useLojaStore = defineStore('loja', {
       } finally {
         this.carregando = false
       }
-    }        
+    }
   }
 })

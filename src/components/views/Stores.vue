@@ -48,13 +48,13 @@ function adicionarLink() {
     novaUrl.value = ''
 }
 
-function cadastrarLoja() {
+async function cadastrarLoja() {
     if (!novaLojaNome.value || !novaLojaLogo.value) {
         alert('Preencha nome e logo da loja.')
         return
     }
     // lojaStore.adicionarLoja(novaLojaNome.value, novaLojaLogo.value, [...novaLinks.value])
-    lojaStore.adicionarLoja({
+    await lojaStore.adicionarLoja({
       name: novaLojaNome.value,
       logoBase64: novaLojaLogo.value,
       links: novaLinks.value
@@ -67,6 +67,7 @@ function cadastrarLoja() {
 // modal edição
 const isEditModalOpen = ref(false)
 const editIndex = ref(null)
+const editId = ref(null);
 const editNome = ref('')
 const editLogo = ref('')
 const editLinks = ref([])
@@ -88,6 +89,7 @@ function onFileChange(event) {
 function openEditModal(index) {
     const loja = lojaStore.lojas[index]
     editIndex.value = index
+    editId.value = loja.id
     editNome.value = loja.name
     editLogo.value = loja.logo_url
     editLinks.value = loja.links.map(l => ({ ...l }))
@@ -96,6 +98,8 @@ function openEditModal(index) {
     editTexto.value = ''
     editUrl.value = ''
     isEditModalOpen.value = true
+
+    console.log('Loja para edição:', loja.id)
 }
 
 function closeEditModal() {
@@ -120,17 +124,24 @@ function removerLinkEdit(i) {
 }
 
 function salvarEdicao() {
-    lojaStore.editarLoja(editIndex.value, {
-        nome: editNome.value,
-        logo: editLogo.value,
-        links: [...editLinks.value]
-    })
-    closeEditModal()
+  if (!editId.value) {
+    alert('Erro: ID da loja não definido para edição.')
+    return
+  }
+
+  lojaStore.editarLoja(editId.value, {
+    name: editNome.value,
+    logo: editLogo.value,
+    links: [...editLinks.value]
+  })
+
+  closeEditModal()
 }
 
-function deletarLoja(index) {
+const  deletarLoja = async (index) => {
     if (confirm('Deseja realmente excluir esta loja?')) {
-        lojaStore.excluirLoja(lojaStore.lojas[index].id)
+        await lojaStore.excluirLoja(lojaStore.lojas[index].id)
+        alert('Loja excluída com sucesso!');
     }
 }
 
@@ -164,11 +175,11 @@ onMounted(() => {
         <h3 class="text-lg font-bold text-zinc-800">Cadastro de Lojas</h3>
         <div class="space-y-3 mb-6">
             <Input v-model="novaLojaNome" placeholder="Nome da loja" id="nova-loja" name="nova-loja" />
-            <div>
+            <div class="mt-2">
                 <input id="upload-logo" type="file" accept=".svg" @change="handleFileUpload" class="hidden" />
                 <label for="upload-logo"
                     class="cursor-pointer inline-block rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
-                    Enviar logo (.svg)
+                    Enviar logo
                 </label>
                 <span v-if="novaLojaLogo" class="ml-2 text-sm text-gray-600">Arquivo pronto</span>
             </div>
@@ -188,6 +199,7 @@ onMounted(() => {
                     <Button @click="adicionarLink">Adicionar</Button>
                 </div>
                 <ul class="mt-2 space-y-1">
+                    <li v-if="novaLinks.length >= 1" class="text-gray-500 mb-2">Links adicionados</li>
                     <li v-for="(l, i) in novaLinks" :key="i" class="flex items-center gap-2">
                         <i :class="l.icone"></i>
                         <span>{{ l.texto }}</span>
@@ -222,14 +234,22 @@ onMounted(() => {
         </ul>
 
         <!-- Modal de edição -->
-        <EditStoreModal :isOpen="isEditModalOpen" :storeData="{
+        <EditStoreModal
+          :isOpen="isEditModalOpen"
+          :storeData="{
+            id: editId,
             nome: editNome,
             logo: editLogo,
             links: editLinks
-        }" :opcoesIcones="opcoesIcones" :inputBaseClass="inputBaseClass" @save="dados => {
-            lojaStore.editarLoja(editIndex, dados)
+          }"
+          :opcoesIcones="opcoesIcones"
+          :inputBaseClass="inputBaseClass"
+          @save="(dados) => {
+            lojaStore.editarLoja(dados.id, dados)
             closeEditModal()
-        }" @cancel="closeEditModal" />
+          }"
+          @cancel="closeEditModal"
+        />
 
     </div>
 </template>

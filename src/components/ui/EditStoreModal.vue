@@ -1,3 +1,4 @@
+<!-- src/components/ui/EditStoreModal.vue -->
 <script setup>
 import { ref, watch } from 'vue'
 import Input from '../ui/Input.vue'
@@ -15,7 +16,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['save', 'cancel'])
 
-// Local reactive copies
+// Cópias reativas dos dados do prop
+const editId = ref('')
 const editNome = ref('')
 const editLogo = ref('')
 const editLinks = ref([])
@@ -23,16 +25,17 @@ const editIcone = ref('')
 const editTexto = ref('')
 const editUrl = ref('')
 
-// Sync props.storeData into local when modal opens
+// Sincroniza prop.storeData quando modal abre
 watch(
   () => props.storeData,
   (newData) => {
-    editNome.value = newData.nome || ''
-    editLogo.value = newData.logo || ''
+    editId.value    = newData.id || ''
+    editNome.value  = newData.nome || ''
+    editLogo.value  = newData.logo || ''
     editLinks.value = newData.links ? newData.links.map(l => ({ ...l })) : []
     editIcone.value = ''
     editTexto.value = ''
-    editUrl.value = ''
+    editUrl.value   = ''
   },
   { immediate: true }
 )
@@ -64,9 +67,11 @@ function removeLink(i) {
 }
 
 function saveLocal() {
+  // Emitindo exatamente o que o store espera:
   emit('save', {
-    nome: editNome.value,
-    logo: editLogo.value,
+    id: editId.value,
+    name: editNome.value,         // ✓ key == 'name'
+    logoBase64: editLogo.value,   // ✓ key == 'logoBase64'
     links: editLinks.value
   })
 }
@@ -80,81 +85,29 @@ function saveLocal() {
       <!-- Logo Preview & Upload -->
       <div class="flex items-center gap-4">
         <img :src="editLogo" alt="Logo Editada" class="w-16 h-16 object-contain rounded" />
-        <input
-          id="edit-upload-logo"
-          type="file"
-          accept=".svg"
-          @change="onFileChange"
-          class="hidden"
-        />
-        <label
-          for="edit-upload-logo"
-          class="cursor-pointer rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100"
-        >
+        <input id="edit-upload-logo" type="file" accept=".svg" @change="onFileChange" class="hidden" />
+        <label for="edit-upload-logo" class="cursor-pointer rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
           Alterar logo (.svg)
         </label>
       </div>
 
       <!-- Nome -->
-      <Input
-        v-model="editNome"
-        placeholder="Nome da loja"
-        id="edit-nome"
-        name="edit-nome"
-      />
+      <Input v-model="editNome" placeholder="Nome da loja" id="edit-nome" name="edit-nome" />
 
       <!-- Novo Link -->
       <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-        <IconSelect
-          v-model="editIcone"
-          :options="opcoesIcones"
-          placeholder="Ícone"
-          class="min-w-[135px] flex-1"
-        />
-        <Input
-          id="new-texto"
-          name="new-texto"
-          v-model="editTexto"
-          placeholder="Texto"
-          :input-class="inputBaseClass"
-        />
-        <Input
-          id="new-url"
-          name="new-url"
-          v-model="editUrl"
-          placeholder="URL"
-          :input-class="inputBaseClass"
-        />
+        <IconSelect v-model="editIcone" :options="opcoesIcones" placeholder="Ícone" class="min-w-[135px] flex-1" />
+        <Input id="new-texto" name="new-texto" v-model="editTexto" placeholder="Texto" :input-class="inputBaseClass" />
+        <Input id="new-url" name="new-url" v-model="editUrl" placeholder="URL" :input-class="inputBaseClass" />
         <Button size="sm" @click="addLink">+ Adicionar Link</Button>
       </div>
 
       <!-- Lista de Links -->
       <div class="space-y-2">
-        <div
-          v-for="(link, i) in editLinks"
-          :key="i"
-          class="flex flex-col sm:flex-row gap-2 items-start sm:items-center"
-        >
-          <IconSelect
-            v-model="link.icone"
-            :options="opcoesIcones"
-            placeholder="Ícone"
-            class="flex-1"
-          />
-          <Input
-            :id="`texto-${i}`"
-            :name="`texto-${i}`"
-            v-model="link.texto"
-            placeholder="Texto"
-            :input-class="inputBaseClass"
-          />
-          <Input
-            :id="`url-${i}`"
-            :name="`url-${i}`"
-            v-model="link.url"
-            placeholder="URL"
-            :input-class="inputBaseClass"
-          />
+        <div v-for="(link, i) in editLinks" :key="i" class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+          <IconSelect v-model="link.icone" :options="opcoesIcones" placeholder="Ícone" class="flex-1" />
+          <Input :id="`texto-${i}`" :name="`texto-${i}`" v-model="link.texto" placeholder="Texto" :input-class="inputBaseClass" />
+          <Input :id="`url-${i}`" :name="`url-${i}`" v-model="link.url" placeholder="URL" :input-class="inputBaseClass" />
           <button @click="removeLink(i)" class="text-red-500">✖</button>
         </div>
       </div>
