@@ -17,7 +17,7 @@ const loja = lojaStore.lojas.find(l => l.id === lojaId)
 // )
 
 // Monta a URL completa da página da loja
-const longUrl = `${window.location.origin}/stores/${lojaId}`
+const longUrl = `${window.location.origin}/store/${lojaId}`
 
 // Estado para a URL encurtada
 const shortUrl = ref('')
@@ -95,6 +95,13 @@ const back = () => {
           Copiar
         </button>
       </div>
+      <a
+        :href="shortUrl || longUrl"
+        target="_blank"
+        class="inline-block mt-4 text-blue-600 hover:underline"
+      >
+        Ver página pública
+      </a>
       <div class="mt-4 text-center">
         <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
           <img :src="qrCodeUrl" alt="QR Code da loja" class="mx-auto" />
