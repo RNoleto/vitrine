@@ -37,11 +37,6 @@ const routes = [
         component: StoreDetail
       },
       {
-        path: 'stores/:id',
-        name: 'StorePage',
-        component: StorePage
-      },
-      {
         path: 'contacts',
         name: 'Contacts',
         component: Contacts
@@ -52,6 +47,11 @@ const routes = [
         component: StoreContactsPage
       }
     ]
+  },
+  {
+    path: '/store/:id',
+    name: 'StorePage',
+    component: StorePage
   },
   // fallback 404
   {
