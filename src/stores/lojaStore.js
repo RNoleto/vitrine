@@ -1,109 +1,117 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import api from '../services/api'
 import { useAuthStore } from './authStore'
 
-export const useLojaStore = defineStore('loja', () => {
-  const lojas = ref([])
-  const carregando = ref(false)
-  const erro = ref(null)
+function base64ToBlob(base64Data, contentType = '') {
+  const byteCharacters = atob(base64Data.split(',')[1])
+  const byteArrays = []
 
-  async function adicionarLoja(loja) {
-    const authStore = useAuthStore()
-    const firebase_uid = authStore.user?.firebase_uid
+  for (let i = 0; i < byteCharacters.length; i += 512) {
+    const slice = byteCharacters.slice(i, i + 512)
+    const byteNumbers = new Array(slice.length)
+    for (let j = 0; j < slice.length; j++) {
+      byteNumbers[j] = slice.charCodeAt(j)
+    }
+    const byteArray = new Uint8Array(byteNumbers)
+    byteArrays.push(byteArray)
+  }
 
-    carregando.value = true
-    try {
-      const formData = new FormData()
-      formData.append('name', loja.name)
-      formData.append('firebase_uid', firebase_uid)
+  return new Blob(byteArrays, { type: contentType })
+}
 
-      if (loja.logoBase64) {
-        const blob = await fetch(loja.logoBase64).then(r => r.blob())
-        const mimeType = blob.type
-        const extension = mimeType.split('/')[1]
-        const filename = `logo.${extension.replace('+xml', '')}`
+export const useLojaStore = defineStore('loja', {
+  state: () => ({
+    lojas: [],
+    carregando: false,
+    erro: null
+  }),
 
-        formData.append('logo', blob, filename)
+  actions: {
+    async adicionarLoja(loja) {
+      const authStore = useAuthStore()
+      const firebase_uid = authStore.user?.firebase_uid
+
+      this.carregando = true
+      try {
+        const formData = new FormData()
+        formData.append('name', loja.name)
+        formData.append('firebase_uid', firebase_uid)
+
+        if (loja.logoBase64) {
+          const contentType = loja.logoBase64.split(';')[0].split(':')[1]
+          const blob = base64ToBlob(loja.logoBase64, contentType)
+          formData.append('logo', blob, 'logo.png')
+        }
+
+        if (Array.isArray(loja.links)) {
+          loja.links.forEach((link, i) => {
+            formData.append(`links[${i}][icone]`, link.icone)
+            formData.append(`links[${i}][texto]`, link.texto)
+            formData.append(`links[${i}][url]`, link.url)
+          })
+        }
+
+        const { data } = await api.post('/stores', formData)
+        this.lojas.push(data)
+        this.erro = null
+      } catch (e) {
+        this.erro = e.response?.data?.error || 'Erro ao criar loja'
+      } finally {
+        this.carregando = false
+      }
+    },
+
+    async listarLojas() {
+      const authStore = useAuthStore()
+      const userId = authStore.user?.id
+
+      if (!userId) {
+        this.erro = 'Usuário não autenticado'
+        return
       }
 
-      if (Array.isArray(loja.links)) {
-        loja.links.forEach((link, i) => {
-          formData.append(`links[${i}][icone]`, link.icone)
-          formData.append(`links[${i}][texto]`, link.texto)
-          formData.append(`links[${i}][url]`, link.url)
+      this.carregando = true
+      try {
+        const response = await api.get('/lojas', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         })
+
+        // Filtra lojas do usuário atual e ativas
+        this.lojas = response.data.filter(loja =>
+          loja.user_id === userId && loja.ativo === 1
+        )
+
+        this.erro = null
+      } catch (e) {
+        this.erro = e.response?.data?.error || 'Erro ao listar lojas'
+      } finally {
+        this.carregando = false
       }
+    },
 
-      const { data } = await api.post('/stores', formData)
-      lojas.value.push(data)
-      erro.value = null
-    } catch (e) {
-      erro.value = e.response?.data?.error || 'Erro ao criar loja'
-    } finally {
-      carregando.value = false
-    }
-  }
+    async editarLoja(id, dadosAtualizados) {
+      this.carregando = true
 
-  async function listarLojas() {
-    const authStore = useAuthStore()
-    const userId = authStore.user?.id
-    // console.log(userId);
-    if (!userId) {
-      erro.value = 'Usuário não autenticado'
-      return
-    }
+      try {
+        const response = await api.put(`/stores/${id}`, dadosAtualizados, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
 
-    carregando.value = true
-    try {
-      const response = await api.get('/lojas', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
+        const index = this.lojas.findIndex(loja => loja.id === id)
+        if (index !== -1) {
+          this.lojas[index] = response.data
+        }
 
-      // Filtra somente as lojas do usuário atual e ativas
-      lojas.value = response.data.filter(loja =>
-        loja.user_id === userId && loja.ativo === 1
-      )
-
-      erro.value = null
-    } catch (e) {
-      erro.value = e.response ? e.response.data.error : 'Erro ao listar lojas'
-    } finally {
-      carregando.value = false
-    }
-  }
-
-  async function editarLoja(id, dadosAtualizados) {
-    carregando.value = true
-
-    try {
-      const response = await api.put(`/stores/${id}`, dadosAtualizados, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-
-      const lojaIndex = lojas.value.findIndex(loja => loja.id === id)
-      if (lojaIndex !== -1) {
-        lojas.value[lojaIndex] = response.data
+        this.erro = null
+      } catch (e) {
+        this.erro = e.response?.data?.error || 'Erro ao editar loja'
+      } finally {
+        this.carregando = false
       }
-
-      erro.value = null
-    } catch (e) {
-      erro.value = e.response ? e.response.data.error : 'Erro ao editar loja'
-    } finally {
-      carregando.value = false
     }
-  }
-
-  return {
-    lojas,
-    erro,
-    carregando,
-    adicionarLoja,
-    listarLojas,
-    editarLoja,
   }
 })

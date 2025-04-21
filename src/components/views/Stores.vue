@@ -206,7 +206,7 @@ onMounted(() => {
         <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
         <ul v-else class="space-y-2">
             <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
-                class="border p-3 rounded flex flex-col justify-between ">
+            class="border p-3 rounded flex flex-col justify-between ">
                 <div class="flex items-center gap-3">
                     <img :src="loja.logo_url" alt="logo" class="w-8 h-8 object-contain" />
                     <span class="font-medium">{{ loja.name }}</span>
