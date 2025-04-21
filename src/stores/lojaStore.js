@@ -65,6 +65,7 @@ export const useLojaStore = defineStore('loja', {
       const authStore = useAuthStore()
       const userId = authStore.user?.id
 
+      // Verificação de usuário autenticado
       if (!userId) {
         this.erro = 'Usuário não autenticado'
         return
@@ -85,6 +86,7 @@ export const useLojaStore = defineStore('loja', {
 
         this.erro = null
       } catch (e) {
+        // Captura erro e exibe mensagem de erro
         this.erro = e.response?.data?.error || 'Erro ao listar lojas'
       } finally {
         this.carregando = false

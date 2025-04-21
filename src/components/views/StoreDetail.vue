@@ -12,9 +12,9 @@ const contactStore = useContactStore()
 const lojaId = parseInt(route.params.id)
 const loja = lojaStore.lojas.find(l => l.id === lojaId)
 
-const contatosDaLoja = computed(() =>
-  contactStore.contact.filter(c => c.empresa === lojaId)
-)
+// const contatosDaLoja = computed(() =>
+//   contactStore.contact.filter(c => c.empresa === lojaId)
+// )
 
 // Monta a URL completa da página da loja
 const longUrl = `${window.location.origin}/stores/${lojaId}`
@@ -134,7 +134,7 @@ const back = () => {
     </section>
 
     <!-- Contatos da Loja -->
-    <section>
+    <!-- <section>
       <h3 class="text-xl font-bold mb-4">Contatos</h3>
       <div v-if="contatosDaLoja.length" class="space-y-3 mb-2">
         <div
@@ -156,8 +156,8 @@ const back = () => {
       <p v-else class="text-gray-500 mb-2">
         Nenhum contato atribuído a esta loja.
       </p>
-      <button @click="back" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">← Voltar</button>
-    </section>
+    </section> -->
+    <button @click="back" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">← Voltar</button>
   </div>
 
   <p v-else class="text-center text-red-600 mt-10">Loja não encontrada.</p>
