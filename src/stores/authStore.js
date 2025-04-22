@@ -45,7 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
       const firebaseUser = result.user
 
       const idToken = await firebaseUser.getIdToken()
-      console.log("Firebase_uid do usuário logado", firebaseUser.uid);
+      // console.log("Firebase_uid do usuário logado", firebaseUser.uid);
 
       // Envia token para o backend (se necessário, mas parece que já está cuidando disso)
       await api.post('/login', { idToken })

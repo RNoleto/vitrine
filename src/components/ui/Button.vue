@@ -25,7 +25,7 @@ const variantClasses = {
     :type="props.type"
     :disabled="props.disabled"
     :class="[
-      'mt-1 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2',
+      'cursor-pointer mt-1 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2',
       variantClasses[props.variant] || variantClasses.default,
       props.customClass
     ]"

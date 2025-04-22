@@ -6,6 +6,7 @@ import Input from '../ui/Input.vue'
 import Button from '../ui/Button.vue'
 import EditStoreModal from '../ui/EditStoreModal.vue'
 import IconSelect from '../ui/IconSelect.vue'
+import Loading from '../ui/Loading.vue'
 
 const router = useRouter()
 
@@ -212,7 +213,7 @@ onMounted(() => {
 
         <!-- Listagem de lojas -->
         <h3 class="text-lg font-semibold mb-3">Lojas Cadastradas</h3>
-        <div v-if="lojaStore.carregando">Carregando lojas...</div>
+        <Loading v-if="lojaStore.carregando" text="" />
         <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
         <ul v-else class="space-y-2">
             <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"

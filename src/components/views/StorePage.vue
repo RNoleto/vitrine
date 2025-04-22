@@ -37,7 +37,7 @@ function irParaContatos() {
   <section class="flex-1 p-6 overflow-y-auto">
     <div v-if="loja" class="max-w-xl mx-auto text-center mt-8">
       <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
-      <h1 class="text-2xl font-bold mt-4">{{ loja.name }}</h1>
+      <h1 class="text-2xl font-bold mt-2">{{ loja.name }}</h1>
 
       <div class="mt-6 space-y-3">
         <div

@@ -74,12 +74,13 @@ function saveLocal() {
     logoBase64: editLogo.value,
     links: editLinks.value
   })
+  // alert('Edição salva com sucesso!');
 }
 </script>
 
 <template>
   <div v-if="isOpen" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-2">
-    <div class="bg-white p-6 rounded-lg w-full max-w-lg space-y-4">
+    <div class="max-h-screen overflow-y-auto bg-white p-6 rounded-lg w-full max-w-lg space-y-4">
       <h4 class="text-lg font-semibold">Editar Loja</h4>
 
       <!-- Logo Preview & Upload -->
