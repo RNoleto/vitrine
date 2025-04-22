@@ -98,8 +98,6 @@ function openEditModal(index) {
     editTexto.value = ''
     editUrl.value = ''
     isEditModalOpen.value = true
-
-    console.log('Loja para edição:', loja.id)
 }
 
 function closeEditModal() {

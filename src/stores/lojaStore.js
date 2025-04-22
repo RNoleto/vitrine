@@ -92,69 +92,58 @@ export const useLojaStore = defineStore('loja', {
       }
     },
 
-    async editarLoja(id, dadosAtualizados) {
-      const authStore = useAuthStore()
-      const firebase_uid = authStore.user?.firebase_uid
-
+    async editarLoja(id, dados) {
       this.carregando = true
       this.erro = null
 
       try {
-        const formData = new FormData()
+        const isNovaLogo =
+          typeof dados.logoBase64 === 'string' &&
+          dados.logoBase64.startsWith('data:')
 
-        // Campos básicos
-        if (dadosAtualizados.name) {
-          formData.append('name', dadosAtualizados.name)
-        }
+        let res
+        if (isNovaLogo) {
+          // ––– FormData + override de método –––
+          const form = new FormData()
+          form.append('_method', 'PUT')
+          form.append('name',   dados.name)
+          form.append('ativo',  dados.ativo ?? 1)
 
-        if (dadosAtualizados.ativo !== undefined) {
-          formData.append('ativo', dadosAtualizados.ativo)
-        }
+          // converte base64 em Blob
+          const ct   = dados.logoBase64.split(';')[0].split(':')[1]
+          const blob = base64ToBlob(dados.logoBase64, ct)
+          form.append('logo', blob, `logo.${ct.split('/')[1]}`)
 
-        // Logo: se for base64 (imagem nova), converter para blob e enviar
-        if (
-          dadosAtualizados.logoBase64 &&
-          typeof dadosAtualizados.logoBase64 === 'string' &&
-          dadosAtualizados.logoBase64.startsWith('data:')
-        ) {
-          const contentType = dadosAtualizados.logoBase64.split(';')[0].split(':')[1]
-          const blob = base64ToBlob(dadosAtualizados.logoBase64, contentType)
-          formData.append('logo', blob, `logo.${contentType.split('/')[1]}`)
-        }
+          // reenvia todos os links (pode ser [])
+          dados.links.forEach((l, i) => {
+            form.append(`links[${i}][icone]`, l.icone)
+            form.append(`links[${i}][texto]`, l.texto)
+            form.append(`links[${i}][url]`,   l.url)
+          })
 
-        // Links
-        if (Array.isArray(dadosAtualizados.links)) {
-          dadosAtualizados.links.forEach((link, i) => {
-            formData.append(`links[${i}][icone]`, link.icone)
-            formData.append(`links[${i}][texto]`, link.texto)
-            formData.append(`links[${i}][url]`, link.url)
+          res = await api.post(`/stores/${id}`, form)
+
+        } else {
+          // ––– JSON puro –––
+          res = await api.put(`/stores/${id}`, {
+            name:  dados.name,
+            ativo: dados.ativo ?? 1,
+            links: dados.links
           })
         }
 
-        // Requisição PUT com FormData
-        const response = await api.post(
-          `/stores/${id}?_method=PUT`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-              'Content-Type': 'multipart/form-data'
-            }
-          }
-        )
-
-        const lojaAtualizada = response.data
+        // atualiza o estado local
+        const updated = res.data
         const idx = this.lojas.findIndex(l => l.id === id)
-        if (idx !== -1) this.lojas[idx] = lojaAtualizada
+        if (idx !== -1) this.lojas[idx] = updated
 
-      } catch (e) {
+      } catch (err) {
         this.erro = 'Erro ao editar loja.'
-        console.error(e)
+        console.error(err)
       } finally {
         this.carregando = false
       }
     },
-
 
     async excluirLoja(id) {
       this.carregando = true

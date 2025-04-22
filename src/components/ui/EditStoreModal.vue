@@ -70,8 +70,8 @@ function saveLocal() {
   // Emitindo exatamente o que o store espera:
   emit('save', {
     id: editId.value,
-    name: editNome.value,         // ✓ key == 'name'
-    logoBase64: editLogo.value,   // ✓ key == 'logoBase64'
+    name: editNome.value,      
+    logoBase64: editLogo.value,
     links: editLinks.value
   })
 }
