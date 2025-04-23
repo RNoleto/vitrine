@@ -59,16 +59,24 @@ function editarContato(index) {
   editIndex.value = index
 }
 
-function excluirContato(index) {
-  contactStore.deleteContact(index)
-  resetForm()
+function excluirContato(id) {
+  if (confirm('Deseja realmente excluir esse contato?')) {
+        contactStore.excluirContato(id)
+        alert('Contato excluída com sucesso!');
+    }
 }
 
 function resetForm() {
   name.value = ''
   whatsapp.value = ''
   empresaSelecionada.value = ''
+  foto.value = null
   editIndex.value = null
+
+  const fileInput = document.querySelector('input[type="file"]')
+  if(fileInput){
+    fileInput.value = ''
+  }
 }
 
 onMounted(() => {
@@ -86,12 +94,10 @@ onMounted(() => {
       <Input id="name" name="name" v-model="name" placeholder="Nome do contato" />
       <Input id="whatsapp" name="whatsapp" v-model="whatsapp" placeholder="Whastapp" />
 
-      <!-- Upload de foto -->
       <input type="file" accept="image/*" @change="handleFotoUpload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
                file:rounded-md file:border-0 file:text-sm file:font-semibold
                file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
 
-      <!-- Select de loja -->
       <select v-model="empresaSelecionada" class="w-full px-3 py-2 border rounded-md">
         <option disabled value="">Selecione a empresa</option>
         <option v-for="(loja, index) in lojaStore.lojas" :key="index" :value="loja.id">
@@ -122,8 +128,8 @@ onMounted(() => {
             </p>
           </div>
           <div class="ml-auto flex space-x-2">
-            <button class="text-blue-600 hover:underline" @click="editarContato(i)">Editar</button>
-            <button class="text-red-600 hover:underline" @click="excluirContato(i)">Excluir</button>
+            <button class="text-blue-600 hover:underline" @click="editarContato(c.id)">Editar</button>
+            <button class="text-red-600 hover:underline" @click="excluirContato(c.id)">Excluir</button>
           </div>
         </li>
       </ul>

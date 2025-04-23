@@ -125,6 +125,9 @@ export const useContactStore = defineStore('contact', {
         if (contato) {
           contato.ativo = 0
         }
+
+        await this.listarContatos()
+
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao excluir contato'
       } finally {
