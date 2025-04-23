@@ -4,6 +4,7 @@ import { useContactStore } from '../../stores/contactStore'
 import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
 import Button from '../ui/Button.vue'
+import Loading from '../ui/Loading.vue'
 
 const contactStore = useContactStore()
 const lojaStore = useLojaStore()
@@ -119,7 +120,8 @@ onMounted(() => {
     <div class="mt-8">
       <p class="font-semibold">Contatos cadastrados</p>
       <ul class="space-y-3 mt-4">
-        <li v-for="(c, i) in contactStore.contatos" :key="i" class="flex items-center space-x-4">
+        <Loading v-if="lojaStore.carregando" text="Carregando Contatos" />
+        <li v-else v-for="(c, i) in contactStore.contatos" :key="i" class="flex items-center space-x-4">
           <img :src="c.photo" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
           <div>
             <p class="font-semibold">{{ c.name }}</p>
