@@ -8,8 +8,8 @@ import Button from '../ui/Button.vue'
 const contactStore = useContactStore()
 const lojaStore = useLojaStore()
 
-const nome = ref('')
-const contato = ref('')
+const name = ref('')
+const whatsapp = ref('')
 const foto = ref(null)
 const empresaSelecionada = ref('')
 const editIndex = ref(null)
@@ -28,15 +28,23 @@ function handleFotoUpload(event) {
 }
 
 function cadastrarContato() {
-  if (!nome.value || !contato.value || !foto.value || !empresaSelecionada.value) {
+  if (!name.value || !whatsapp.value || !foto.value || !empresaSelecionada.value) {
     alert('Preencha todos os campos!')
     return
   }
 
+  // Passando o valor de empresaSelecionada diretamente para o store
+  const contato = {
+    name: name.value,
+    whatsapp: whatsapp.value,
+    fotoBase64: foto.value,
+    store_id: empresaSelecionada.value, // Passando o valor aqui
+  }
+
   if (editIndex.value !== null) {
-    contactStore.updateContact(editIndex.value, nome.value, foto.value, contato.value, empresaSelecionada.value)
+    contactStore.editarContato(editIndex.value, contato)
   } else {
-    contactStore.addContact(nome.value, foto.value, contato.value, empresaSelecionada.value)
+    contactStore.adicionarContato(contato)
   }
 
   resetForm()
@@ -57,15 +65,15 @@ function excluirContato(index) {
 }
 
 function resetForm() {
-  nome.value = ''
-  contato.value = ''
-  foto.value = null
+  name.value = ''
+  whatsapp.value = ''
   empresaSelecionada.value = ''
   editIndex.value = null
 }
 
 onMounted(() => {
-  contactStore.fetchContacts();
+  lojaStore.listarLojas();
+  contactStore.listarContatos();
 })
 </script>
 
@@ -75,8 +83,8 @@ onMounted(() => {
     <p class="font-semibold">Cadastrar Contato</p>
 
     <div class="flex flex-col gap-2 mt-5">
-      <Input id="name" name="name" v-model="nome" placeholder="Nome do contato" />
-      <Input id="contact" name="contact" v-model="contato" placeholder="Telefone ou email" />
+      <Input id="name" name="name" v-model="name" placeholder="Nome do contato" />
+      <Input id="whatsapp" name="whatsapp" v-model="whatsapp" placeholder="Whastapp" />
 
       <!-- Upload de foto -->
       <input type="file" accept="image/*" @change="handleFotoUpload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
@@ -103,22 +111,22 @@ onMounted(() => {
     <div class="mt-8">
       <p class="font-semibold">Contatos cadastrados</p>
       <ul class="space-y-3 mt-4">
-  <li v-for="(c, i) in contactStore.contacts" :key="i" class="flex items-center space-x-4">
-    <img :src="c.foto" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
-    <div>
-      <p class="font-semibold">{{ c.nome }}</p>
-      <p class="text-sm">{{ c.contato }}</p>
-      <p class="text-sm text-indigo-600 italic">
-        Empresa:
-        {{ lojaStore.lojas.find(loja => loja.id === c.empresa)?.nome || 'Empresa não encontrada' }}
-      </p>
-    </div>
-    <div class="ml-auto flex space-x-2">
-      <button class="text-blue-600 hover:underline" @click="editarContato(i)">Editar</button>
-      <button class="text-red-600 hover:underline" @click="excluirContato(i)">Excluir</button>
-    </div>
-  </li>
-</ul>
+        <li v-for="(c, i) in contactStore.contatos" :key="i" class="flex items-center space-x-4">
+          <img :src="c.photo" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
+          <div>
+            <p class="font-semibold">{{ c.name }}</p>
+            <p class="text-sm">{{ c.whatsapp }}</p>
+            <p class="text-sm text-indigo-600 italic">
+              Empresa:
+              {{lojaStore.lojas.find(loja => loja.id === c.store_id)?.name || 'Empresa não encontrada'}}
+            </p>
+          </div>
+          <div class="ml-auto flex space-x-2">
+            <button class="text-blue-600 hover:underline" @click="editarContato(i)">Editar</button>
+            <button class="text-red-600 hover:underline" @click="excluirContato(i)">Excluir</button>
+          </div>
+        </li>
+      </ul>
 
     </div>
   </div>
