@@ -27,7 +27,7 @@ function handleFotoUpload(event) {
   }
 }
 
-function cadastrarContato() {
+async function cadastrarContato() {
   if (!name.value || !whatsapp.value || !foto.value || !empresaSelecionada.value) {
     alert('Preencha todos os campos!')
     return
@@ -44,19 +44,21 @@ function cadastrarContato() {
   if (editIndex.value !== null) {
     contactStore.editarContato(editIndex.value, contato)
   } else {
-    contactStore.adicionarContato(contato)
+    await contactStore.adicionarContato(contato)
+    await contactStore.listarContatos()
   }
 
   resetForm()
 }
 
-function editarContato(index) {
-  const c = contactStore.contact[index]
-  nome.value = c.nome
-  contato.value = c.contato
-  foto.value = c.foto
-  empresaSelecionada.value = c.empresa
-  editIndex.value = index
+function editarContato(id) {
+  const c = contactStore.contatos.find(contato => contato.id === id)
+  if(!c) return alert('Contato não encontrado')
+  name.value = c.name 
+  whatsapp.value = c.whatsapp 
+  foto.value = c.foto 
+  empresaSelecionada.value = c.store_id
+  editIndex.value = id 
 }
 
 function excluirContato(id) {
