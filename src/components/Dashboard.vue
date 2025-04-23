@@ -14,7 +14,7 @@ function toggleSidebar() {
 
 const links = [
   { name: 'Home', route: '/home' },
-  { name: 'Empresas', route: '/stores' },
+  { name: 'Lojas', route: '/stores' },
   { name: 'Contatos', route: '/contacts' },
   // Adicione mais links conforme necessário
 ]
@@ -34,7 +34,7 @@ function logout() {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
-      <h1 class="text-xl font-bold text-gray-800 ml-4">Dashboard</h1>
+      <p class="text-xl font-bold text-gray-800 ml-4">Dashboard</p>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
