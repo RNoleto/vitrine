@@ -1,28 +1,29 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
-import { useContactStore } from '../../stores/contactStore'
 import Loading from '../ui/Loading.vue'
 
 const route = useRoute()
 const router = useRouter()
 const lojaStore = useLojaStore()
-// const contactStore = useContactStore()
 
 const lojaId = parseInt(route.params.id)
 const loja = ref(null)
+const contatos = ref([])
 
 onMounted(async () => {
-  // Carrega as lojas se ainda não tiverem sido carregadas
-  if (lojaStore.lojas.length === 0) {
-    await lojaStore.listarLojas()
+  lojaStore.carregando = true
+
+  try {
+    // Buscar loja e contatos da API pública
+    loja.value = await lojaStore.obterLojaPublica(lojaId)
+    contatos.value = await lojaStore.obterContatosLojaPublica(lojaId)
+  } catch (error) {
+    console.error('Erro ao carregar dados públicos da loja:', error)
+  } finally {
+    lojaStore.carregando = false
   }
-
-  // Procura a loja pelo ID
-  loja.value = lojaStore.lojas.find((l) => l.id === lojaId)
-
-  // await contactStore.listarContatos()
 })
 
 function abrirLink(url) {
@@ -38,17 +39,14 @@ function irParaContatos() {
 }
 
 function abrirWhatsapp(contato) {
-  const numeroFormatado = contato.whatsapp.replace(/\D/g, '') // remove caracteres não numéricos
+  const numeroFormatado = contato.whatsapp.replace(/\D/g, '')
   const nomeLoja = loja.value?.name || 'sua loja'
   const mensagem = `Olá ${contato.name}, vi a vitrine da sua loja ${nomeLoja} e gostaria de um atendimento`
   const url = `https://wa.me/${numeroFormatado}?text=${encodeURIComponent(mensagem)}`
   window.open(url, '_blank')
 }
-
-// const contatosDaLoja = computed(() => {
-//   return contactStore.contatos.filter(contato => contato.store_id === lojaId && contato.ativo)
-// })
 </script>
+
 
 <template>
   <section class="flex-1 p-6 overflow-y-auto">

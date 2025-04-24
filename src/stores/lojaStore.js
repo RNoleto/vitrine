@@ -23,6 +23,8 @@ export const useLojaStore = defineStore('loja', {
   state: () => ({
     lojas: [],
     carregando: false,
+    lojaSelecionada: null,
+    contatosLoja: [],
     erro: null
   }),
 
@@ -161,7 +163,47 @@ export const useLojaStore = defineStore('loja', {
       } finally {
         this.carregando = false
       }
+    },
+    
+    async listarLojasPublicas() {
+      this.carregando = true
+      try {
+        const { data } = await api.get('/public/stores')
+        this.lojas = data
+        this.erro = null
+      } catch (e) {
+        this.erro = e.response?.data?.error || 'Erro ao carregar lojas públicas'
+      } finally {
+        this.carregando = false
+      }
+    },
+
+    async obterLojaPublica(id) {
+      this.carregando = true
+      try {
+        const { data } = await api.get(`/public/stores/${id}`)
+        return data // ou, se quiser armazenar no estado, crie `lojaSelecionada` no state
+      } catch (e) {
+        this.erro = e.response?.data?.error || 'Erro ao carregar loja pública'
+        return null
+      } finally {
+        this.carregando = false
+      }
+    },
+
+    async obterContatosLojaPublica(id) {
+      this.carregando = true
+      try {
+        const { data } = await api.get(`/public/stores/${id}/contacts`)
+        return data
+      } catch (e) {
+        this.erro = e.response?.data?.error || 'Erro ao carregar contatos da loja'
+        return []
+      } finally {
+        this.carregando = false
+      }
     }
+
   },
 
   persist: true
