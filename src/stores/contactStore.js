@@ -30,11 +30,7 @@ export const useContactStore = defineStore('contact', {
     async listarContatos() {
       this.carregando = true;
       try {
-        const { data } = await api.get('/contacts', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
+        const { data } = await api.get('/contacts');
     
         // console.log('Contatos da API:', data);
         this.contatos = data.filter(contato => contato.ativo !== 0);
