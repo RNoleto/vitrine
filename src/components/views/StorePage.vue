@@ -39,7 +39,7 @@ function irParaContatos() {
 }
 
 function abrirWhatsapp(contato) {
-  const numeroFormatado = contato.whatsapp.replace(/\D/g, '')
+  const numeroFormatado = '55' + contato.whatsapp.replace(/\D/g, '')
   const nomeLoja = loja.value?.name || 'sua loja'
   const mensagem = `Olá ${contato.name}, vi a vitrine da sua loja ${nomeLoja} e gostaria de um atendimento`
   const url = `https://wa.me/${numeroFormatado}?text=${encodeURIComponent(mensagem)}`
