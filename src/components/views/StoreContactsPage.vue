@@ -37,15 +37,18 @@ function openWhatsapp(telefone, nomeContato) {
 
 <template>
   <section class="flex-1 p-6 overflow-y-auto">
-    <Loading v-if="lojaStore.carregando" text="Carregando contatos da loja" />
+    <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" />
     <div v-else class="max-w-xl mx-auto text-center mt-8">
-      <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
-      <h1 class="text-2xl font-bold mt-2">{{ loja.name }}</h1>
+      <div v-if="loja" class="mb-6">
+        <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
+        <h1 class="text-2xl font-bold mt-2">{{ loja.name }}</h1>
+      </div>
       <div>
         <p class="text-2xl font-bold text-center">
           Contatos de {{ loja?.name || 'Loja não encontrada' }}
         </p>
-        <ul v-if="contatos.length" class="space-y-4">
+        <Loading v-if="contactStore.carregando" text="" />
+        <ul v-if="contatos.length" class="mt-2 space-y-4">
           <li
             v-for="(c, i) in contatos"
             :key="i"

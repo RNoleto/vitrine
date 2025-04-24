@@ -162,5 +162,7 @@ export const useLojaStore = defineStore('loja', {
         this.carregando = false
       }
     }
-  }
+  },
+
+  persist: true
 })
