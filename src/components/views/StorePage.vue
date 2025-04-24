@@ -1,9 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useWhatsapp } from '@/composables/useWhatsapp'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import Loading from '../ui/Loading.vue'
 
+
+const { abrirWhatsapp } = useWhatsapp()
 const route = useRoute()
 const router = useRouter()
 const lojaStore = useLojaStore()
@@ -38,13 +41,6 @@ function irParaContatos() {
   router.push(`/contacts/${lojaId}/contacts`)
 }
 
-function abrirWhatsapp(contato) {
-  const numeroFormatado = '55' + contato.whatsapp.replace(/\D/g, '')
-  const nomeLoja = loja.value?.name || 'sua loja'
-  const mensagem = `Olá ${contato.name}, vi a vitrine da sua loja ${nomeLoja} e gostaria de um atendimento`
-  const url = `https://wa.me/${numeroFormatado}?text=${encodeURIComponent(mensagem)}`
-  window.open(url, '_blank')
-}
 </script>
 
 
@@ -66,7 +62,7 @@ function abrirWhatsapp(contato) {
       <!-- Lista de Contatos da Loja -->
       <div v-if="contatos.length === 1" class="mt-3 space-y-3 mb-2">
         <div class="flex items-center gap-4 p-4 border rounded cursor-pointer hover:bg-gray-100"
-          @click="abrirWhatsapp(contatos[0])">
+          @click="abrirWhatsapp(contatos[0], loja?.name)">
           <img :src="contatos[0].photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
           <div class="text-left">
             <p><strong>Nome:</strong> {{ contatos[0].name }}</p>

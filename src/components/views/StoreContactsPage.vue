@@ -1,10 +1,13 @@
 <script setup>
 import { onMounted, computed } from 'vue'
+import { useWhatsapp } from '@/composables/useWhatsapp'
 import { useRoute } from 'vue-router'
 import { useContactStore } from '../../stores/contactStore'
 import { useLojaStore } from '../../stores/lojaStore'
 import Loading from '../ui/Loading.vue'
 
+
+const { abrirWhatsapp } = useWhatsapp()
 const route = useRoute()
 const lojaId = parseInt(route.params.id)
 const contactStore = useContactStore()
@@ -27,12 +30,6 @@ const contatos = computed(() =>
   contactStore.contatos.filter(c => c.store_id === lojaId && c.ativo)
 )
 
-function openWhatsapp(telefone, nomeContato) {
-  const phone = telefone.replace(/\D/g, '')
-  const text = `Olá ${nomeContato}, tudo bem? Estou entrando em contato pela Vitrine da Loja ${loja.value?.name || ''} e gostaria de solicitar atendimento. Obrigado!`
-  const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`
-  window.open(url, '_blank')
-}
 </script>
 
 <template>
@@ -52,7 +49,7 @@ function openWhatsapp(telefone, nomeContato) {
           <li
             v-for="(c, i) in contatos"
             :key="i"
-            @click="openWhatsapp(c.whatsapp, c.name)"
+            @click="abrirWhatsapp(c, loja?.name)"
             class="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
           >
             <img
