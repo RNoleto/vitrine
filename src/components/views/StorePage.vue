@@ -37,6 +37,14 @@ function irParaContatos() {
   router.push(`/contacts/${lojaId}/contacts`)
 }
 
+function abrirWhatsapp(contato) {
+  const numeroFormatado = contato.whatsapp.replace(/\D/g, '') // remove caracteres não numéricos
+  const nomeLoja = loja.value?.name || 'sua loja'
+  const mensagem = `Olá ${contato.name}, vi a vitrine da sua loja ${nomeLoja} e gostaria de um atendimento`
+  const url = `https://wa.me/${numeroFormatado}?text=${encodeURIComponent(mensagem)}`
+  window.open(url, '_blank')
+}
+
 const contatosDaLoja = computed(() => {
   return contactStore.contatos.filter(contato => contato.store_id === lojaId && contato.ativo)
 })
@@ -58,18 +66,28 @@ const contatosDaLoja = computed(() => {
         </div>
       </div>
       <!-- Lista de Contatos da Loja -->
-      <div v-if="contatosDaLoja.length" class="mt-3 space-y-3 mb-2">
-        <div v-for="contato in contatosDaLoja" :key="contato.id" class="flex items-center gap-4 p-4 border rounded">
-          <img :src="contato.photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
+      <!-- Lista de Contatos da Loja -->
+      <div v-if="contatosDaLoja.length === 1" class="mt-3 space-y-3 mb-2">
+        <div class="flex items-center gap-4 p-4 border rounded cursor-pointer hover:bg-gray-100"
+          @click="abrirWhatsapp(contatosDaLoja[0])">
+          <img :src="contatosDaLoja[0].photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
           <div class="text-left">
-            <p><strong>Nome:</strong> {{ contato.name }}</p>
-            <p><strong>Telefone:</strong> {{ contato.whatsapp }}</p>
+            <p><strong>Nome:</strong> {{ contatosDaLoja[0].name }}</p>
+            <p><strong>Telefone:</strong> {{ contatosDaLoja[0].whatsapp }}</p>
           </div>
         </div>
       </div>
+
+      <div v-else-if="contatosDaLoja.length > 1" class="mt-3 mb-2">
+        <button @click="irParaContatos" class="text-indigo-600 underline hover:text-indigo-800 text-sm">
+          Ver todos os contatos ({{ contatosDaLoja.length }})
+        </button>
+      </div>
+
       <p v-else class="text-gray-500 mb-2">
         Nenhum contato atribuído a esta loja.
       </p>
+
     </div>
 
     <div v-else class="text-center text-red-600 mt-10">
