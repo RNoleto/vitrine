@@ -1,11 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
+import { useContactStore } from '../../stores/contactStore'
 
 const route = useRoute()
 const router = useRouter()
 const lojaStore = useLojaStore()
+const contactStore = useContactStore()
 
 const lojaId = parseInt(route.params.id)
 const loja = ref(null)
@@ -15,7 +17,7 @@ onMounted(async () => {
   if (lojaStore.lojas.length === 0) {
     await lojaStore.listarLojas()
   }
-
+ 
   // Procura a loja pelo ID
   loja.value = lojaStore.lojas.find((l) => l.id === lojaId)
 })
@@ -58,5 +60,10 @@ function irParaContatos() {
     <div v-else class="text-center text-red-600 mt-10">
       Loja não encontrada.
     </div>
+
+    <!-- <div v-for="contato in contatosDaLoja" :key="contato.id">
+      <p>{{ contato.name }}</p>
+      <p>{{ contato.whatsapp }}</p>
+    </div> -->
   </section>
 </template>

@@ -74,11 +74,7 @@ export const useLojaStore = defineStore('loja', {
 
       this.carregando = true
       try {
-        const response = await api.get('/lojas', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
+        const response = await api.get('/stores')
 
         this.lojas = response.data.filter(loja =>
           loja.user_id === userId && loja.ativo === 1
@@ -90,7 +86,7 @@ export const useLojaStore = defineStore('loja', {
       } finally {
         this.carregando = false
       }
-    },
+    },   
 
     async editarLoja(id, dados) {
       this.carregando = true

@@ -2,11 +2,13 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
+import { useContactStore } from '../../stores/contactStore'
 import Loading from '../ui/Loading.vue'
 
 const route = useRoute()
 const router = useRouter()
 const lojaStore = useLojaStore()
+const contactStore = useContactStore()
 
 const lojaId = parseInt(route.params.id)
 const loja = ref(null)
@@ -39,6 +41,8 @@ onMounted(async () => {
   } catch {
     shortUrl.value = longUrl.value
   }
+
+  await contactStore.listarContatos()
 })
 
 function copyLink() {
@@ -60,6 +64,10 @@ function irParaContatos() {
 const back = () => {
   router.push('/stores')
 }
+
+const contatosDaLoja = computed(() => {
+  return contactStore.contatos.filter(contato => contato.store_id === lojaId && contato.ativo)
+})
 </script>
 
 <template>
@@ -141,29 +149,29 @@ const back = () => {
       </section>
   
       <!-- Contatos da Loja -->
-      <!-- <section>
+      <section>
         <h3 class="text-xl font-bold mb-4">Contatos</h3>
         <div v-if="contatosDaLoja.length" class="space-y-3 mb-2">
           <div
             v-for="contato in contatosDaLoja"
-            :key="contato.nome"
+            :key="contato.id"
             class="flex items-center gap-4 p-4 border rounded"
           >
             <img
-              :src="contato.foto"
+              :src="contato.photo"
               alt="Foto do contato"
               class="w-10 h-10 rounded-full object-cover"
             />
             <div class="text-left">
-              <p><strong>Nome:</strong> {{ contato.nome }}</p>
-              <p><strong>Telefone:</strong> {{ contato.contato }}</p>
+              <p><strong>Nome:</strong> {{ contato.name }}</p>
+              <p><strong>Telefone:</strong> {{ contato.whatsapp }}</p>
             </div>
           </div>
         </div>
         <p v-else class="text-gray-500 mb-2">
           Nenhum contato atribuído a esta loja.
         </p>
-      </section> -->
+      </section>
       <button @click="back" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">← Voltar</button>
     </div>
     <p v-else class="text-center text-red-600 mt-10">Loja não encontrada.</p>
