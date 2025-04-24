@@ -66,7 +66,6 @@ const contatosDaLoja = computed(() => {
         </div>
       </div>
       <!-- Lista de Contatos da Loja -->
-      <!-- Lista de Contatos da Loja -->
       <div v-if="contatosDaLoja.length === 1" class="mt-3 space-y-3 mb-2">
         <div class="flex items-center gap-4 p-4 border rounded cursor-pointer hover:bg-gray-100"
           @click="abrirWhatsapp(contatosDaLoja[0])">
@@ -83,13 +82,7 @@ const contatosDaLoja = computed(() => {
           Ver todos os contatos ({{ contatosDaLoja.length }})
         </button>
       </div>
-
-      <p v-else class="text-gray-500 mb-2">
-        Nenhum contato atribuído a esta loja.
-      </p>
-
     </div>
-
     <div v-else class="text-center text-red-600 mt-10">
       Loja não encontrada.
     </div>
