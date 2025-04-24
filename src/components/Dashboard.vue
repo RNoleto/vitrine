@@ -61,7 +61,9 @@ function logout() {
           <h2 class="text-2xl text-gray-800">Conteúdo Principal</h2>
         </header>
         <section>
-          <router-view />
+          <main>
+            <router-view />
+          </main>
         </section>
       </main>
     </div>

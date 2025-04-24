@@ -43,42 +43,45 @@ function irParaContatos() {
 
 </script>
 
-
 <template>
-  <section class="flex-1 p-6 overflow-y-auto">
-    <Loading v-if="lojaStore.carregando" text="Carregando página da loja" />
-    <div v-else-if="loja" class="max-w-xl mx-auto text-center mt-8">
-      <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
-      <h1 class="text-2xl font-bold mt-2">{{ loja.name }}</h1>
-
-      <div class="mt-6 space-y-3">
-        <div v-for="(link, index) in loja.links" :key="index" class="flex items-center justify-center gap-2">
-          <button @click="abrirLink(link.url)"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm shadow-zinc-500">
-            <i :class="link.icone"></i> {{ link.texto }}
+  <section>
+    <main class="flex">
+      <Loading v-if="lojaStore.carregando" text="Carregando página da loja" />
+      <div v-else-if="loja" class="storePage text-center">
+        <div>
+          <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
+          <h1 class="title text-4xl font-bold">{{ loja.name }}</h1>
+        </div>
+  
+        <div class="space-y-3">
+          <div v-for="(link, index) in loja.links" :key="index" class="flex items-center justify-center gap-2">
+            <button @click="abrirLink(link.url)"
+              class="w-full text-lg bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm shadow-zinc-500">
+              <i :class="link.icone"></i> {{ link.texto }}
+            </button>
+          </div>
+        </div>
+        <!-- Lista de Contatos da Loja -->
+        <div v-if="contatos.length === 1" class="mt-3 space-y-3 mb-2">
+          <div class="flex items-center gap-4 px-4 py-2 border border-zinc-400 rounded-lg cursor-pointer bg-zinc-300 hover:bg-zinc-500 hover:border-zinc-600 hover:text-white"
+            @click="abrirWhatsapp(contatos[0], loja?.name)">
+            <img :src="contatos[0].photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
+            <div class="text-left">
+              <p><!-- <strong>Nome:</strong> --> {{ contatos[0].name }}</p>
+              <!-- <p><strong>Telefone:</strong> {{ contatos[0].whatsapp }}</p> -->
+            </div>
+          </div>
+        </div>
+  
+        <div v-else-if="contatos.length > 1" class="mt-3 mb-2">
+          <button @click="irParaContatos" class="text-indigo-600 underline hover:text-indigo-800 text-sm">
+            Ver todos os contatos ({{ contatos.length }})
           </button>
         </div>
       </div>
-      <!-- Lista de Contatos da Loja -->
-      <div v-if="contatos.length === 1" class="mt-3 space-y-3 mb-2">
-        <div class="flex items-center gap-4 p-4 border rounded cursor-pointer hover:bg-gray-100"
-          @click="abrirWhatsapp(contatos[0], loja?.name)">
-          <img :src="contatos[0].photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
-          <div class="text-left">
-            <p><strong>Nome:</strong> {{ contatos[0].name }}</p>
-            <p><strong>Telefone:</strong> {{ contatos[0].whatsapp }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div v-else-if="contatos.length > 1" class="mt-3 mb-2">
-        <button @click="irParaContatos" class="text-indigo-600 underline hover:text-indigo-800 text-sm">
-          Ver todos os contatos ({{ contatos.length }})
-        </button>
-      </div>
-    </div>
-    <div v-else class="text-center text-red-600 mt-10">
-      Loja não encontrada.
-    </div>
+      <div v-else class="text-center text-red-600 mt-10">
+        Loja não encontrada.
+      </div>  
+    </main>
   </section>
 </template>
