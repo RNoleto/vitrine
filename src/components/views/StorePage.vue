@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useContactStore } from '../../stores/contactStore'
+import Loading from '../ui/Loading.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,9 +18,11 @@ onMounted(async () => {
   if (lojaStore.lojas.length === 0) {
     await lojaStore.listarLojas()
   }
- 
+
   // Procura a loja pelo ID
   loja.value = lojaStore.lojas.find((l) => l.id === lojaId)
+
+  await contactStore.listarContatos()
 })
 
 function abrirLink(url) {
@@ -33,37 +36,44 @@ function abrirLink(url) {
 function irParaContatos() {
   router.push(`/contacts/${lojaId}/contacts`)
 }
+
+const contatosDaLoja = computed(() => {
+  return contactStore.contatos.filter(contato => contato.store_id === lojaId && contato.ativo)
+})
 </script>
 
 <template>
   <section class="flex-1 p-6 overflow-y-auto">
-    <div v-if="loja" class="max-w-xl mx-auto text-center mt-8">
+    <Loading v-if="lojaStore.carregando" text="Carregando página da loja" />
+    <div v-else-if="loja" class="max-w-xl mx-auto text-center mt-8">
       <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
       <h1 class="text-2xl font-bold mt-2">{{ loja.name }}</h1>
 
       <div class="mt-6 space-y-3">
-        <div
-          v-for="(link, index) in loja.links"
-          :key="index"
-          class="flex items-center justify-center gap-2"
-        >
-          <button
-            @click="abrirLink(link.url)"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm shadow-zinc-500"
-          >
+        <div v-for="(link, index) in loja.links" :key="index" class="flex items-center justify-center gap-2">
+          <button @click="abrirLink(link.url)"
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm shadow-zinc-500">
             <i :class="link.icone"></i> {{ link.texto }}
           </button>
         </div>
       </div>
+      <!-- Lista de Contatos da Loja -->
+      <div v-if="contatosDaLoja.length" class="mt-3 space-y-3 mb-2">
+        <div v-for="contato in contatosDaLoja" :key="contato.id" class="flex items-center gap-4 p-4 border rounded">
+          <img :src="contato.photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
+          <div class="text-left">
+            <p><strong>Nome:</strong> {{ contato.name }}</p>
+            <p><strong>Telefone:</strong> {{ contato.whatsapp }}</p>
+          </div>
+        </div>
+      </div>
+      <p v-else class="text-gray-500 mb-2">
+        Nenhum contato atribuído a esta loja.
+      </p>
     </div>
 
     <div v-else class="text-center text-red-600 mt-10">
       Loja não encontrada.
     </div>
-
-    <!-- <div v-for="contato in contatosDaLoja" :key="contato.id">
-      <p>{{ contato.name }}</p>
-      <p>{{ contato.whatsapp }}</p>
-    </div> -->
   </section>
 </template>
