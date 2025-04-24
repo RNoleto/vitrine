@@ -64,22 +64,22 @@ function abrirWhatsapp(contato) {
         </div>
       </div>
       <!-- Lista de Contatos da Loja -->
-      <!-- <div v-if="contatosDaLoja.length === 1" class="mt-3 space-y-3 mb-2">
+      <div v-if="contatos.length === 1" class="mt-3 space-y-3 mb-2">
         <div class="flex items-center gap-4 p-4 border rounded cursor-pointer hover:bg-gray-100"
-          @click="abrirWhatsapp(contatosDaLoja[0])">
-          <img :src="contatosDaLoja[0].photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
+          @click="abrirWhatsapp(contatos[0])">
+          <img :src="contatos[0].photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
           <div class="text-left">
-            <p><strong>Nome:</strong> {{ contatosDaLoja[0].name }}</p>
-            <p><strong>Telefone:</strong> {{ contatosDaLoja[0].whatsapp }}</p>
+            <p><strong>Nome:</strong> {{ contatos[0].name }}</p>
+            <p><strong>Telefone:</strong> {{ contatos[0].whatsapp }}</p>
           </div>
         </div>
-      </div> -->
+      </div>
 
-      <!-- <div v-else-if="contatosDaLoja.length > 1" class="mt-3 mb-2">
+      <div v-else-if="contatos.length > 1" class="mt-3 mb-2">
         <button @click="irParaContatos" class="text-indigo-600 underline hover:text-indigo-800 text-sm">
-          Ver todos os contatos ({{ contatosDaLoja.length }})
+          Ver todos os contatos ({{ contatos.length }})
         </button>
-      </div> -->
+      </div>
     </div>
     <div v-else class="text-center text-red-600 mt-10">
       Loja não encontrada.
