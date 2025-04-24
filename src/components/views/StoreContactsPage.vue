@@ -18,7 +18,7 @@ onMounted(async () => {
   }
 
   if (contactStore.contatos.length === 0) {
-    await contactStore.listarContatos()
+    await contactStore.listarContatosPublicosPorLoja(lojaId)
   }
 })
 

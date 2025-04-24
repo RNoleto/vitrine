@@ -129,6 +129,20 @@ export const useContactStore = defineStore('contact', {
       } finally {
         this.carregando = false
       }
+    },
+
+    async listarContatosPublicosPorLoja(lojaId) {
+      this.carregando = true
+      try {
+        const { data } = await api.get(`/public/stores/${lojaId}/contacts`)
+        this.contatos = data.filter(contato => contato.ativo !== 0)
+        this.erro = null
+      } catch (e) {
+        this.erro = e.response?.data?.error || 'Erro ao listar contatos públicos'
+      } finally {
+        this.carregando = false
+      }
     }
+    
   }
 })
