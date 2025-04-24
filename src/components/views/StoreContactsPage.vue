@@ -14,7 +14,7 @@ const loja = computed(() => lojaStore.lojas.find(l => l.id === lojaId))
 
 onMounted(async () => {
   if (lojaStore.lojas.length === 0) {
-    await lojaStore.listarLojas()
+    await lojaStore.listarLojasPublicas()
   }
 
   if (contactStore.contatos.length === 0) {
