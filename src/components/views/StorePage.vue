@@ -31,13 +31,13 @@ onMounted(async () => {
   }
 })
 
-function abrirLink(url) {
-  if (url) {
-    window.open(url, '_blank')
-  } else {
-    alert('Link inválido.')
-  }
-}
+// function abrirLink(url) {
+//   if (url) {
+//     window.open(url, '_blank')
+//   } else {
+//     alert('Link inválido.')
+//   }
+// }
 
 function irParaContatos() {
   router.push(`/contacts/${lojaId}/contacts`)
@@ -48,7 +48,7 @@ function irParaContatos() {
 <template>
   <section class="flex flex-col min-h-[100vh] flex-1">
     <main class="flex">
-      <Loading v-if="lojaStore.carregando" text="Carregando página da loja" />
+      <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="flex-1"/>
       <div v-else-if="loja" class="storePage text-center">
         <div class="mt-6">
           <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
@@ -65,7 +65,7 @@ function irParaContatos() {
           <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="abrirWhatsapp(contatos[0], loja?.name)" />
         </div>
         <div v-else-if="contatos.length > 1">
-          <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset icon"  @click="irParaContatos"/>
+          <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset icon"  @click="irParaContatos" />
         </div>
       </div>
       <div v-else class="text-center text-red-600 mt-10">
