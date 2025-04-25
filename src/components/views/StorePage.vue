@@ -4,6 +4,8 @@ import { useWhatsapp } from '@/composables/useWhatsapp'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import Loading from '../ui/Loading.vue'
+import Card from '../ui/Card.vue'
+import Footer from '../Footer.vue'
 
 
 const { abrirWhatsapp } = useWhatsapp()
@@ -44,44 +46,32 @@ function irParaContatos() {
 </script>
 
 <template>
-  <section>
+  <section class="flex flex-col min-h-[100vh] flex-1">
     <main class="flex">
       <Loading v-if="lojaStore.carregando" text="Carregando página da loja" />
       <div v-else-if="loja" class="storePage text-center">
-        <div>
+        <div class="mt-6">
           <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
-          <h1 class="title text-4xl font-bold">{{ loja.name }}</h1>
+          <h1 class="title font-bold">{{ loja.name }}</h1>
         </div>
-  
+        <!-- Links da loja -->
         <div class="space-y-3">
-          <div v-for="(link, index) in loja.links" :key="index" class="flex items-center justify-center gap-2">
-            <button @click="abrirLink(link.url)"
-              class="w-full text-lg bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm shadow-zinc-500">
-              <i :class="link.icone"></i> {{ link.texto }}
-            </button>
+          <div v-for="(link, index) in loja.links" :key="index">
+            <Card :text="link.texto" :icon="link.icone" :link="link.url" />
           </div>
         </div>
         <!-- Lista de Contatos da Loja -->
-        <div v-if="contatos.length === 1" class="mt-3 space-y-3 mb-2">
-          <div class="flex items-center gap-4 px-4 py-2 border border-zinc-400 rounded-lg cursor-pointer bg-zinc-300 hover:bg-zinc-500 hover:border-zinc-600 hover:text-white"
-            @click="abrirWhatsapp(contatos[0], loja?.name)">
-            <img :src="contatos[0].photo" alt="Foto do contato" class="w-10 h-10 rounded-full object-cover" />
-            <div class="text-left">
-              <p><!-- <strong>Nome:</strong> --> {{ contatos[0].name }}</p>
-              <!-- <p><strong>Telefone:</strong> {{ contatos[0].whatsapp }}</p> -->
-            </div>
-          </div>
+        <div v-if="contatos.length === 1" class="space-y-3 mb-2">
+          <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="abrirWhatsapp(contatos[0], loja?.name)" />
         </div>
-  
-        <div v-else-if="contatos.length > 1" class="mt-3 mb-2">
-          <button @click="irParaContatos" class="text-indigo-600 underline hover:text-indigo-800 text-sm">
-            Ver todos os contatos ({{ contatos.length }})
-          </button>
+        <div v-else-if="contatos.length > 1">
+          <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset icon"  @click="irParaContatos"/>
         </div>
       </div>
       <div v-else class="text-center text-red-600 mt-10">
         Loja não encontrada.
       </div>  
     </main>
+    <Footer />
   </section>
 </template>
