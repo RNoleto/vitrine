@@ -1,9 +1,24 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useContactStore } from '../../stores/contactStore'
 import Loading from '../ui/Loading.vue'
+
+// Teste de temas
+import { useThemeStore } from '../../stores/themeStore'
+const themeStore = useThemeStore()
+
+const themes = ['dark', 'pastel', 'aqua']
+
+function handleThemeChange(event) {
+  const newTheme = event.target.value
+  console.log('Alterando tema para:', newTheme)  // Verifique se está sendo chamado corretamente
+  themeStore.setTheme(newTheme)
+}
+
+
+// Fim do teste de temas
 
 const route = useRoute()
 const router = useRouter()
@@ -104,6 +119,15 @@ const contatosDaLoja = computed(() => {
         </div>
       </section>
       <div class="divider"></div>
+      <section>
+        <div>
+          <select @change="handleThemeChange" class="p-2 border rounded">
+            <option v-for="theme in themes" :key="theme" :value="theme">
+              {{ theme.charAt(0).toUpperCase() + theme.slice(1) }}
+            </option>
+          </select>
+        </div>
+      </section>
       <!-- Links da Loja -->
       <section>
         <h3 class="text-xl font-bold mb-4">Links</h3>

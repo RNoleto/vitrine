@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useWhatsapp } from '@/composables/useWhatsapp'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
@@ -7,6 +7,13 @@ import Loading from '../ui/Loading.vue'
 import Card from '../ui/Card.vue'
 import Footer from '../Footer.vue'
 
+// teste manipulação de tema
+import { useThemeStore } from '../../stores/themeStore'
+const themeStore = useThemeStore()
+
+const themeClass = computed(() => {
+  return `theme-${themeStore.theme}` // Agora direto no state reativo
+})
 
 const { abrirWhatsapp } = useWhatsapp()
 const route = useRoute()
@@ -18,6 +25,19 @@ const loja = ref(null)
 const contatos = ref([])
 
 onMounted(async () => {
+
+// Observar o state reativo
+  watch(
+    () => themeStore.theme, // Observe o theme reativo diretamente
+    (newTheme) => {
+      console.log('Tema atualizado:', newTheme)
+      if (newTheme) {
+        document.body.setAttribute('data-theme', newTheme) // Atualiza o atributo sem refresh
+      }
+    },
+    { immediate: true } // Roda já na primeira montagem
+  )
+
   lojaStore.carregando = true
 
   try {
@@ -46,7 +66,7 @@ function irParaContatos() {
 </script>
 
 <template>
-  <section class="flex flex-col min-h-[100vh] flex-1">
+  <section :class="[themeClass, 'flex flex-col min-h-[100vh] flex-1']" :style="{ background: 'var(--color-background)', color: 'var(--color-foreground)' }" >
     <main class="flex">
       <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="flex-1"/>
       <div v-else-if="loja" class="storePage text-center">
