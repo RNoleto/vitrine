@@ -14,20 +14,22 @@ defineProps({
     v-bind="internal ? { to: link } : { href: link, target: '_blank', rel: 'noopener noreferrer' }"
     class="card"
   >
-    <div class="icon-wrapper">
+    <div class="icon-wrapper" :style="{ color: 'var(--color-background)' }">
       <img
         v-if="photo"
         :src="photo"
         alt="Foto"
         class="photo"
+        :style="{ color: 'var(--color-primary)' }"
       />
       <i
         v-else-if="icon"
         :class="icon"
         class="icon"
+        :style="{ color: 'var(--color-primary)' }"
       />
     </div>
-    <p>{{ text }}</p>
+    <p :style="{ color: 'var(--color-primary)' }">{{ text }}</p>
   </component>
 </template>
 
@@ -57,7 +59,7 @@ defineProps({
   width: 40px;
   height: 40px;
   /* background: linear-gradient(135deg, #5A50B3 0%, #874DA2 50%, #B24890 100%); */
-  background: #cecece;
+  /* background: #cecece; */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -67,7 +69,7 @@ defineProps({
 
 .icon-wrapper .icon {
   font-size: 20px;
-  color: white;
+  /* color: white; */
 }
 
 .photo {

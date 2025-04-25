@@ -26,18 +26,6 @@ const contatos = ref([])
 
 onMounted(async () => {
 
-// Observar o state reativo
-  watch(
-    () => themeStore.theme, // Observe o theme reativo diretamente
-    (newTheme) => {
-      console.log('Tema atualizado:', newTheme)
-      if (newTheme) {
-        document.body.setAttribute('data-theme', newTheme) // Atualiza o atributo sem refresh
-      }
-    },
-    { immediate: true } // Roda já na primeira montagem
-  )
-
   lojaStore.carregando = true
 
   try {
@@ -50,6 +38,13 @@ onMounted(async () => {
     lojaStore.carregando = false
   }
 })
+
+watch(() => themeStore.theme, (newTheme) => {
+  console.log('Tema atualizado:', newTheme)
+  if (newTheme) {
+    document.body.setAttribute('data-theme', newTheme)
+  }
+}, { immediate: true })
 
 // function abrirLink(url) {
 //   if (url) {
@@ -67,7 +62,7 @@ function irParaContatos() {
 
 <template>
   <section :class="[themeClass, 'flex flex-col min-h-[100vh] flex-1']" :style="{ background: 'var(--color-background)', color: 'var(--color-foreground)' }" >
-    <main class="flex">
+    <main class="flex vitrine">
       <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="flex-1"/>
       <div v-else-if="loja" class="storePage text-center">
         <div class="mt-6">
