@@ -112,7 +112,11 @@ section.gradient {
   border-top: 4px solid var(--color-accent);
 }
 
-section.gradient ::v-deep(.footer) {
+section.gradient ::v-deep(footer) {
+  color: var(--color-text);
+}
+
+section ::v-deep(footer) {
   color: var(--color-text);
 }
 

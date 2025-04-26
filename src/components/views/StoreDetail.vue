@@ -9,7 +9,7 @@ import Loading from '../ui/Loading.vue'
 import { useThemeStore } from '../../stores/themeStore'
 const themeStore = useThemeStore()
 
-const themes = ['dark', 'light-gradient', 'pastel', 'aqua']
+const themes = ['dark', 'light', 'pastel', 'aqua', 'light-gradient']
 
 function handleThemeChange(event) {
   const newTheme = event.target.value

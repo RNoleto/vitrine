@@ -10,7 +10,7 @@ const props = defineProps({
 <template>
     <div class="flex flex-col items-center justify-center mt-20 text-gray-600">
         <div class="loader mb-4"></div>
-        <p v-if="text" class="text-lg font-medium">{{ text }}</p>
+        <p v-if="text" class="textLoader text-lg font-medium">{{ text }}</p>
     </div>
 </template>
 
