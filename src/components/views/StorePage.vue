@@ -59,8 +59,8 @@ function irParaContatos() {
 
 <template>
   <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
-    <main class="flex flex-col vitrine w-full">
-      <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="custom-loading flex-1" :style="{color: 'var(--color-accent)', border: 'var(--color-primary)'}" />
+    <main class="flex flex-col w-full">
+      <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="custom-loading" />
       <div v-else-if="loja" class="storePage text-center">
         <div class="mt-6">
           <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
@@ -107,9 +107,17 @@ section.gradient {
   color: var(--color-accent);
 }
 
+.custom-loading{
+  min-height: calc(100vh - 200px);
+}
+
 .custom-loading ::v-deep(.loader) {
   border: 4px solid var(--color-text);
   border-top: 4px solid var(--color-accent);
+}
+
+.custom-loading ::v-deep(.textLoader) {
+  color: var(--color-accent);
 }
 
 section.gradient ::v-deep(footer) {

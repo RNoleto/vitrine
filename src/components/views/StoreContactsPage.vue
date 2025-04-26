@@ -56,7 +56,7 @@ const contatos = computed(() =>
 <template>
   <section :class="[themeClass, 'flex flex-col min-h-[100vh] flex-1']">
     <main class="flex">
-      <Loading v-if="!lojaStore.carregando" text="Carregando dados da loja"  />
+      <Loading v-if="!lojaStore.carregando" text="Carregando dados da loja" class="custom-loading"  />
       <div v-else class="storePage text-center">
         <div v-if="loja" class="mt-6">
           <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
@@ -94,14 +94,14 @@ section.gradient {
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: var(--color-primary);
 }
+
+.custom-loading{
+  min-height: calc(100vh - 200px);
+}
+
 .custom-loading ::v-deep(.loader) {
   border: 4px solid var(--color-text);
   border-top: 4px solid var(--color-accent);
-}
-
-.custom-loading ::v-deep(.textLoader) {
-  color: var(--color-text);
-  font-size: 5.2rem;
 }
 
 section.gradient ::v-deep(.footer) {
