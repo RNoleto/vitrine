@@ -1,22 +1,36 @@
 
 .theme-dark {
-    --color-background: oklch(0.12 0 0);
-    --color-foreground: oklch(0.95 0 0);
-    --color-primary: oklch(0.6 0.2 260);
-    --color-accent: oklch(0.72 0.11 178);
-  }
+  --color-background: #121212;
+  --color-foreground: #1E1E1E;
+  --color-primary: #C38FFF; 
+  --color-accent: #03DAC6;
+  --color-text: #DFDFDF;
+}
+
+.theme-light-gradient{
+  /* Mantém as cores padrão */
+  --color-foreground: rgba(255, 255, 255, 0.7);
+  --color-primary: #6C40BF;
+  --color-accent: #00BFA6;
+  --color-text: #222222;
+  --backdrop-blur: blur(10px);
+}
+
+
+.theme-pastel {
+  --color-background: #fdf9f3;
+  --color-foreground: #4d4d4d;
+  --color-primary: #d9a7f2;   
+  --color-accent: #f5c07a; 
+  --color-text: #DFDFDF;   
+}
   
-  .theme-pastel {
-    --color-background: oklch(0.98 0.02 100);
-    --color-foreground: oklch(0.3 0.02 100);
-    --color-primary: oklch(0.85 0.1 300);
-    --color-accent: oklch(0.9 0.08 30);
-  }
-  
-  .theme-aqua {
-    --color-background: oklch(0.95 0.05 190);
-    --color-foreground: oklch(0.2 0.02 190);
-    --color-primary: oklch(0.7 0.15 200);
-    --color-accent: oklch(0.72 0.11 178);
-  }
+.theme-aqua {
+  --color-background: #e0f7fa; 
+  --color-foreground: #333333; 
+  --color-primary: #4dd0e1;    
+  --color-accent: #5ec8d8; 
+  --color-text: #DFDFDF;    
+}
+
   

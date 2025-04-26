@@ -9,27 +9,13 @@ defineProps({
 </script>
 
 <template>
-  <component
-    :is="internal ? 'RouterLink' : 'a'"
-    v-bind="internal ? { to: link } : { href: link, target: '_blank', rel: 'noopener noreferrer' }"
-    class="card"
-  >
-    <div class="icon-wrapper" :style="{ color: 'var(--color-background)' }">
-      <img
-        v-if="photo"
-        :src="photo"
-        alt="Foto"
-        class="photo"
-        :style="{ color: 'var(--color-primary)' }"
-      />
-      <i
-        v-else-if="icon"
-        :class="icon"
-        class="icon"
-        :style="{ color: 'var(--color-primary)' }"
-      />
+  <component :is="internal ? 'RouterLink' : 'a'"
+    v-bind="internal ? { to: link } : { href: link, target: '_blank', rel: 'noopener noreferrer' }" class="card">
+    <div class="icon-wrapper">
+      <img v-if="photo" :src="photo" alt="Foto" class="photo" />
+      <i v-else-if="icon" :class="icon" class="icon" />
     </div>
-    <p :style="{ color: 'var(--color-primary)' }">{{ text }}</p>
+    <p>{{ text }}</p>
   </component>
 </template>
 
@@ -38,10 +24,11 @@ defineProps({
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: #ffffff;
+  background: var(--color-foreground);
+  /* backdrop-filter: var(--backdrop-blur); */
   text-align: left;
   padding: 0.25rem 0.25rem 0.25rem 1rem;
-  border: 1px solid #cecece;
+  border: 1px solid var(--color-accent);
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   margin-bottom: 1rem;
@@ -53,13 +40,22 @@ defineProps({
 
 .card:hover {
   transform: scale(1.01);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+.card:hover :deep(.icon-wrapper) {
+  background: var(--color-accent); /* ou qualquer outra cor de destaque */
+  transition: background 0.3s ease;
+}
+
+.card:hover :deep(.icon){
+  color: var(--color-foreground)
 }
 
 .icon-wrapper {
   width: 40px;
   height: 40px;
-  /* background: linear-gradient(135deg, #5A50B3 0%, #874DA2 50%, #B24890 100%); */
-  /* background: #cecece; */
+  background: var(--color-background);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -69,7 +65,7 @@ defineProps({
 
 .icon-wrapper .icon {
   font-size: 20px;
-  /* color: white; */
+  color: var(--color-accent);
 }
 
 .photo {
@@ -78,5 +74,9 @@ defineProps({
   object-fit: cover;
   border-radius: 50%;
   transform: scale(1.13);
+}
+
+p{
+  color: var(--color-text);
 }
 </style>

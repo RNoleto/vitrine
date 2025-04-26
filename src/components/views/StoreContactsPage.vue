@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 import { useWhatsapp } from '@/composables/useWhatsapp'
 import { useRoute, useRouter } from 'vue-router'
 import { useContactStore } from '../../stores/contactStore'
@@ -7,6 +7,24 @@ import { useLojaStore } from '../../stores/lojaStore'
 import Loading from '../ui/Loading.vue'
 import Card from '../ui/Card.vue'
 import Footer from '../Footer.vue'
+
+// teste manipulação de tema
+import { useThemeStore } from '../../stores/themeStore'
+const themeStore = useThemeStore()
+
+const gradientAtivo = computed(() => themeStore.hasGradient)
+
+const themeClass = computed(() => ({
+  [`theme-${themeStore.themeName}`]: true,
+  'gradient': themeStore.hasGradient
+}))
+
+watch(() => themeStore.theme, (newTheme) => {
+  console.log('Tema atualizado:', newTheme)
+  if (newTheme) {
+    document.body.setAttribute('data-theme', newTheme)
+  }
+}, { immediate: true })
 
 
 const { abrirWhatsapp } = useWhatsapp()
@@ -36,7 +54,7 @@ const contatos = computed(() =>
 </script>
 
 <template>
-  <section class="flex flex-col min-h-[100vh] flex-1">
+  <section :class="[themeClass, 'flex flex-col min-h-[100vh] flex-1']">
     <main class="flex">
       <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" />
       <div v-else class="storePage text-center">
@@ -56,7 +74,7 @@ const contatos = computed(() =>
           </p>
         </div>
         <div class="flex justify-end mt-2" @click="router.back()">
-          <p class="text-zinc-800 cursor-pointer border p-2 bg-white rounded-md shadow-md hover:shadow-lg hover:bg-zinc-100 transition duration-200 ease-in-out">
+          <p class="back px-4 py-2 mt-4 rounded-md shadow-md transition duration-200 ease-in-out">
             ← Voltar
           </p>
         </div>
@@ -65,3 +83,41 @@ const contatos = computed(() =>
     <Footer />
   </section>
 </template>
+
+<style scoped>
+section {
+  background: var(--color-background);
+  color: var(--color-primary);
+}
+
+section.gradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: var(--color-primary);
+}
+.custom-loading ::v-deep(.loader) {
+  border: 4px solid var(--color-text);
+  border-top: 4px solid var(--color-accent);
+}
+
+section.gradient ::v-deep(.footer) {
+  color: var(--color-text);
+}
+
+.title{
+  color: var(--color-accent);
+}
+
+.back{
+  color: var(--color-accent);
+  background: var(--color-foreground);
+  border: 1px solid var(--color-accent);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.back:hover{
+  transform: scale(1.01);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+</style>

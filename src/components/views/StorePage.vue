@@ -11,9 +11,14 @@ import Footer from '../Footer.vue'
 import { useThemeStore } from '../../stores/themeStore'
 const themeStore = useThemeStore()
 
-const themeClass = computed(() => {
-  return `theme-${themeStore.theme}` // Agora direto no state reativo
-})
+const gradientAtivo = computed(() => themeStore.hasGradient)
+
+const themeClass = computed(() => ({
+  [`theme-${themeStore.themeName}`]: true,
+  'gradient': themeStore.hasGradient
+}))
+
+
 
 const { abrirWhatsapp } = useWhatsapp()
 const route = useRoute()
@@ -46,14 +51,6 @@ watch(() => themeStore.theme, (newTheme) => {
   }
 }, { immediate: true })
 
-// function abrirLink(url) {
-//   if (url) {
-//     window.open(url, '_blank')
-//   } else {
-//     alert('Link inválido.')
-//   }
-// }
-
 function irParaContatos() {
   router.push(`/contacts/${lojaId}/contacts`)
 }
@@ -61,32 +58,62 @@ function irParaContatos() {
 </script>
 
 <template>
-  <section :class="[themeClass, 'flex flex-col min-h-[100vh] flex-1']" :style="{ background: 'var(--color-background)', color: 'var(--color-foreground)' }" >
-    <main class="flex vitrine">
-      <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="flex-1"/>
+  <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
+    <main class="flex flex-col vitrine w-full">
+      <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="custom-loading flex-1" :style="{color: 'var(--color-accent)', border: 'var(--color-primary)'}" />
       <div v-else-if="loja" class="storePage text-center">
         <div class="mt-6">
           <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
           <h1 class="title font-bold">{{ loja.name }}</h1>
         </div>
-        <!-- Links da loja -->
-        <div class="space-y-3">
-          <div v-for="(link, index) in loja.links" :key="index">
-            <Card :text="link.texto" :icon="link.icone" :link="link.url" />
+        <div class="mt-10">
+          <!-- Links da loja -->
+          <div class="space-y-3">
+            <div v-for="(link, index) in loja.links" :key="index">
+              <Card :text="link.texto" :icon="link.icone" :link="link.url" />
+            </div>
+          </div>
+          <!-- Lista de Contatos da Loja -->
+          <div v-if="contatos.length === 1" class="space-y-3 mb-2">
+            <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="abrirWhatsapp(contatos[0], loja?.name)" />
+          </div>
+          <div v-else-if="contatos.length > 1">
+            <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset icon" @click="irParaContatos" />
           </div>
         </div>
-        <!-- Lista de Contatos da Loja -->
-        <div v-if="contatos.length === 1" class="space-y-3 mb-2">
-          <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="abrirWhatsapp(contatos[0], loja?.name)" />
-        </div>
-        <div v-else-if="contatos.length > 1">
-          <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset icon"  @click="irParaContatos" />
+      </div>
+      <div v-else class="flex flex-1 items-center justify-center min-h-screen">
+        <div class="text-center text-red-600 p-6 rounded shadow">
+          <p class="text-sm">Loja não encontrada.</p>
         </div>
       </div>
-      <div v-else class="text-center text-red-600 mt-10">
-        Loja não encontrada.
-      </div>  
     </main>
     <Footer />
   </section>
 </template>
+
+<style scoped>
+section {
+  background: var(--color-background);
+  color: var(--color-primary);
+}
+
+section.gradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: var(--color-primary);
+}
+
+.title {
+  color: var(--color-accent);
+}
+
+.custom-loading ::v-deep(.loader) {
+  border: 4px solid var(--color-text);
+  border-top: 4px solid var(--color-accent);
+}
+
+section.gradient ::v-deep(.footer) {
+  color: var(--color-text);
+}
+
+</style>
