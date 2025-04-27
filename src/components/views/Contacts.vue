@@ -120,24 +120,23 @@ onMounted(() => {
     <div class="mt-8">
       <p class="font-semibold">Contatos cadastrados</p>
       <ul class="space-y-3 mt-4">
-        <Loading v-if="lojaStore.carregando" text="Carregando Contatos" />
-        <li v-else v-for="(c, i) in contactStore.contatos" :key="i" class="flex items-center space-x-4">
+        <Loading v-if="lojaStore.carregando" text="" />
+        <li v-else v-for="(c, i) in contactStore.contatos" :key="i" class="flex items-center space-x-4 border bg-zinc-100 border-gray-300 p-2 rounded-lg shadow-sm">
           <img :src="c.photo" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
           <div>
             <p class="font-semibold">{{ c.name }}</p>
             <p class="text-sm">{{ c.whatsapp }}</p>
             <p class="text-sm text-indigo-600 italic">
-              Empresa:
+              Loja:
               {{lojaStore.lojas.find(loja => loja.id === c.store_id)?.name || 'Empresa não encontrada'}}
             </p>
           </div>
-          <div class="ml-auto flex space-x-2">
-            <button class="text-blue-600 hover:underline" @click="editarContato(c.id)">Editar</button>
-            <button class="text-red-600 hover:underline" @click="excluirContato(c.id)">Excluir</button>
+          <div class="ml-auto flex gap-2 space-x-2">
+            <button class="cursor-pointer p-2 rounded-md bg-blue-600 text-white hover:bg-blue-500 hover:scale-105" @click="editarContato(c.id)">Editar</button>
+            <button class="cursor-pointer p-2 rounded-md bg-red-600  text-white hover:bg-red-500 hover:scale-105" @click="excluirContato(c.id)">Excluir</button>
           </div>
         </li>
       </ul>
-
     </div>
   </div>
 </template>

@@ -17,9 +17,7 @@ const props = defineProps({
 <style scoped>
 .loader {
     border: 4px solid #e5e7eb;
-    /* gray-200 */
     border-top: 4px solid #3b82f6;
-    /* blue-500 */
     border-radius: 50%;
     width: 3rem;
     height: 3rem;

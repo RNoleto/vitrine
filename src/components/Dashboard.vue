@@ -27,7 +27,7 @@ function logout() {
 <template>
   <div class="min-h-screen flex flex-col bg-gray-100">
     <!-- Cabeçalho Mobile -->
-    <header class="bg-white p-4 border-b border-gray-300 flex items-center md:hidden">
+    <header class="relative sm:static bg-white p-4 border-b border-gray-300 flex items-center md:hidden">
       <button @click="toggleSidebar" class="text-gray-700 focus:outline-none">
         <!-- Ícone de Hamburger -->
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -39,7 +39,7 @@ function logout() {
 
     <div class="flex flex-1 overflow-hidden">
       <!-- Sidebar -->
-      <aside :class="['flex flex-col bg-white p-4 border-r border-gray-300 w-64 transition-all duration-300',
+      <aside :class="['absolute sm:static flex flex-col bg-white p-4 border-r border-gray-300 w-64 transition-all duration-300',
         sidebarOpen ? 'block' : 'hidden', 'md:block']">
         <h1 class="text-xl font-bold text-gray-800 mb-6">Dashboard</h1>
         <nav class="flex-1">
@@ -71,5 +71,8 @@ function logout() {
 </template>
 
 <style scoped>
-/* O componente utiliza apenas classes utilitárias do Tailwind CSS */
+aside {
+  z-index: 10;
+  min-height: calc(100vh - 3.8rem); /* Altura total menos a altura do cabeçalho */
+}
 </style>

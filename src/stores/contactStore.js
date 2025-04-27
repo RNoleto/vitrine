@@ -111,11 +111,7 @@ export const useContactStore = defineStore('contact', {
       this.carregando = true
 
       try {
-        await api.delete(`/contacts/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
+        await api.delete(`/contacts/${id}`)
 
         const contato = this.contatos.find(c => c.id === id)
         if (contato) {
