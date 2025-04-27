@@ -23,6 +23,7 @@ export const useLojaStore = defineStore('loja', {
   state: () => ({
     lojas: [],
     carregando: false,
+    cadastrando: false,
     lojaSelecionada: null,
     contatosLoja: [],
     erro: null
@@ -30,6 +31,7 @@ export const useLojaStore = defineStore('loja', {
 
   actions: {
     async adicionarLoja(loja) {
+      this.cadastrando = true
       const authStore = useAuthStore()
       const firebase_uid = authStore.user?.firebase_uid
 
@@ -60,6 +62,7 @@ export const useLojaStore = defineStore('loja', {
         this.erro = e.response?.data?.error || 'Erro ao criar loja'
       } finally {
         this.carregando = false
+        this.cadastrando= false
       }
     },
 
@@ -71,9 +74,7 @@ export const useLojaStore = defineStore('loja', {
         this.erro = 'Usuário não autenticado'
         return
       }
-
-      if (this.lojas.length > 0) return
-
+      
       this.carregando = true
       try {
         const response = await api.get('/stores')
@@ -145,21 +146,14 @@ export const useLojaStore = defineStore('loja', {
 
     async excluirLoja(id) {
       this.carregando = true
-
       try {
-        await api.delete(`/stores/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
-
-        // Remove a loja do estado local
-        const loja = this.lojas.find(loja => loja.id === id)
-        if (loja) {
-          loja.ativo = 0
-        }
+        await api.delete(`/stores/${id}`)
+        // Remove imediatamente do estado local
+        this.lojas = this.lojas.filter(loja => loja.id !== id)
+        await this.listarLojas()
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao excluir loja'
+        throw new Error(this.erro)
       } finally {
         this.carregando = false
       }

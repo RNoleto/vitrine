@@ -139,8 +139,12 @@ function salvarEdicao() {
 
 const  deletarLoja = async (index) => {
     if (confirm('Deseja realmente excluir esta loja?')) {
-        await lojaStore.excluirLoja(lojaStore.lojas[index].id)
-        alert('Loja excluída com sucesso!');
+        try{
+            await lojaStore.excluirLoja(lojaStore.lojas[index].id)
+            alert('Loja excluída com sucesso!');
+        } catch (error){
+            alert('Erro ao excluir loja: ' + (error.message || 'Tente novamente mais tarde.'))
+        }
     }
 }
 
@@ -206,7 +210,12 @@ onMounted(() => {
                     </li>
                 </ul>
             </div>
-            <Button @click="cadastrarLoja">Cadastrar Loja</Button>
+            <Button 
+                @click="cadastrarLoja"
+                :disabled="lojaStore.cadastrando || lojaStore.carregando"
+            >
+                {{ lojaStore.cadastrando ? 'Cadastrando...' : 'Cadastrar loja' }}
+            </Button>
         </div>
 
         <div class="divider"></div>
