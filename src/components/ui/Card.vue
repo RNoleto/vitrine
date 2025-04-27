@@ -1,8 +1,8 @@
 <script setup>
 defineProps({
   text: String,
-  icon: String,      // Aqui pode vir 'fa-brands fa-instagram'
-  photo: String,     // Aqui é URL de imagem
+  icon: String,
+  photo: String,
   link: String,
   internal: Boolean,
 });

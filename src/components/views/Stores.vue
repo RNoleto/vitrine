@@ -56,9 +56,9 @@ async function cadastrarLoja() {
     }
     // lojaStore.adicionarLoja(novaLojaNome.value, novaLojaLogo.value, [...novaLinks.value])
     await lojaStore.adicionarLoja({
-      name: novaLojaNome.value,
-      logoBase64: novaLojaLogo.value,
-      links: novaLinks.value
+        name: novaLojaNome.value,
+        logoBase64: novaLojaLogo.value,
+        links: novaLinks.value
     })
     novaLojaNome.value = ''
     novaLojaLogo.value = null
@@ -123,26 +123,26 @@ function removerLinkEdit(i) {
 }
 
 function salvarEdicao() {
-  if (!editId.value) {
-    alert('Erro: ID da loja não definido para edição.')
-    return
-  }
+    if (!editId.value) {
+        alert('Erro: ID da loja não definido para edição.')
+        return
+    }
 
-  lojaStore.editarLoja(editId.value, {
-    name: editNome.value,
-    logo: editLogo.value,
-    links: [...editLinks.value]
-  })
+    lojaStore.editarLoja(editId.value, {
+        name: editNome.value,
+        logo: editLogo.value,
+        links: [...editLinks.value]
+    })
 
-  closeEditModal()
+    closeEditModal()
 }
 
-const  deletarLoja = async (index) => {
+const deletarLoja = async (index) => {
     if (confirm('Deseja realmente excluir esta loja?')) {
-        try{
+        try {
             await lojaStore.excluirLoja(lojaStore.lojas[index].id)
             alert('Loja excluída com sucesso!');
-        } catch (error){
+        } catch (error) {
             alert('Erro ao excluir loja: ' + (error.message || 'Tente novamente mais tarde.'))
         }
     }
@@ -160,11 +160,11 @@ const opcoesIcones = [
 ]
 
 function acessarLoja(id) {
-  router.push(`/stores/${id}`)
+    router.push(`/stores/${id}`)
 }
 
 function acessarDetalheLoja(id) {
-  router.push(`/stores/${id}/detail`)
+    router.push(`/stores/${id}/detail`)
 }
 
 onMounted(() => {
@@ -186,20 +186,16 @@ onMounted(() => {
                 </label>
                 <span v-if="novaLojaLogo" class="ml-2 text-sm text-gray-600">Arquivo pronto</span>
             </div>
+            <div class="divider"></div>
             <div class="space-y-2">
                 <p class="font-semibold">Links da página</p>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <IconSelect
-                      v-model="novoIcone"
-                      :options="opcoesIcones"
-                      placeholder="Ícone"
-                      class="flex-1"
-                    />
+                <div class="flex flex-col sm:grid sm:grid-cols-4 gap-2">
+                    <IconSelect v-model="novoIcone" :options="opcoesIcones" placeholder="Ícone" class="flex-1" />
                     <Input id="text-new" name="text-new" v-model="novoTexto" placeholder="Texto do botão"
                         :input-class="inputBaseClass" />
                     <Input id="url-new" name="url-new" v-model="novaUrl" placeholder="URL"
                         :input-class="inputBaseClass" />
-                    <Button @click="adicionarLink">Adicionar</Button>
+                    <Button @click="adicionarLink" class="items-center">Adicionar Link</Button>
                 </div>
                 <ul class="mt-2 space-y-1">
                     <li v-if="novaLinks.length >= 1" class="text-gray-500 mb-2">Links adicionados</li>
@@ -210,10 +206,7 @@ onMounted(() => {
                     </li>
                 </ul>
             </div>
-            <Button 
-                @click="cadastrarLoja"
-                :disabled="lojaStore.cadastrando || lojaStore.carregando"
-            >
+            <Button @click="cadastrarLoja" :disabled="lojaStore.cadastrando || lojaStore.carregando">
                 {{ lojaStore.cadastrando ? 'Cadastrando...' : 'Cadastrar loja' }}
             </Button>
         </div>
@@ -221,43 +214,38 @@ onMounted(() => {
         <div class="divider"></div>
 
         <!-- Listagem de lojas -->
-        <h3 class="text-lg font-semibold mb-3">Lojas Cadastradas</h3>
-        <Loading v-if="lojaStore.carregando" text="" />
-        <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
-        <ul v-else class="space-y-2">
-            <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
-            class="border p-3 rounded flex flex-col justify-between ">
-                <div class="flex items-center gap-3">
-                    <img :src="loja.logo_url" alt="logo" class="w-8 h-8 object-contain" />
-                    <span class="font-medium">{{ loja.name }}</span>
-                </div>
-                <div class="flex gap-2 mt-2">
-                    <Button size="sm" variant="acessar"><router-link :to="`/store/${loja.id}`">Acessar</router-link>
-                    </Button>
-                    <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.id)">Detalhe</Button>
-                    <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>
-                    <Button size="sm" variant="excluir" @click="deletarLoja(idx)">Excluir</Button>
-                </div>
-            </li>
-        </ul>
+        <section>
+            <h3 class="text-lg font-semibold mb-3">Lojas Cadastradas</h3>
+            <Loading v-if="lojaStore.carregando" text="" />
+            <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
+            <ul v-else class="flex flex-col flex-wrap gap-2 sm:grid sm:grid-cols-2 md:grid-cols-3">
+                <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
+                    class="border p-3 rounded flex flex-col justify-between ">
+                    <div class="flex items-center gap-3 mb-2">
+                        <img :src="loja.logo_url" alt="logo" class="w-8 h-8 object-contain" />
+                        <span class="font-medium">{{ loja.name }}</span>
+                    </div>
+                    <div class="flex gap-2 mt-1 sm:grid sm:grid-cols-2">
+                        <Button size="sm" variant="acessar"><router-link :to="`/store/${loja.id}`">Acessar</router-link>
+                        </Button>
+                        <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.id)">Detalhe</Button>
+                        <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>
+                        <Button size="sm" variant="excluir" @click="deletarLoja(idx)">Excluir</Button>
+                    </div>
+                </li>
+            </ul>
 
-        <!-- Modal de edição -->
-        <EditStoreModal
-          :isOpen="isEditModalOpen"
-          :storeData="{
-            id: editId,
-            nome: editNome,
-            logo: editLogo,
-            links: editLinks
-          }"
-          :opcoesIcones="opcoesIcones"
-          :inputBaseClass="inputBaseClass"
-          @save="(dados) => {
-            lojaStore.editarLoja(dados.id, dados)
-            closeEditModal()
-          }"
-          @cancel="closeEditModal"
-        />
+            <!-- Modal de edição -->
+            <EditStoreModal :isOpen="isEditModalOpen" :storeData="{
+                id: editId,
+                nome: editNome,
+                logo: editLogo,
+                links: editLinks
+            }" :opcoesIcones="opcoesIcones" :inputBaseClass="inputBaseClass" @save="(dados) => {
+                lojaStore.editarLoja(dados.id, dados)
+                closeEditModal()
+            }" @cancel="closeEditModal" />
+        </section>
 
     </div>
 </template>

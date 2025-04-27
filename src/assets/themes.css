@@ -1,4 +1,12 @@
 
+.theme-default {
+  --color-background: #FAFAFA;
+  --color-foreground: #E4E5F1;
+  --color-primary: #D2D3DB; 
+  --color-accent: #565868;
+  --color-text: #9394A5;
+}
+
 .theme-dark {
   --color-background: #121212;
   --color-foreground: #1E1E1E;

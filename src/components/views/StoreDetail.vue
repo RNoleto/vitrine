@@ -8,13 +8,13 @@ import Loading from '../ui/Loading.vue'
 // Teste de temas
 import { useThemeStore } from '../../stores/themeStore'
 const themeStore = useThemeStore()
+const selectedTheme = ref('')
 
-const themes = ['dark', 'light', 'pastel', 'aqua', 'light-gradient']
+const themes = ['default', 'dark', 'light', 'pastel', 'aqua', 'light-gradient']
 
-function handleThemeChange(event) {
-  const newTheme = event.target.value
-  console.log('Alterando tema para:', newTheme)  // Verifique se está sendo chamado corretamente
-  themeStore.setTheme(newTheme)
+function handleThemeChange() {
+  console.log('Tema selecionado:', selectedTheme.value)
+  themeStore.setTheme(selectedTheme.value)
 }
 
 
@@ -121,7 +121,8 @@ const contatosDaLoja = computed(() => {
       <div class="divider"></div>
       <section>
         <div>
-          <select @change="handleThemeChange" class="p-2 border rounded">
+          <select v-model="selectedTheme" @change="handleThemeChange" class="p-2 border rounded">
+            <option value="">Selecione um tema</option>
             <option v-for="theme in themes" :key="theme" :value="theme">
               {{ theme.charAt(0).toUpperCase() + theme.slice(1) }}
             </option>
