@@ -46,8 +46,8 @@ async function cadastrarContato() {
     contactStore.editarContato(editIndex.value, contato)
   } else {
     await contactStore.adicionarContato(contato)
-    await contactStore.listarContatos()
   }
+  await contactStore.listarContatos()
 
   resetForm()
 }
@@ -62,11 +62,15 @@ function editarContato(id) {
   editIndex.value = id 
 }
 
-function excluirContato(id) {
+async function excluirContato(id) {
   if (confirm('Deseja realmente excluir esse contato?')) {
-        contactStore.excluirContato(id)
-        alert('Contato excluída com sucesso!');
+    try {
+      await contactStore.excluirContato(id)
+      alert('Contato excluído com sucesso!')
+    } catch (error) {
+      alert('Erro ao excluir contato: ' + (error.message || 'Tente novamente mais tarde'))
     }
+  }
 }
 
 function resetForm() {
@@ -109,9 +113,17 @@ onMounted(() => {
       </select>
 
 
-      <Button @click="cadastrarContato">
-        {{ editIndex !== null ? 'Atualizar' : 'Cadastrar' }}
+      <Button 
+        @click="cadastrarContato" 
+        :disabled="contactStore.cadastrando || contactStore.carregando"
+      >
+        {{ 
+          editIndex !== null 
+            ? (contactStore.cadastrando ? 'Atualizando...' : 'Atualizar')
+            : (contactStore.cadastrando ? 'Cadastrando...' : 'Cadastrar')
+        }}
       </Button>
+
 
     </div>
 

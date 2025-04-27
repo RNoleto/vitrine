@@ -23,6 +23,7 @@ export const useContactStore = defineStore('contact', {
   state: () => ({
     contatos: [],
     carregando: false,
+    cadastrando: false,
     erro: null
   }),
 
@@ -43,8 +44,9 @@ export const useContactStore = defineStore('contact', {
     },    
 
     async adicionarContato(contato) {
+      this.cadastrando = true
       const authStore = useAuthStore()
-      const storeId = contato.store_id // Agora, pegamos o store_id do contato passado
+      const storeId = contato.store_id
     
       const formData = new FormData()
       formData.append('name', contato.name)
@@ -66,10 +68,12 @@ export const useContactStore = defineStore('contact', {
         this.erro = e.response?.data?.error || 'Erro ao adicionar contato'
       } finally {
         this.carregando = false
+        this.cadastrando = false
       }
     },      
 
     async editarContato(id, dados) {
+      this.cadastrando = true
       this.carregando = true
       this.erro = null
 
@@ -103,6 +107,7 @@ export const useContactStore = defineStore('contact', {
         this.erro = 'Erro ao editar contato.'
         console.error(err)
       } finally {
+        this.cadastrando = false
         this.carregando = false
       }
     },
@@ -113,15 +118,13 @@ export const useContactStore = defineStore('contact', {
       try {
         await api.delete(`/contacts/${id}`)
 
-        const contato = this.contatos.find(c => c.id === id)
-        if (contato) {
-          contato.ativo = 0
-        }
+        this.contatos = this.contatos.filter(c => c.id !== id)
 
         await this.listarContatos()
 
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao excluir contato'
+        throw new Error(this.erro)
       } finally {
         this.carregando = false
       }
