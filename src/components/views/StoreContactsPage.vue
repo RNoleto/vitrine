@@ -1,30 +1,22 @@
 <script setup>
-import { onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useWhatsapp } from '@/composables/useWhatsapp'
 import { useRoute, useRouter } from 'vue-router'
 import { useContactStore } from '../../stores/contactStore'
 import { useLojaStore } from '../../stores/lojaStore'
+import { useThemeStore } from '../../stores/themeStore'
 import Loading from '../ui/Loading.vue'
 import Card from '../ui/Card.vue'
 import Footer from '../Footer.vue'
 
 // teste manipulação de tema
-import { useThemeStore } from '../../stores/themeStore'
 const themeStore = useThemeStore()
-
-const gradientAtivo = computed(() => themeStore.hasGradient)
+// const gradientAtivo = computed(() => themeStore.hasGradient)
 
 const themeClass = computed(() => ({
   [`theme-${themeStore.themeName}`]: true,
   'gradient': themeStore.hasGradient
 }))
-
-watch(() => themeStore.theme, (newTheme) => {
-  console.log('Tema atualizado:', newTheme)
-  if (newTheme) {
-    document.body.setAttribute('data-theme', newTheme)
-  }
-}, { immediate: true })
 
 
 const { abrirWhatsapp } = useWhatsapp()
@@ -37,6 +29,12 @@ const lojaStore = useLojaStore()
 const loja = computed(() => lojaStore.lojas.find(l => l.id === lojaId))
 
 onMounted(async () => {
+  
+  if (loja.value) {
+    const savedTheme = loja.value.theme || 'default';
+    themeStore.applyTheme(savedTheme, lojaId);
+  }
+
   if (lojaStore.lojas.length === 0) {
     await lojaStore.listarLojasPublicas()
   }
@@ -54,9 +52,9 @@ const contatos = computed(() =>
 </script>
 
 <template>
-  <section :class="[themeClass, 'flex flex-col min-h-[100vh] flex-1']">
-    <main class="flex">
-      <Loading v-if="!lojaStore.carregando" text="Carregando dados da loja" class="custom-loading"  />
+  <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
+    <main class=" flex-col w-full">
+      <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" class="custom-loading"  />
       <div v-else class="storePage text-center">
         <div v-if="loja" class="mt-6">
           <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />

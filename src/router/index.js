@@ -10,6 +10,9 @@ import Contacts from '../components/views/Contacts.vue'
 import StorePage from '../components/views/StorePage.vue'
 import StoreContactsPage from '../components/views/StoreContactsPage.vue'
 
+import { useThemeStore } from '../stores/themeStore'
+import { useLojaStore } from '../stores/lojaStore'
+
 const routes = [
   {
     path: '/',
@@ -46,12 +49,30 @@ const routes = [
   {
     path: '/store/:id',
     name: 'StorePage',
-    component: StorePage
+    component: StorePage,
+    beforeEnter: (to, from, next) => {
+      const themeStore = useThemeStore();
+      const lojaStore = useLojaStore();
+      
+      lojaStore.obterLojaPublica(to.params.id).then(loja => {
+        themeStore.applyTheme(loja.theme || 'default', to.params.id);
+        next();
+      });
+    }
   },
   {
     path: '/contacts/:id/contacts',
     name: 'StoreContactsPage',
-    component: StoreContactsPage
+    component: StoreContactsPage,
+    beforeEnter: (to, from, next) => {
+      const themeStore = useThemeStore();
+      const lojaStore = useLojaStore();
+      
+      lojaStore.obterLojaPublica(to.params.id).then(loja => {
+        themeStore.applyTheme(loja.theme || 'default', to.params.id);
+        next();
+      });
+    }
   },
   // fallback 404
   {

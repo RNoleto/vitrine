@@ -1,20 +1,45 @@
 <script setup>
-import { ref, computed, onMounted, watch, useTemplateRef } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useContactStore } from '../../stores/contactStore'
 import Loading from '../ui/Loading.vue'
 
+
 // Teste de temas
 import { useThemeStore } from '../../stores/themeStore'
 const themeStore = useThemeStore()
 const selectedTheme = ref('')
+const previewTheme = ref('')
+const isPreview = ref(false)
 
 const themes = ['default', 'dark', 'light', 'pastel', 'aqua', 'light-gradient']
 
-function handleThemeChange() {
-  console.log('Tema selecionado:', selectedTheme.value)
-  themeStore.setTheme(selectedTheme.value)
+async function handleThemeChange() {
+  if (!selectedTheme.value) return;
+
+  // Aplica apenas na pré-visualização
+  previewTheme.value = selectedTheme.value
+  isPreview.value = true
+}
+
+async function aplicarTema() {
+  try {
+    await lojaStore.atualizarTemaLoja(lojaId, previewTheme.value);
+    themeStore.applyTheme(previewTheme.value, lojaId);
+    selectedTheme.value = previewTheme.value;
+    isPreview.value = false
+    alert('Tema aplicado com sucesso!');
+  } catch (error) {
+    console.error('Erro ao aplicar tema:', error);
+    alert('Erro ao aplicar tema: ' + (error.message || 'Tente novamente'));
+  }
+}
+
+function cancelarPreview() {
+  previewTheme.value = ''
+  isPreview.value = false
+  themeStore.applyTheme(selectedTheme.value, lojaId)
 }
 
 
@@ -46,6 +71,8 @@ async function buscarLoja() {
 onMounted(async () => {
   await buscarLoja()
 
+  selectedTheme.value = lojaStore.getTema(lojaId) || 'default';
+
   // gera link encurtado
   try {
     const resp = await fetch(
@@ -66,15 +93,6 @@ function copyLink() {
     .then(() => alert('Link copiado!'))
     .catch(() => alert('Falha ao copiar link.'))
 }
-
-// function abrirLink(url) {
-//   if (url) window.open(url, '_blank')
-//   else alert('Link inválido.')
-// }
-
-// function irParaContatos() {
-//   window.location.href = `/contacts/${lojaId}`
-// }
 
 const back = () => {
   router.push('/stores')
@@ -119,14 +137,54 @@ const contatosDaLoja = computed(() => {
         </div>
       </section>
       <div class="divider"></div>
+      <!-- Tema da Loja -->
       <section>
-        <div>
+        <div class="flex gap-4 items-center mb-4">
           <select v-model="selectedTheme" @change="handleThemeChange" class="p-2 border rounded">
             <option value="">Selecione um tema</option>
             <option v-for="theme in themes" :key="theme" :value="theme">
               {{ theme.charAt(0).toUpperCase() + theme.slice(1) }}
             </option>
           </select>
+          <div v-if="isPreview" class="flex gap-2">
+            <button @click="aplicarTema" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+              Aplicar Tema
+            </button>
+            <button @click="cancelarPreview" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pré-visualização -->
+      <section v-if="isPreview" class="border-2 border-dashed p-4 rounded-lg mb-8">
+        <div class="preview-theme" :class="`theme-${previewTheme}`">
+          <div class="preview-content">
+            <div class="preview-header">
+              <img :src="loja.logo_url" alt="Logo" class="preview-logo">
+              <h3 class="preview-title">{{ loja.name }}</h3>
+            </div>
+
+            <div class="preview-links">
+              <div v-for="(link, index) in loja.links.slice(0, 2)" :key="index" class="preview-link">
+                <i :class="link.icone" :style="{ color: 'var(--color-accent)' }"></i>
+                <span>{{ link.texto }}</span>
+              </div>
+            </div>
+
+            <div class="preview-contact">
+              <div class="preview-contact-info" v-for="contato in contatosDaLoja.slice(0, 1)" :key="contato.id">
+                <div class="flex items-center gap-2">
+                  <img :src="contato.photo" alt="Foto do contato" class="preview-avatar" />
+                  <div>
+                    <p>{{ contato.name }}</p>
+                  </div>
+                  <!-- <p>(11) 99999-9999</p> -->
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       <!-- Links da Loja -->
@@ -164,3 +222,80 @@ const contatosDaLoja = computed(() => {
     <p v-else class="text-center text-red-600 mt-10">Loja não encontrada.</p>
   </div>
 </template>
+<style scoped>
+.preview-theme {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  transform: scale(0.9);
+  transform-origin: top left;
+  width: 320px;
+  min-height: 400px;
+  background: var(--color-background);
+}
+
+.preview-content {
+  pointer-events: none;
+}
+
+.preview-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.preview-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.preview-title {
+  color: var(--color-accent);
+  margin-top: 0.5rem;
+}
+
+.preview-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  margin: 0.25rem 0;
+  background-color: var(--color-foreground);
+  border-radius: 4px;
+  border: 1px solid var(--color-accent);
+  color: var(--color-text);
+}
+
+.preview-link i {
+  width: 20px;
+  text-align: center;
+  color: var(--color-accent);
+}
+
+.preview-link span {
+  color: var(--color-text);
+}
+
+.preview-contact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background-color: var(--color-foreground);
+  border-radius: 4px;
+  border: 1px solid var(--color-accent);
+}
+
+.preview-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+}
+
+.preview-contact-info {
+  color: var(--color-text);
+}
+</style>

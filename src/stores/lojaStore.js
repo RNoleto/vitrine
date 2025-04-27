@@ -62,7 +62,7 @@ export const useLojaStore = defineStore('loja', {
         this.erro = e.response?.data?.error || 'Erro ao criar loja'
       } finally {
         this.carregando = false
-        this.cadastrando= false
+        this.cadastrando = false
       }
     },
 
@@ -74,7 +74,7 @@ export const useLojaStore = defineStore('loja', {
         this.erro = 'Usuário não autenticado'
         return
       }
-      
+
       this.carregando = true
       try {
         const response = await api.get('/stores')
@@ -89,7 +89,7 @@ export const useLojaStore = defineStore('loja', {
       } finally {
         this.carregando = false
       }
-    },   
+    },
 
     async editarLoja(id, dados) {
       this.carregando = true
@@ -105,11 +105,11 @@ export const useLojaStore = defineStore('loja', {
           // ––– FormData + override de método –––
           const form = new FormData()
           form.append('_method', 'PUT')
-          form.append('name',   dados.name)
-          form.append('ativo',  dados.ativo ?? 1)
+          form.append('name', dados.name)
+          form.append('ativo', dados.ativo ?? 1)
 
           // converte base64 em Blob
-          const ct   = dados.logoBase64.split(';')[0].split(':')[1]
+          const ct = dados.logoBase64.split(';')[0].split(':')[1]
           const blob = base64ToBlob(dados.logoBase64, ct)
           form.append('logo', blob, `logo.${ct.split('/')[1]}`)
 
@@ -117,7 +117,7 @@ export const useLojaStore = defineStore('loja', {
           dados.links.forEach((l, i) => {
             form.append(`links[${i}][icone]`, l.icone)
             form.append(`links[${i}][texto]`, l.texto)
-            form.append(`links[${i}][url]`,   l.url)
+            form.append(`links[${i}][url]`, l.url)
           })
 
           res = await api.post(`/stores/${id}`, form)
@@ -125,7 +125,7 @@ export const useLojaStore = defineStore('loja', {
         } else {
           // ––– JSON puro –––
           res = await api.put(`/stores/${id}`, {
-            name:  dados.name,
+            name: dados.name,
             ativo: dados.ativo ?? 1,
             links: dados.links
           })
@@ -158,7 +158,7 @@ export const useLojaStore = defineStore('loja', {
         this.carregando = false
       }
     },
-    
+
     async listarLojasPublicas() {
       this.carregando = true
       try {
@@ -196,6 +196,32 @@ export const useLojaStore = defineStore('loja', {
       } finally {
         this.carregando = false
       }
+    },
+    // Dentro do objeto actions:
+    async atualizarTemaLoja(id, tema) {
+      this.carregando = true;
+      try {
+        // 1. Atualiza no backend
+        await api.put(`/stores/${id}`, { theme: tema });
+
+        // 2. Atualiza o estado local
+        const index = this.lojas.findIndex(l => l.id === id);
+        if (index !== -1) {
+          this.lojas[index].theme = tema;
+        }
+
+        return true;
+      } catch (error) {
+        this.erro = error.response?.data?.error || 'Erro ao atualizar tema';
+        throw error;
+      } finally {
+        this.carregando = false;
+      }
+    },
+
+    getTema(id) {
+      const loja = this.lojas.find(l => l.id === id);
+      return loja?.theme || 'default';
     }
 
   },

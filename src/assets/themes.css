@@ -1,4 +1,4 @@
-
+:root,
 .theme-default {
   --color-background: #FAFAFA;
   --color-foreground: #E4E5F1;
@@ -7,6 +7,7 @@
   --color-text: #9394A5;
 }
 
+[data-theme="dark"],
 .theme-dark {
   --color-background: #121212;
   --color-foreground: #1E1E1E;
@@ -15,6 +16,7 @@
   --color-text: #DFDFDF;
 }
 
+[data-theme="light"],
 .theme-light {
   --color-background: #FAFAFA;
   --color-foreground: #E4E5F1;
@@ -23,28 +25,35 @@
   --color-text: #9394A5;
 }
 
+[data-theme="pastel"],
 .theme-pastel {
-  --color-background: #F4F3EE;   
-  --color-foreground: #E9E1EE;   
-  --color-primary: #E5CFE3;      
-  --color-accent: #A999BD;       
-  --color-text: #5e5e5e;         
+  --color-background: #F4F3EE;
+  --color-foreground: #E9E1EE;
+  --color-primary: #E5CFE3;
+  --color-accent: #A999BD;
+  --color-text: #5e5e5e;
 }
-  
+
+[data-theme="aqua"],
 .theme-aqua {
-  --color-background: #e0f7fa; 
-  --color-foreground: #333333; 
-  --color-primary: #4dd0e1;    
-  --color-accent: #5ec8d8; 
-  --color-text: #DFDFDF;    
+  --color-background: #e0f7fa;
+  --color-foreground: #333333;
+  --color-primary: #4dd0e1;
+  --color-accent: #5ec8d8;
+  --color-text: #DFDFDF;
 }
 
-/* Temas que usam gradient */
-
-.theme-light-gradient{
+[data-theme="light-gradient"],
+.theme-light-gradient {
+  --color-background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   --color-foreground: rgba(255, 255, 255, 0.7);
   --color-primary: #6C40BF;
   --color-accent: #00BFA6;
   --color-text: #222222;
   --backdrop-blur: blur(10px);
-}  
+}
+
+/* Versão com gradient para o tema light */
+.theme-light-gradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+}

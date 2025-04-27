@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useWhatsapp } from '@/composables/useWhatsapp'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
@@ -11,7 +11,7 @@ import Footer from '../Footer.vue'
 import { useThemeStore } from '../../stores/themeStore'
 const themeStore = useThemeStore()
 
-const gradientAtivo = computed(() => themeStore.hasGradient)
+// const gradientAtivo = computed(() => themeStore.hasGradient)
 
 const themeClass = computed(() => ({
   [`theme-${themeStore.themeName}`]: true,
@@ -33,6 +33,11 @@ onMounted(async () => {
 
   lojaStore.carregando = true
 
+  if (loja.value) {
+    const savedTheme = loja.value.theme || 'default';
+    themeStore.applyTheme(savedTheme, lojaId);
+  }
+
   try {
     // Buscar loja e contatos da API pública
     loja.value = await lojaStore.obterLojaPublica(lojaId)
@@ -43,13 +48,6 @@ onMounted(async () => {
     lojaStore.carregando = false
   }
 })
-
-watch(() => themeStore.theme, (newTheme) => {
-  console.log('Tema atualizado:', newTheme)
-  if (newTheme) {
-    document.body.setAttribute('data-theme', newTheme)
-  }
-}, { immediate: true })
 
 function irParaContatos() {
   router.push(`/contacts/${lojaId}/contacts`)
@@ -93,6 +91,11 @@ function irParaContatos() {
 </template>
 
 <style scoped>
+.store-page {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
 section {
   background: var(--color-background);
   color: var(--color-primary);
