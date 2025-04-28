@@ -2,7 +2,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { auth, googleProvider, onAuthStateChanged, signInWithPopup, signOut } from '../services/firebase'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { auth, googleProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signInWithPopup, signOut } from '../services/firebase'
 import api from '../services/api'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -19,24 +20,90 @@ export const useAuthStore = defineStore('auth', () => {
   onAuthStateChanged(auth, async (firebaseUser) => {
     if (firebaseUser) {
       try {
-        // Busca o usuário no backend pelo UID
-        const res = await api.get(`/usuarios/firebase/${firebaseUser.uid}`)
-        const backendUser = res.data
-
-        user.value = backendUser
-        localStorage.setItem('user', JSON.stringify(backendUser))
+        // Verificação de consistência aprimorada
+        const shouldSync = !user.value || 
+                          user.value.firebase_uid !== firebaseUser.uid || 
+                          !localStorage.getItem('user');
+  
+        if (shouldSync) {
+          const res = await api.get(`/usuarios/firebase/${firebaseUser.uid}`)
+          user.value = res.data
+          localStorage.setItem('user', JSON.stringify(res.data))
+        }
       } catch (error) {
-        console.error('Erro ao buscar usuário pelo Firebase UID:', error)
-        user.value = null
-        localStorage.removeItem('user')
+        if (error.response?.status === 404) {
+          console.log('Sincronização pendente, tentando novamente...')
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          try {
+            const res = await api.get(`/usuarios/firebase/${firebaseUser.uid}`)
+            user.value = res.data
+            localStorage.setItem('user', JSON.stringify(res.data))
+          } catch (retryError) {
+            console.error('Falha na ressincronização:', retryError)
+          }
+        }
       }
     } else {
       user.value = null
       localStorage.removeItem('user')
     }
-
     isLoading.value = false
   })
+
+  async function registerWithEmail(fullName, email, password) {
+    isLoading.value = true
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password)
+      const firebaseUser = result.user
+  
+      const idToken = await firebaseUser.getIdToken()
+      
+      // Força a atualização imediata do estado local
+      user.value = {
+        firebase_uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        name: fullName
+      }
+      
+      const loginResponse = await api.post('/login', { 
+        idToken,
+        name: fullName
+       })
+      
+      // Atualização segura dos dados
+      user.value = { ...user.value, ...loginResponse.data.user }
+      localStorage.setItem('user', JSON.stringify(user.value))
+      localStorage.setItem('firebaseToken', idToken)
+  
+    } catch (err) {
+      console.error('Erro no cadastro:', err)
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function loginWithEmail(email, password) {
+    isLoading.value = true
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password)
+      const firebaseUser = result.user
+  
+      const idToken = await firebaseUser.getIdToken()
+      const loginResponse = await api.post('/login', { idToken }) // Alterado
+      
+      // Usa os dados direto da resposta
+      user.value = loginResponse.data.user
+      localStorage.setItem('user', JSON.stringify(loginResponse.data.user))
+      localStorage.setItem('firebaseToken', idToken)
+  
+    } catch (err) {
+      console.error('Erro no login com Email:', err)
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
 
   async function loginWithGoogle() {
     isLoading.value = true
@@ -45,16 +112,11 @@ export const useAuthStore = defineStore('auth', () => {
       const firebaseUser = result.user
 
       const idToken = await firebaseUser.getIdToken()
-      // console.log("Firebase_uid do usuário logado", firebaseUser.uid);
 
-      // Envia token para o backend (se necessário, mas parece que já está cuidando disso)
-      await api.post('/login', { idToken })
+      // Modifique esta parte
+      const loginResponse = await api.post('/login', { idToken })
+      const backendUser = loginResponse.data.user
 
-      // Busca o usuário completo pelo firebase UID
-      const res = await api.get(`/usuarios/firebase/${firebaseUser.uid}`)
-      const backendUser = res.data
-
-      // Atualiza store e localStorage com usuário completo (incluindo ID)
       user.value = backendUser
       localStorage.setItem('user', JSON.stringify(backendUser))
       localStorage.setItem('firebaseToken', idToken)
@@ -69,7 +131,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     try {
-      await signOut(auth)      
+      await signOut(auth)
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
     } finally {
@@ -80,13 +142,25 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function resetPassword(email) {
+    try {
+      await sendPasswordResetEmail(auth, email)
+      alert('Email de recuperação enviado!')
+    } catch (e) {
+      throw new Error('Falha ao enviar email de recuperação')
+    }
+  }
+
   const isLoggedIn = () => !!user.value
 
   return {
     user,
     isLoading,
     isLoggedIn,
+    loginWithEmail,
     loginWithGoogle,
+    registerWithEmail,
+    resetPassword,
     logout,
   }
 })
