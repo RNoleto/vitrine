@@ -11,7 +11,7 @@ import { useThemeStore } from '../../stores/themeStore'
 const themeStore = useThemeStore()
 const selectedTheme = ref('')
 const previewTheme = ref('')
-const isPreview = ref(false)
+const isPreview = ref(true)
 
 const themes = ['default', 'dark', 'light', 'pastel', 'aqua', 'light-gradient']
 
@@ -28,7 +28,7 @@ async function aplicarTema() {
     await lojaStore.atualizarTemaLoja(lojaId, previewTheme.value);
     themeStore.applyTheme(previewTheme.value, lojaId);
     selectedTheme.value = previewTheme.value;
-    isPreview.value = false
+    // isPreview.value = false
     alert('Tema aplicado com sucesso!');
   } catch (error) {
     console.error('Erro ao aplicar tema:', error);
@@ -137,20 +137,21 @@ const contatosDaLoja = computed(() => {
         </div>
       </section>
       <div class="divider"></div>
+      
       <!-- Tema da Loja -->
       <section>
-        <div class="flex gap-4 items-center mb-4">
-          <select v-model="selectedTheme" @change="handleThemeChange" class="p-2 border rounded">
+        <div class="flex flex-col gap-4 items-center mb-4">
+          <select v-model="selectedTheme" @change="handleThemeChange" class="p-2 border rounded w-full">
             <option value="">Selecione um tema</option>
             <option v-for="theme in themes" :key="theme" :value="theme">
               {{ theme.charAt(0).toUpperCase() + theme.slice(1) }}
             </option>
           </select>
-          <div v-if="isPreview" class="flex gap-2">
-            <button @click="aplicarTema" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+          <div v-if="isPreview" class="flex gap-2 w-full">
+            <button @click="aplicarTema" class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
               Aplicar Tema
             </button>
-            <button @click="cancelarPreview" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+            <button @click="cancelarPreview" class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
               Cancelar
             </button>
           </div>
@@ -158,7 +159,7 @@ const contatosDaLoja = computed(() => {
       </section>
 
       <!-- Pré-visualização -->
-      <section v-if="isPreview" class="border-2 border-dashed p-4 rounded-lg mb-8">
+      <section v-if="isPreview" class="border-2 border-dashed p-4 rounded-lg">
         <div class="preview-theme" :class="`theme-${previewTheme}`">
           <div class="preview-content">
             <div class="preview-header">
@@ -187,6 +188,7 @@ const contatosDaLoja = computed(() => {
           </div>
         </div>
       </section>
+      <div class="divider"></div>
       <!-- Links da Loja -->
       <section>
         <h3 class="text-xl font-bold mb-4">Links</h3>
