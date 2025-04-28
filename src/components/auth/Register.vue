@@ -7,6 +7,11 @@
                 <p class="text-sm text-gray-500 mt-1">Crie sua conta para acessar o sistema</p>
             </div>
 
+            <!-- Ilustração -->
+            <div class="flex justify-center">
+              <img src="/vitrine.png" alt="Login Illustration" class="w-28 h-28" />
+            </div>
+
             <!-- Formulário de Cadastro -->
             <form @submit.prevent="register" class="space-y-4">
                 <div>

@@ -26,27 +26,30 @@
             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" />
         </div>
 
-        <Button type="submit" :disabled="auth.isLoading"
-          class="w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50">
-          {{ auth.isLoading ? 'Entrando…' : 'Entrar com Email' }}
-        </Button>
-      </form>
+        
+        <div class="flex gap-2">
+          <Button type="submit" :disabled="auth.isLoading"
+            class="text-xs w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50">
+            {{ auth.isLoading ? 'Entrando…' : 'Entrar com Email' }}
+          </Button>
 
-      <!-- Divisor -->
-      <div class="flex items-center gap-4">
-        <div class="flex-1 border-t border-gray-200"></div>
-        <span class="text-sm text-gray-400">OU</span>
-        <div class="flex-1 border-t border-gray-200"></div>
-      </div>
-
-      <!-- Botão de Login Google -->
-      <div>
         <Button @click="login" :disabled="auth.isLoading"
-          class="w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50">
+          class="text-xs w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50">
           <i class="fa-brands fa-google text-lg"></i>
           {{ auth.isLoading ? 'Entrando…' : 'Entrar com Google' }}
         </Button>
       </div>
+      </form>
+
+      <!-- Divisor -->
+      <!-- <div class="flex items-center gap-4">
+        <div class="flex-1 border-t border-gray-200"></div>
+        <span class="text-sm text-gray-400">OU</span>
+        <div class="flex-1 border-t border-gray-200"></div>
+      </div> -->
+
+      <!-- Botão de Login Google -->
+      
 
       <!-- Rodapé opcional -->
       <p class="text-sm text-gray-600 text-center">
