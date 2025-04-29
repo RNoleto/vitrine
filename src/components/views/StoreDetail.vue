@@ -160,7 +160,7 @@ const contatosDaLoja = computed(() => {
       </section>
 
       <!-- Pré-visualização -->
-      <section v-if="isPreview" class="border-2 border-dashed p-4 rounded-lg preview-container">
+      <section v-if="isPreview" class="border-2 border-dashed border-gray-300 p-4 rounded-lg preview-container">
         <div class="preview-theme" :class="`theme-${previewTheme}`">
           <div class="preview-content">
             <div class="preview-header">
@@ -227,7 +227,7 @@ const contatosDaLoja = computed(() => {
 </template>
 <style scoped>
 .preview-theme {
-  border: 2px dashed #ccc;
+  /* border: 2px dashed #ccc; */
   border-radius: 8px;
   padding: 1rem;
   transform: scale(0.9);

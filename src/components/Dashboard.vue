@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useAuthStore } from '../stores/authStore'
 import Button from '@/components/ui/Button.vue'
 
@@ -25,6 +25,15 @@ function toggleSidebar() {
 function logout() {
   authStore.logout()
 }
+
+watch(sidebarOpen, (newVal) => {
+  if (window.innerWidth < 768) {
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.style.overflow = newVal ? 'hidden' : 'auto';
+    }
+  }
+});
 </script>
 
 <template>
@@ -104,12 +113,14 @@ function logout() {
       ></div>
 
       <!-- Área Principal -->
-      <main class="flex-1 p-6 overflow-y-auto transition-all duration-300">
-        <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <component :is="Component" />
-          </transition>
-        </router-view>
+      <main class="flex-1 p-6 transition-all duration-300 md:overflow-y-auto md:h-screen" :class="{ 'overflow-hidden': sidebarOpen }">
+        <div class="min-h-full md:h-full">
+          <router-view v-slot="{ Component }">
+            <transition name="fade" mode="out-in">
+              <component :is="Component" />
+            </transition>
+          </router-view>
+        </div>
       </main>
     </div>
   </div>
@@ -131,11 +142,30 @@ aside {
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
 }
 
+@media (max-width: 767px) {
+  main {
+    height: calc(100vh - 3.5rem);
+  }
+  
+  main.overflow-hidden {
+    overflow: hidden !important;
+  }
+}
+
 @media (min-width: 768px) {
   aside {
     box-shadow: none;
     height: 100vh;
     top: 0; 
+  }
+
+  main {
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  main > div {
+    min-height: calc(100% - 3rem); /* Ajuste conforme necessidade */
   }
 }
 </style>

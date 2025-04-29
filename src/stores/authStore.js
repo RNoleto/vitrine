@@ -9,15 +9,20 @@ import api from '../services/api'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const router = useRouter()
-  const isLoading = ref(true)
+  const isLoading = ref({
+    global: true,
+    email: false,
+    google: false
+  })
   const storedUser = localStorage.getItem('user')
 
   if (storedUser) {
     user.value = JSON.parse(storedUser)
-    isLoading.value = false
+    isLoading.value.global = false
   }
 
   onAuthStateChanged(auth, async (firebaseUser) => {
+    isLoading.value.global = true
     if (firebaseUser) {
       try {
         // Verificação de consistência aprimorada
@@ -47,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       localStorage.removeItem('user')
     }
-    isLoading.value = false
+    isLoading.value.global = false
   })
 
   async function registerWithEmail(fullName, email, password) {
@@ -79,12 +84,12 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('Erro no cadastro:', err)
       throw err
     } finally {
-      isLoading.value = false
+      isLoading.value.email = false
     }
   }
 
   async function loginWithEmail(email, password) {
-    isLoading.value = true
+    isLoading.value.email = true
     try {
       const result = await signInWithEmailAndPassword(auth, email, password)
       const firebaseUser = result.user
@@ -101,12 +106,12 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('Erro no login com Email:', err)
       throw err
     } finally {
-      isLoading.value = false
+      isLoading.value.email = false
     }
   }
 
   async function loginWithGoogle() {
-    isLoading.value = true
+    isLoading.value.google = true
     try {
       const result = await signInWithPopup(auth, googleProvider)
       const firebaseUser = result.user
@@ -125,7 +130,7 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('Erro no login com Google/backend:', err)
       throw err
     } finally {
-      isLoading.value = false
+      isLoading.value.google = false
     }
   }
 

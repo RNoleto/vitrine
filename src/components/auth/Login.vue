@@ -28,30 +28,20 @@
 
         
         <div class="flex gap-2">
-          <Button type="submit" :disabled="auth.isLoading"
+          <Button type="submit" :disabled="auth.isLoading.email"
             class="text-xs w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50">
-            {{ auth.isLoading ? 'Entrando…' : 'Entrar com Email' }}
+            {{ auth.isLoading.email ? 'Entrando…' : 'Entrar com Email' }}
           </Button>
 
-        <Button @click="login" :disabled="auth.isLoading"
+        <Button @click="login" :disabled="auth.isLoading.google"
           class="text-xs w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50">
           <i class="fa-brands fa-google text-lg"></i>
-          {{ auth.isLoading ? 'Entrando…' : 'Entrar com Google' }}
+          {{ auth.isLoading.google ? 'Entrando…' : 'Entrar com Google' }}
         </Button>
       </div>
-      </form>
+      </form>    
 
-      <!-- Divisor -->
-      <!-- <div class="flex items-center gap-4">
-        <div class="flex-1 border-t border-gray-200"></div>
-        <span class="text-sm text-gray-400">OU</span>
-        <div class="flex-1 border-t border-gray-200"></div>
-      </div> -->
-
-      <!-- Botão de Login Google -->
-      
-
-      <!-- Rodapé opcional -->
+      <!-- Rodapé -->
       <p class="text-sm text-gray-600 text-center">
         Não tem conta? 
         <RouterLink to="/register" class="text-indigo-600 hover:underline">Crie uma aqui</RouterLink>
