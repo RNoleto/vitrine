@@ -96,7 +96,6 @@ onMounted(() => {
 <template>
   <div>
     <p class="font-semibold">Cadastrar Contato</p>
-
     <div class="flex flex-col gap-2 mt-5">
       <Input id="name" name="name" v-model="name" placeholder="Nome do contato" />
       <Input id="whatsapp" name="whatsapp" v-model="whatsapp" placeholder="Whastapp" />

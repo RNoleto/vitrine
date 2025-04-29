@@ -72,6 +72,7 @@ onMounted(async () => {
   await buscarLoja()
 
   selectedTheme.value = lojaStore.getTema(lojaId) || 'default';
+  previewTheme.value = selectedTheme.value
 
   // gera link encurtado
   try {
@@ -159,7 +160,7 @@ const contatosDaLoja = computed(() => {
       </section>
 
       <!-- Pré-visualização -->
-      <section v-if="isPreview" class="border-2 border-dashed p-4 rounded-lg">
+      <section v-if="isPreview" class="border-2 border-dashed p-4 rounded-lg preview-container">
         <div class="preview-theme" :class="`theme-${previewTheme}`">
           <div class="preview-content">
             <div class="preview-header">
@@ -230,10 +231,18 @@ const contatosDaLoja = computed(() => {
   border-radius: 8px;
   padding: 1rem;
   transform: scale(0.9);
-  transform-origin: top left;
+  transform-origin: center;
   width: 320px;
   min-height: 400px;
   background: var(--color-background);
+  margin: 0 auto;
+}
+
+section[v-if]{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
 }
 
 .preview-content {

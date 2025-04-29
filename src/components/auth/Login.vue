@@ -17,13 +17,13 @@
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
           <input type="email" id="email" v-model="email" required
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" />
+            class="mt-1 block w-full rounded-md border-gray-300 bg-zinc-50 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" />
         </div>
 
         <div>
           <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
           <input type="password" id="password" v-model="password" required
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" />
+            class="mt-1 block w-full rounded-md border-gray-300 bg-zinc-50 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" />
         </div>
 
         
@@ -34,7 +34,7 @@
           </Button>
 
         <Button @click="login" :disabled="auth.isLoading"
-          class="text-xs w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50">
+          class="text-xs w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50">
           <i class="fa-brands fa-google text-lg"></i>
           {{ auth.isLoading ? 'Entrando…' : 'Entrar com Google' }}
         </Button>

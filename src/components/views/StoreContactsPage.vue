@@ -54,27 +54,29 @@ const contatos = computed(() =>
 <template>
   <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
     <main class=" flex-col w-full">
-      <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" class="custom-loading"  />
-      <div v-else class="storePage text-center">
-        <div v-if="loja" class="mt-6">
-          <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
-          <h1 class="title font-bold">{{ loja.name }}</h1>
-        </div>
-        <div>
-          <Loading v-if="contactStore.carregando" text="" />
-          <div v-if="contatos.length">
-            <div v-for="(c, i) in contatos" :key="i" @click="abrirWhatsapp(c, loja?.name)">
-              <Card :photo="c.photo" :text="c.name" />
-            </div>
+      <div class="max-w-[800px] mx-auto w-full">
+        <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" class="custom-loading"  />
+        <div v-else class="storePage text-center">
+          <div v-if="loja" class="mt-6">
+            <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
+            <h1 class="title font-bold">{{ loja.name }}</h1>
           </div>
-          <p v-else class="text-center text-gray-500">
-            Nenhum contato cadastrado para esta loja.
-          </p>
-        </div>
-        <div class="flex justify-end mt-2" @click="router.back()">
-          <p class="back px-4 py-2 mt-4 rounded-md shadow-md transition duration-200 ease-in-out">
-            ← Voltar
-          </p>
+          <div>
+            <Loading v-if="contactStore.carregando" text="" />
+            <div v-if="contatos.length">
+              <div v-for="(c, i) in contatos" :key="i" @click="abrirWhatsapp(c, loja?.name)">
+                <Card :photo="c.photo" :text="c.name" />
+              </div>
+            </div>
+            <p v-else class="text-center text-gray-500">
+              Nenhum contato cadastrado para esta loja.
+            </p>
+          </div>
+          <div class="flex justify-end mt-2" @click="router.back()">
+            <p class="back px-4 py-2 mt-4 rounded-md shadow-md transition duration-200 ease-in-out">
+              ← Voltar
+            </p>
+          </div>
         </div>
       </div>
     </main>
@@ -122,5 +124,13 @@ section.gradient ::v-deep(.footer) {
 .back:hover{
   transform: scale(1.01);
   box-shadow: 0 0 8px var(--color-accent);
+}
+
+section.gradient ::v-deep(footer) {
+  color: var(--color-text);
+}
+
+section ::v-deep(footer) {
+  color: var(--color-text);
 }
 </style>

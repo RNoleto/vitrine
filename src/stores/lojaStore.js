@@ -201,15 +201,17 @@ export const useLojaStore = defineStore('loja', {
     async atualizarTemaLoja(id, tema) {
       this.carregando = true;
       try {
-        // 1. Atualiza no backend
-        await api.put(`/stores/${id}`, { theme: tema });
-
-        // 2. Atualiza o estado local
+        // 1. Atualiza no backend usando PATCH
+        const { data } = await api.patch(`/stores/${id}`, { 
+          theme: tema 
+        });
+    
+        // 2. Atualiza o estado local com os dados retornados
         const index = this.lojas.findIndex(l => l.id === id);
         if (index !== -1) {
-          this.lojas[index].theme = tema;
+          this.lojas[index] = { ...this.lojas[index], ...data };
         }
-
+    
         return true;
       } catch (error) {
         this.erro = error.response?.data?.error || 'Erro ao atualizar tema';
