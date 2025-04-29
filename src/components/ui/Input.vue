@@ -30,8 +30,8 @@ const {
   errorMessage
 } = defineProps({
   type: { type: String, default: 'text' },
-  id: { type: String, required: true },
-  name: { type: String, required: true },
+  id: { type: String, required: false },
+  name: { type: String, required: false },
   autocomplete: { type: String, default: '' },
   required: { type: Boolean, default: false },
   placeholder: { type: String, default: '' },
