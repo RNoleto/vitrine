@@ -67,7 +67,7 @@ onMounted(async () => {
           </div>
           <div>
             <Loading v-if="contactStore.carregando" text="" />
-            <div v-if="contatos.length">
+            <div v-if="contatos.length" class="mt-10">
               <div v-for="(c, i) in contatos" :key="i" @click="abrirWhatsapp(c, loja?.name)">
                 <Card :photo="c.photo" :text="c.name" />
               </div>

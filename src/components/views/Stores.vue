@@ -177,7 +177,7 @@ onMounted(() => {
     <div>
         <!-- Formulário de cadastro -->
         <h3 class="text-lg font-bold text-zinc-800">Cadastro de Lojas</h3>
-        <div class="space-y-3 mb-6">
+        <div class="space-y-3 my-6">
             <Input v-model="novaLojaNome" placeholder="Nome da loja" id="nova-loja" name="nova-loja" />
             <div class="mt-2">
                 <input id="upload-logo" type="file" accept=".svg" @change="handleFileUpload" class="hidden" />
@@ -227,7 +227,7 @@ onMounted(() => {
                         <span class="font-medium">{{ loja.name }}</span>
                     </div>
                     <div class="flex gap-2 mt-1 sm:grid sm:grid-cols-2">
-                        <Button size="sm" variant="acessar"><router-link :to="`/${loja.slug}`">Acessar</router-link>
+                        <Button size="sm" variant="acessar"><router-link :to="`/${loja.slug}`" target="_blank">Acessar</router-link>
                         </Button>
                         <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.slug)">Detalhe</Button>
                         <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>
