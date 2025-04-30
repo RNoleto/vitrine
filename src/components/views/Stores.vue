@@ -50,9 +50,10 @@ function adicionarLink() {
 }
 
 async function cadastrarLoja() {
-    if (!novaLojaNome.value || !novaLojaLogo.value) {
-        alert('Preencha nome e logo da loja.')
-        return
+    const nomeLimpo = novaLojaNome.value.trim();
+    if (nomeLimpo.length < 3 || !/^[\p{L}\d\s\-_]+$/u.test(nomeLimpo)) {
+        alert('Nome inválido. Use pelo menos 3 caracteres alfanuméricos.');
+        return;
     }
     // lojaStore.adicionarLoja(novaLojaNome.value, novaLojaLogo.value, [...novaLinks.value])
     await lojaStore.adicionarLoja({
@@ -159,8 +160,8 @@ const opcoesIcones = [
     { label: 'Localização', value: 'fa-solid fa-location-dot' }
 ]
 
-function acessarLoja(id) {
-    router.push(`/stores/${id}`)
+function acessarLoja(slug) {
+    router.push(`/${slug}`)
 }
 
 function acessarDetalheLoja(id) {
@@ -226,7 +227,7 @@ onMounted(() => {
                         <span class="font-medium">{{ loja.name }}</span>
                     </div>
                     <div class="flex gap-2 mt-1 sm:grid sm:grid-cols-2">
-                        <Button size="sm" variant="acessar"><router-link :to="`/store/${loja.id}`">Acessar</router-link>
+                        <Button size="sm" variant="acessar"><router-link :to="`/store/${loja.slug}`">Acessar</router-link>
                         </Button>
                         <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.id)">Detalhe</Button>
                         <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>

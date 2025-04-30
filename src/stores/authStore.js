@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   async function registerWithEmail(fullName, email, password) {
-    isLoading.value = true
+    isLoading.value.email = true
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password)
       const firebaseUser = result.user

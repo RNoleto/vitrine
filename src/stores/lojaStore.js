@@ -172,11 +172,11 @@ export const useLojaStore = defineStore('loja', {
       }
     },
 
-    async obterLojaPublica(id) {
+    async obterLojaPublica(slug) {
       this.carregando = true
       try {
-        const { data } = await api.get(`/public/stores/${id}`)
-        return data // ou, se quiser armazenar no estado, crie `lojaSelecionada` no state
+        const { data } = await api.get(`/lojas/${slug}`)
+        return data
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao carregar loja pública'
         return null

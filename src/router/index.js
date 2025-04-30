@@ -53,31 +53,37 @@ const routes = [
     ]
   },
   {
-    path: '/store/:id',
+    path: '/:slug',
     name: 'StorePage',
     component: StorePage,
-    beforeEnter: (to, from, next) => {
+    beforeEnter: async (to, from, next) => {
       const themeStore = useThemeStore();
       const lojaStore = useLojaStore();
-      
-      lojaStore.obterLojaPublica(to.params.id).then(loja => {
-        themeStore.applyTheme(loja.theme || 'default', to.params.id);
-        next();
-      });
+      try {
+        const loja = await lojaStore.obterLojaPublica(to.params.slug);
+          themeStore.applyTheme(loja.theme || 'default', loja.id);
+          next();        
+      } catch (error) {
+        next({ name: 'Login'});
+      }
     }
   },
   {
-    path: '/contacts/:id/contacts',
+    path: '/:slug/contacts',
     name: 'StoreContactsPage',
     component: StoreContactsPage,
-    beforeEnter: (to, from, next) => {
+    beforeEnter: async (to, from, next) => {
       const themeStore = useThemeStore();
       const lojaStore = useLojaStore();
-      
-      lojaStore.obterLojaPublica(to.params.id).then(loja => {
-        themeStore.applyTheme(loja.theme || 'default', to.params.id);
+
+      try {
+        const loja = await lojaStore.obterLojaPublica(to.params.slug);
+        themeStore.applyTheme(loja.theme || 'default', loja.id);
         next();
-      });
+      } catch (error) {
+        next({ name: 'Login' });
+      }
+      
     }
   },
   // fallback 404
