@@ -53,18 +53,23 @@ const routes = [
     ]
   },
   {
-    path: '/:slug',
+    path: '/:slug([a-zA-Z0-9-]+)',
     name: 'StorePage',
     component: StorePage,
     beforeEnter: async (to, from, next) => {
       const themeStore = useThemeStore();
       const lojaStore = useLojaStore();
+      
+      if (!to.params.slug) { // Validação adicional
+        return next({ name: 'Home' })
+      }
+    
       try {
         const loja = await lojaStore.obterLojaPublica(to.params.slug);
-          themeStore.applyTheme(loja.theme || 'default', loja.id);
-          next();        
+        themeStore.applyTheme(loja.theme || 'default', loja.id);
+        next();
       } catch (error) {
-        next({ name: 'Login'});
+        next({ name: 'Home' }); // Redireciona para home se falhar
       }
     }
   },
