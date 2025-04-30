@@ -3,11 +3,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useContactStore } from '../../stores/contactStore'
+import { useThemeStore } from '../../stores/themeStore'
 import Loading from '../ui/Loading.vue'
 
+const route = useRoute()
+const router = useRouter()
+const slug = route.params.slug
 
-// Teste de temas
-import { useThemeStore } from '../../stores/themeStore'
 const themeStore = useThemeStore()
 const selectedTheme = ref('')
 const previewTheme = ref('')
@@ -25,8 +27,8 @@ async function handleThemeChange() {
 
 async function aplicarTema() {
   try {
-    await lojaStore.atualizarTemaLoja(lojaId, previewTheme.value);
-    themeStore.applyTheme(previewTheme.value, lojaId);
+    await lojaStore.atualizarTemaLoja(loja.value.id, previewTheme.value);
+    themeStore.applyTheme(previewTheme.value, loja.value.id);
     selectedTheme.value = previewTheme.value;
     // isPreview.value = false
     alert('Tema aplicado com sucesso!');
@@ -44,16 +46,13 @@ function cancelarPreview() {
 
 
 // Fim do teste de temas
-
-const route = useRoute()
-const router = useRouter()
 const lojaStore = useLojaStore()
 const contactStore = useContactStore()
 
-const lojaId = parseInt(route.params.id)
+// const lojaId = parseInt(route.params.id)
 const loja = ref(null)
 
-const longUrl = computed(() => `${window.location.origin}/store/${lojaId}`)
+const longUrl = computed(() => `${window.location.origin}/${slug}`)
 const shortUrl = ref('')
 const qrCodeUrl = computed(() => {
   const target = shortUrl.value || longUrl.value
@@ -65,13 +64,13 @@ async function buscarLoja() {
   if (lojaStore.lojas.length === 0) {
     await lojaStore.listarLojas()
   }
-  loja.value = lojaStore.lojas.find(l => l.id === lojaId)
+  loja.value = lojaStore.lojas.find(l => l.slug === slug)
 }
 
 onMounted(async () => {
   await buscarLoja()
 
-  selectedTheme.value = lojaStore.getTema(lojaId) || 'default';
+  selectedTheme.value = loja.value?.theme || 'default';
   previewTheme.value = selectedTheme.value
 
   // gera link encurtado
@@ -100,7 +99,7 @@ const back = () => {
 }
 
 const contatosDaLoja = computed(() => {
-  return contactStore.contatos.filter(contato => contato.store_id === lojaId && contato.ativo)
+  return contactStore.contatos.filter(contato => contato.store_id === loja.value?.id && contato.ativo)
 })
 </script>
 
@@ -131,7 +130,7 @@ const contatosDaLoja = computed(() => {
             <img :src="qrCodeUrl" alt="QR Code da loja" class="mx-auto" />
           </div>
           <div class="mt-2">
-            <a :href="qrCodeUrl" download="qr-loja-{{ lojaId }}.png" class="text-sm text-indigo-600 hover:underline">
+            <a :href="qrCodeUrl" download="qr-loja-{{ slug }}.png" class="text-sm text-indigo-600 hover:underline">
               Baixar QR code
             </a>
           </div>

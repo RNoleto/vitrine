@@ -46,7 +46,7 @@ const routes = [
         component: Stores
       },
       {
-        path: 'stores/:id/detail',
+        path: 'stores/:slug/detail',
         name: 'StoreDetail',
         component: StoreDetail
       },

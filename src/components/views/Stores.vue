@@ -164,8 +164,8 @@ function acessarLoja(slug) {
     router.push(`/${slug}`)
 }
 
-function acessarDetalheLoja(id) {
-    router.push(`/stores/${id}/detail`)
+function acessarDetalheLoja(slug) {
+    router.push(`/stores/${slug}/detail`)
 }
 
 onMounted(() => {
@@ -229,7 +229,7 @@ onMounted(() => {
                     <div class="flex gap-2 mt-1 sm:grid sm:grid-cols-2">
                         <Button size="sm" variant="acessar"><router-link :to="`/${loja.slug}`">Acessar</router-link>
                         </Button>
-                        <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.id)">Detalhe</Button>
+                        <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.slug)">Detalhe</Button>
                         <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>
                         <Button size="sm" variant="excluir" @click="deletarLoja(idx)">Excluir</Button>
                     </div>

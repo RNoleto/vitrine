@@ -31,7 +31,7 @@ const contatos = ref([])
 
 onMounted(async () => {
   lojaStore.carregando = true
-  const slug = route.params.slug // ← Use o slug da rota
+  const slug = route.params.slug
 
   try {
     loja.value = await lojaStore.obterLojaPublica(slug)

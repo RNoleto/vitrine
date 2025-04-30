@@ -184,6 +184,7 @@ export const useLojaStore = defineStore('loja', {
         }
     
         const { data } = await api.get(`/lojas/${normalizedSlug}`);
+        this.lojaSelecionada = data
         return data;
       } catch (e) {
         console.error('Erro na requisição:', e.response?.data || e.message);

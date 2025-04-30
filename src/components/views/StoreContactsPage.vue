@@ -10,52 +10,56 @@ import Card from '../ui/Card.vue'
 import Footer from '../Footer.vue'
 
 // teste manipulação de tema
-const themeStore = useThemeStore()
-// const gradientAtivo = computed(() => themeStore.hasGradient)
+const route = useRoute()
+const router = useRouter()
+const slug = route.params.slug
 
+// Stores
+const contactStore = useContactStore()
+const lojaStore = useLojaStore()
+const themeStore = useThemeStore()
+
+
+const loja = ref(null)
+
+// Tema
 const themeClass = computed(() => ({
   [`theme-${themeStore.themeName}`]: true,
   'gradient': themeStore.hasGradient
 }))
 
+// Contatos
+const contatos = computed(() =>
+  contactStore.contatos.filter(c => c.store_id === loja.value?.id && c.ativo)
+)
+
+// const loja = computed(() => lojaStore.lojas.find(l => l.id === lojaId))
 
 const { abrirWhatsapp } = useWhatsapp()
-const route = useRoute()
-const router = useRouter()
-const lojaId = parseInt(route.params.id)
-const contactStore = useContactStore()
-const lojaStore = useLojaStore()
-
-const loja = computed(() => lojaStore.lojas.find(l => l.id === lojaId))
 
 onMounted(async () => {
-  
-  if (loja.value) {
-    const savedTheme = loja.value.theme || 'default';
-    themeStore.applyTheme(savedTheme, lojaId);
-  }
-
-  if (lojaStore.lojas.length === 0) {
-    await lojaStore.listarLojasPublicas()
-  }
-
-  if (contactStore.contatos.length === 0) {
-    await contactStore.listarContatosPublicosPorLoja(lojaId)
+  try {
+    // Buscar loja pelo slug
+    await lojaStore.obterLojaPublica(slug)
+    loja.value = lojaStore.lojaSelecionada
+    
+    if (loja.value) {
+      themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
+      await contactStore.listarContatosPublicosPorLoja(loja.value.id)
+    }
+  } catch (error) {
+    console.error('Erro ao carregar contatos:', error)
+    router.push('/404')
   }
 })
-
-
-const contatos = computed(() =>
-  contactStore.contatos.filter(c => c.store_id === lojaId && c.ativo)
-)
 
 </script>
 
 <template>
   <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
-    <main class=" flex-col w-full">
+    <main class="flex-col w-full">
       <div class="max-w-[800px] mx-auto w-full">
-        <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" class="custom-loading"  />
+        <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" class="custom-loading" />
         <div v-else class="storePage text-center">
           <div v-if="loja" class="mt-6">
             <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
