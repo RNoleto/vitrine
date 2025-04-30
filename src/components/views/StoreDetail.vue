@@ -106,7 +106,7 @@ const contatosDaLoja = computed(() => {
 <template>
   <div>
     <Loading v-if="lojaStore.carregando" />
-    <div v-else-if="loja" class="max-w-4xl space-y-10">
+    <div v-else-if="loja" class="space-y-10">
       <h1 class="text-3xl font-bold text-center">Detalhes da Loja</h1>
       <!-- Logo e Nome -->
       <section class="flex flex-col items-center justify-center gap-2">
