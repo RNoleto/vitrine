@@ -175,11 +175,15 @@ export const useLojaStore = defineStore('loja', {
     async obterLojaPublica(slug) {
       this.carregando = true
       try {
+        if (!slug || typeof slug !== 'string') { // Validação do slug
+          throw new Error('Slug inválido')
+        }
         const { data } = await api.get(`/lojas/${slug}`)
         return data
       } catch (e) {
-        this.erro = e.response?.data?.error || 'Erro ao carregar loja pública'
-        return null
+        console.error('Erro ao buscar loja:', e)
+        this.erro = e.response?.data?.error || 'Loja não encontrada'
+        throw e // Propague o erro para o router
       } finally {
         this.carregando = false
       }
