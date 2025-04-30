@@ -227,7 +227,7 @@ onMounted(() => {
                         <span class="font-medium">{{ loja.name }}</span>
                     </div>
                     <div class="flex gap-2 mt-1 sm:grid sm:grid-cols-2">
-                        <Button size="sm" variant="acessar"><router-link :to="`/store/${loja.slug}`">Acessar</router-link>
+                        <Button size="sm" variant="acessar"><router-link :to="`/${loja.slug}`">Acessar</router-link>
                         </Button>
                         <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.id)">Detalhe</Button>
                         <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>

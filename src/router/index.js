@@ -10,6 +10,7 @@ import StoreDetail from '../components/views/StoreDetail.vue'
 import Contacts from '../components/views/Contacts.vue'
 import StorePage from '../components/views/StorePage.vue'
 import StoreContactsPage from '../components/views/StoreContactsPage.vue'
+import NotFound from '@/components/views/NotFound.vue'
 
 import { useThemeStore } from '../stores/themeStore'
 import { useLojaStore } from '../stores/lojaStore'
@@ -24,6 +25,10 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register
+  },
+  {
+    path: '/404',
+    name: 'NotFound'
   },
   {
     path: '/',
@@ -57,19 +62,18 @@ const routes = [
     name: 'StorePage',
     component: StorePage,
     beforeEnter: async (to, from, next) => {
-      const themeStore = useThemeStore();
       const lojaStore = useLojaStore();
+      const themeStore = useThemeStore();
       
-      if (!to.params.slug) { // Validação adicional
-        return next({ name: 'Home' })
-      }
+      const slug = to.params.slug?.toLowerCase().trim(); // Normaliza o slug
     
       try {
-        const loja = await lojaStore.obterLojaPublica(to.params.slug);
+        const loja = await lojaStore.obterLojaPublica(slug);
         themeStore.applyTheme(loja.theme || 'default', loja.id);
         next();
       } catch (error) {
-        next({ name: 'Home' }); // Redireciona para home se falhar
+        console.error('Erro detalhado:', error);
+        next({ name: 'NotFound' });
       }
     }
   },
@@ -94,7 +98,8 @@ const routes = [
   // fallback 404
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/home'
+    redirect: '/404',
+    component: NotFound
   }
 ]
 

@@ -25,23 +25,22 @@ const route = useRoute()
 const router = useRouter()
 const lojaStore = useLojaStore()
 
-const lojaId = parseInt(route.params.id)
+// const lojaId = parseInt(route.params.id)
 const loja = ref(null)
 const contatos = ref([])
 
 onMounted(async () => {
-
   lojaStore.carregando = true
-
-  if (loja.value) {
-    const savedTheme = loja.value.theme || 'default';
-    themeStore.applyTheme(savedTheme, lojaId);
-  }
+  const slug = route.params.slug // ← Use o slug da rota
 
   try {
-    // Buscar loja e contatos da API pública
-    loja.value = await lojaStore.obterLojaPublica(lojaId)
-    contatos.value = await lojaStore.obterContatosLojaPublica(lojaId)
+    loja.value = await lojaStore.obterLojaPublica(slug)
+    contatos.value = await lojaStore.obterContatosLojaPublica(loja.value.id) // ← Use ID da loja obtida
+    
+    // Aplique o tema após obter a loja
+    if (loja.value) {
+      themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
+    }
   } catch (error) {
     console.error('Erro ao carregar dados públicos da loja:', error)
   } finally {
@@ -49,8 +48,9 @@ onMounted(async () => {
   }
 })
 
+// Corrija a navegação para contatos
 function irParaContatos() {
-  router.push(`/contacts/${lojaId}/contacts`)
+  router.push(`/${route.params.slug}/contacts`) // ← Use slug ao invés de ID
 }
 
 </script>
@@ -62,7 +62,7 @@ function irParaContatos() {
         <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="custom-loading" />
         <div v-else-if="loja" class="storePage text-center">
           <div class="mt-6">
-            <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" />
+            <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" v-if="loja.logo_url" />
             <h1 class="title font-bold">{{ loja.name }}</h1>
           </div>
           <div class="mt-10">

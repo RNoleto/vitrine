@@ -173,19 +173,23 @@ export const useLojaStore = defineStore('loja', {
     },
 
     async obterLojaPublica(slug) {
-      this.carregando = true
+      this.carregando = true;
       try {
-        if (!slug || typeof slug !== 'string') { // Validação do slug
-          throw new Error('Slug inválido')
+        // Validação corrigida
+
+        const normalizedSlug = slug.toLowerCase().trim()
+
+        if (!normalizedSlug.match(/^[a-z0-9-]+$/)) {
+          throw new Error('Slug inválido');
         }
-        const { data } = await api.get(`/lojas/${slug}`)
-        return data
+    
+        const { data } = await api.get(`/lojas/${normalizedSlug}`);
+        return data;
       } catch (e) {
-        console.error('Erro ao buscar loja:', e)
-        this.erro = e.response?.data?.error || 'Loja não encontrada'
-        throw e // Propague o erro para o router
+        console.error('Erro na requisição:', e.response?.data || e.message);
+        throw e;
       } finally {
-        this.carregando = false
+        this.carregando = false;
       }
     },
 
