@@ -98,9 +98,12 @@ const back = () => {
   router.push('/stores')
 }
 
-const contatosDaLoja = computed(() => {
-  return contactStore.contatos.filter(contato => contato.store_id === loja.value?.id && contato.ativo)
-})
+const contatosDaLoja = computed(() => contactStore.contatos.filter(contato => 
+    contato.stores?.some(store => 
+      store.id === loja.value?.id && 
+      store.pivot.ativo === 1 // Verifica ativo na relação
+    )
+  ))
 </script>
 
 <template>

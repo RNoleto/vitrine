@@ -35,11 +35,11 @@ onMounted(async () => {
 
   try {
     loja.value = await lojaStore.obterLojaPublica(slug)
-    contatos.value = await lojaStore.obterContatosLojaPublica(loja.value.id) // ← Use ID da loja obtida
     
-    // Aplique o tema após obter a loja
+    // Carrega os contatos através da própria loja
     if (loja.value) {
       themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
+      contatos.value = loja.value.contacts || []
     }
   } catch (error) {
     console.error('Erro ao carregar dados públicos da loja:', error)

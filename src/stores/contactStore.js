@@ -45,70 +45,73 @@ export const useContactStore = defineStore('contact', {
 
     async adicionarContato(contato) {
       this.cadastrando = true
-      const authStore = useAuthStore()
-      const storeId = contato.store_id
-    
       const formData = new FormData()
+      
       formData.append('name', contato.name)
       formData.append('whatsapp', contato.whatsapp)
-      formData.append('store_id', storeId)
+    
+      // Adiciona store_ids como array
+      contato.lojasIds.forEach((id, index) => {
+        formData.append(`store_ids[${index}]`, id)
+      })
     
       if (contato.fotoBase64) {
         const contentType = contato.fotoBase64.split(';')[0].split(':')[1]
         const blob = base64ToBlob(contato.fotoBase64, contentType)
-        formData.append('photo', blob, 'photo.png')
+        formData.append('photo', blob, 'contact_photo.png')
       }
     
-      this.carregando = true
       try {
-        const { data } = await api.post('/contacts', formData)
+        const { data } = await api.post('/contacts', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('firebaseToken')}`
+          }
+        })
+        
         this.contatos.push(data)
-        this.erro = null
+        return data
+        
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao adicionar contato'
+        throw e
       } finally {
-        this.carregando = false
         this.cadastrando = false
       }
     },      
 
     async editarContato(id, dados) {
       this.cadastrando = true
-      this.carregando = true
-      this.erro = null
-
       try {
-        let res
-        const isNovaFoto = typeof dados.fotoBase64 === 'string' && dados.fotoBase64.startsWith('data:')
-
-        if (isNovaFoto) {
+        // 1. Atualiza dados básicos
+        const res = await api.put(`/contacts/${id}`, {
+          name: dados.name,
+          whatsapp: dados.whatsapp
+        })
+        
+        // 2. Atualiza lojas vinculadas
+        await this.atualizarVinculos(id, dados.lojasIds)
+        
+        // 3. Atualiza foto separadamente se necessário
+        if (dados.fotoBase64) {
           const form = new FormData()
-          form.append('_method', 'PUT')
-          form.append('name', dados.name)
-          form.append('whatsapp', dados.whatsapp)
-
           const ct = dados.fotoBase64.split(';')[0].split(':')[1]
           const blob = base64ToBlob(dados.fotoBase64, ct)
           form.append('photo', blob, `photo.${ct.split('/')[1]}`)
-
-          res = await api.post(`/contacts/${id}`, form)
-        } else {
-          res = await api.put(`/contacts/${id}`, {
-            name: dados.name,
-            whatsapp: dados.whatsapp,
-          })
+          
+          await api.post(`/contacts/${id}/photo`, form)
         }
-
-        const updated = res.data
-        const idx = this.contatos.findIndex(c => c.id === id)
-        if (idx !== -1) this.contatos[idx] = updated
-
+        
+        // Atualiza estado local
+        const updated = await api.get(`/contacts/${id}`)
+        const index = this.contatos.findIndex(c => c.id === id)
+        if (index !== -1) this.contatos.splice(index, 1, updated.data)
+        
       } catch (err) {
         this.erro = 'Erro ao editar contato.'
-        console.error(err)
+        throw err
       } finally {
         this.cadastrando = false
-        this.carregando = false
       }
     },
 
@@ -134,12 +137,34 @@ export const useContactStore = defineStore('contact', {
       this.carregando = true
       try {
         const { data } = await api.get(`/public/stores/${lojaId}/contacts`)
-        this.contatos = data.filter(contato => contato.ativo !== 0)
+        this.contatos = data
         this.erro = null
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao listar contatos públicos'
       } finally {
         this.carregando = false
+      }
+    },
+
+    async vincularLojas(contactId, lojasIds) {
+      try {
+        await api.post(`/contacts/${contactId}/lojas`, {
+          lojas: lojasIds
+        })
+      } catch (e) {
+        this.erro = 'Erro ao vincular lojas'
+        throw e
+      }
+    },
+
+    async atualizarVinculos(contactId, lojasIds) {
+      try {
+        await api.put(`/contacts/${contactId}/lojas`, {
+          lojas: lojasIds
+        })
+      } catch (e) {
+        this.erro = 'Erro ao atualizar lojas'
+        throw e
       }
     }
     

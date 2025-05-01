@@ -29,8 +29,13 @@ const themeClass = computed(() => ({
 }))
 
 // Contatos
-const contatos = computed(() =>
-  contactStore.contatos.filter(c => c.store_id === loja.value?.id && c.ativo)
+const contatos = computed(() => 
+  contactStore.contatos.filter(contato => 
+    contato.stores?.some(store => 
+      store.id === loja.value?.id && 
+      store.pivot.ativo === 1 // Verifica ativo na relação
+    )
+  )
 )
 
 // const loja = computed(() => lojaStore.lojas.find(l => l.id === lojaId))
@@ -39,13 +44,13 @@ const { abrirWhatsapp } = useWhatsapp()
 
 onMounted(async () => {
   try {
-    // Buscar loja pelo slug
     await lojaStore.obterLojaPublica(slug)
     loja.value = lojaStore.lojaSelecionada
     
     if (loja.value) {
       themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
       await contactStore.listarContatosPublicosPorLoja(loja.value.id)
+      console.log('Contatos carregados:', contactStore.contatos) // ← Log de depuração
     }
   } catch (error) {
     console.error('Erro ao carregar contatos:', error)

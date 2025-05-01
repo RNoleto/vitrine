@@ -194,18 +194,16 @@ export const useLojaStore = defineStore('loja', {
       }
     },
 
-    async obterContatosLojaPublica(id) {
-      this.carregando = true
+    async obterContatosLojaPublica(lojaId) {
       try {
-        const { data } = await api.get(`/public/stores/${id}/contacts`)
+        const { data } = await api.get(`/public/stores/${lojaId}/contacts`)
         return data
-      } catch (e) {
-        this.erro = e.response?.data?.error || 'Erro ao carregar contatos da loja'
+      } catch (error) {
+        console.error('Erro ao buscar contatos públicos:', error)
         return []
-      } finally {
-        this.carregando = false
       }
     },
+
     async atualizarTemaLoja(id, tema) {
       this.carregando = true;
       try {
