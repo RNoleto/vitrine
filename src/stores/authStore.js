@@ -22,6 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   onAuthStateChanged(auth, async (firebaseUser) => {
+    if (localStorage.getItem('pendingSync')) return
     isLoading.value.global = true
     if (firebaseUser) {
       try {
@@ -58,29 +59,23 @@ export const useAuthStore = defineStore('auth', () => {
   async function registerWithEmail(fullName, email, password) {
     isLoading.value.email = true
     try {
+      localStorage.setItem('pendingSync', 'true')
       const result = await createUserWithEmailAndPassword(auth, email, password)
       const firebaseUser = result.user
-  
       const idToken = await firebaseUser.getIdToken()
-      
-      // Força a atualização imediata do estado local
-      user.value = {
-        firebase_uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        name: fullName
-      }
-      
-      const loginResponse = await api.post('/login', { 
+      await api.post('/login', { 
         idToken,
         name: fullName
-       })
-      
-      // Atualização segura dos dados
-      user.value = { ...user.value, ...loginResponse.data.user }
-      localStorage.setItem('user', JSON.stringify(user.value))
-      localStorage.setItem('firebaseToken', idToken)
-  
+      })
+      await signOut(auth)
+      localStorage.removeItem('pendingSync') // Remover flag
+      localStorage.removeItem('user')
+      localStorage.removeItem('firebaseToken')
+
+      alert('Cadastro realizado! Faça login para continuar')
+      router.push('/login')
     } catch (err) {
+      localStorage.removeItem('pendingSync')
       console.error('Erro no cadastro:', err)
       throw err
     } finally {
