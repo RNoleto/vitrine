@@ -22,6 +22,7 @@ function base64ToBlob(base64Data, contentType = '') {
 export const useContactStore = defineStore('contact', {
   state: () => ({
     contatos: [],
+    lojasNomes: new Map(),
     carregando: false,
     cadastrando: false,
     erro: null
@@ -31,17 +32,25 @@ export const useContactStore = defineStore('contact', {
     async listarContatos() {
       this.carregando = true;
       try {
-        const { data } = await api.get('/contacts');
-    
-        // console.log('Contatos da API:', data);
-        this.contatos = data.filter(contato => contato.ativo !== 0);
-        this.erro = null;
+        const { data } = await api.get('/contacts')
+        this.contatos = data.map(contato => ({
+          ...contato,
+          lojas: contato.lojas?.map(loja => ({
+            id: loja.id,
+            name: this.lojasNomes.get(loja.id) || loja.name
+          })) || []
+        }))
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao listar contatos';
       } finally {
         this.carregando = false;
       }
-    },    
+    },
+    
+    async carregarNomesLojas() {
+      const { data } = await api.get('/stores')
+      this.lojasNomes = new Map(data.map(loja => [loja.id, loja.name]))
+    },
 
     async adicionarContato(contato) {
       this.cadastrando = true
@@ -93,7 +102,7 @@ export const useContactStore = defineStore('contact', {
         await this.atualizarVinculos(id, dados.lojasIds)
         
         // 3. Atualiza foto separadamente se necessário
-        if (dados.fotoBase64) {
+        if (dados.fotoBase64 && dados.fotoBase64.startsWith('data:')) {
           const form = new FormData()
           const ct = dados.fotoBase64.split(';')[0].split(':')[1]
           const blob = base64ToBlob(dados.fotoBase64, ct)
@@ -102,10 +111,16 @@ export const useContactStore = defineStore('contact', {
           await api.post(`/contacts/${id}/photo`, form)
         }
         
-        // Atualiza estado local
-        const updated = await api.get(`/contacts/${id}`)
+        // Atualiza estado LOCAL sem chamar a API novamente
         const index = this.contatos.findIndex(c => c.id === id)
-        if (index !== -1) this.contatos.splice(index, 1, updated.data)
+        if (index !== -1) {
+          this.contatos[index] = {
+            ...this.contatos[index],
+            name: dados.name,
+            whatsapp: dados.whatsapp,
+            lojas: this.contatos[index].lojas // Mantém as lojas existentes
+          }
+        }
         
       } catch (err) {
         this.erro = 'Erro ao editar contato.'
@@ -159,9 +174,19 @@ export const useContactStore = defineStore('contact', {
 
     async atualizarVinculos(contactId, lojasIds) {
       try {
-        await api.put(`/contacts/${contactId}/lojas`, {
+        await api.put(`/contacts/${contactId}/stores`, {
           lojas: lojasIds
         })
+    
+        // Atualização local segura
+        const index = this.contatos.findIndex(c => c.id === contactId)
+        if (index !== -1) {
+          this.contatos[index].lojas = lojasIds.map(id => ({
+            id: id,
+            name: this.lojasNomes.get(id) || 'Loja' // Usamos um Map cacheado
+          }))
+        }
+    
       } catch (e) {
         this.erro = 'Erro ao atualizar lojas'
         throw e
