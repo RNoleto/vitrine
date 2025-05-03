@@ -85,6 +85,14 @@ function editarContato(id) {
   editIndex.value = id
 }
 
+function removeFoto() {
+  foto.value = null
+  const fileInput = document.querySelector('input[type="file"]')
+  if (fileInput) {
+    fileInput.value = ''
+  }
+}
+
 async function excluirContato(id) {
   if (confirm('Deseja realmente excluir esse contato?')) {
     try {
@@ -110,6 +118,7 @@ function resetForm() {
   whatsapp.value = ''
   empresaSelecionada.value = []
   foto.value = null
+  removeFoto()
   editIndex.value = null
 
   const fileInput = document.querySelector('input[type="file"]')
@@ -142,29 +151,25 @@ onMounted(() => {
       <Input id="name" name="name" v-model="name" placeholder="Nome do contato" />
       <Input id="whatsapp" name="whatsapp" v-model="whatsapp" placeholder="Whastapp" />
 
-      <input type="file" accept="image/*" @change="handleFotoUpload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-               file:rounded-md file:border-0 file:text-sm file:font-semibold
-               file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
-
-               <div class="border rounded-md p-2 h-32 overflow-y-auto">
-        <div class="space-y-2">
-          <div 
-            v-for="loja in lojaStore.lojas" 
-            :key="loja.id"
-            @click="toggleLoja(loja.id)"
-            class="flex items-center p-2 cursor-pointer rounded-md transition-colors"
-            :class="empresaSelecionada.includes(loja.id) 
-              ? 'bg-indigo-100 text-indigo-800' 
-              : 'hover:bg-gray-100'"
-          >
-            <input 
-              type="checkbox" 
-              :checked="empresaSelecionada.includes(loja.id)"
-              class="hidden"
-              :value="loja.id"
-            >
-            <span class="ml-2">{{ loja.name }}</span>
+      <div class="image-upload-container">
+        <label class="file-input-label">
+          <input type="file" accept="image/*" @change="handleFotoUpload" class="file-input" />
+          <span class="upload-button">Selecionar Foto</span>
+          <div v-if="foto" class="image-preview">
+            <img :src="foto" alt="Pré-visualização" class="preview-image" />
+            <button @click.stop="removeFoto" class="remove-image-button">
+              ×
+            </button>
           </div>
+        </label>
+      </div>
+
+      <div class="loja-list">
+        <div v-for="loja in lojaStore.lojas" :key="loja.id" class="loja-item"
+          :class="{ 'selected': empresaSelecionada.includes(loja.id) }" @click="toggleLoja(loja.id)">
+          <input type="checkbox" :checked="empresaSelecionada.includes(loja.id)" class="checkbox-hidden"
+            :value="loja.id">
+          <span class="loja-name">{{ loja.name }}</span>
         </div>
       </div>
 
@@ -211,9 +216,121 @@ onMounted(() => {
   </div>
 </template>
 
-<!-- <style scoped>
-.select-container::after {
-  @apply absolute right-[0.75rem] top-1/2 -translate-y-1/2 rotate-90 pointer-events-none;
-  content: "⬎";
+<style scoped>
+.image-upload-container {
+  margin: 1rem 0;
 }
-</style> -->
+
+.file-input-label {
+  display: block;
+  cursor: pointer;
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #e0e7ff;
+  color: #4f46e5;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.upload-button:hover {
+  background-color: #c7d2fe;
+}
+
+.image-preview {
+  position: relative;
+  margin-top: 1rem;
+  max-width: 150px;
+}
+
+.preview-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid #e0e7ff;
+}
+
+.remove-image-button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 25px;
+  height: 25px;
+  background-color: #ef4444;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  border: none;
+}
+
+.remove-image-button:hover {
+  background-color: #dc2626;
+}
+
+.loja-list {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.loja-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 4px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.loja-item:hover {
+  background-color: #f5f5f5;
+}
+
+.loja-item.selected {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.checkbox-hidden {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.loja-name {
+  margin-left: 8px;
+}
+
+/* Estilização da scrollbar */
+.loja-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.loja-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.loja-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.loja-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+</style>

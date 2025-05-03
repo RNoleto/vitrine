@@ -161,7 +161,8 @@ const opcoesIcones = [
 ]
 
 function acessarLoja(slug) {
-    router.push(`/${slug}`)
+    const url = router.resolve(`/${slug}`).href
+    window.open(url, '_blank', 'noopener,noreferrer')
 }
 
 function acessarDetalheLoja(slug) {
@@ -227,8 +228,7 @@ onMounted(() => {
                         <span class="font-medium">{{ loja.name }}</span>
                     </div>
                     <div class="flex gap-2 mt-1 sm:grid sm:grid-cols-2">
-                        <Button size="sm" variant="acessar"><router-link :to="`/${loja.slug}`" target="_blank">Acessar</router-link>
-                        </Button>
+                        <Button size="sm" variant="acessar" @click="acessarLoja(loja.slug)">Acessar</Button>
                         <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.slug)">Detalhe</Button>
                         <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>
                         <Button size="sm" variant="excluir" @click="deletarLoja(idx)">Excluir</Button>
