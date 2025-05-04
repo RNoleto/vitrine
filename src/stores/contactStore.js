@@ -59,7 +59,7 @@ export const useContactStore = defineStore('contact', {
       formData.append('name', contato.name)
       formData.append('whatsapp', contato.whatsapp)
     
-      // Adiciona store_ids como array
+      // Adiciona store_ids como array (formato correto para o Laravel)
       contato.lojasIds.forEach((id, index) => {
         formData.append(`store_ids[${index}]`, id)
       })
@@ -71,13 +71,7 @@ export const useContactStore = defineStore('contact', {
       }
     
       try {
-        const { data } = await api.post('/contacts', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${localStorage.getItem('firebaseToken')}`
-          }
-        })
-        
+        const { data } = await api.post('/contacts', formData)
         this.contatos.push(data)
         return data
         
