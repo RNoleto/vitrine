@@ -40,8 +40,9 @@
 
             <p class="text-sm text-gray-600 text-center">
                 Já tem uma conta?
-                <RouterLink to="/login" class="text-indigo-600 hover:underline">Faça login</RouterLink>
+                <RouterLink to="/" class="text-indigo-600 hover:underline">Faça login</RouterLink>
             </p>
+            <p class="text-xs text-gray-400 text-center">© 2025 Vitrines. Todos os direitos reservados.</p>
         </div>
     </div>
 </template>

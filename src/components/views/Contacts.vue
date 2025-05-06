@@ -151,17 +151,17 @@ onMounted(() => {
       <Input id="name" name="name" v-model="name" placeholder="Nome do contato" />
       <Input id="whatsapp" name="whatsapp" v-model="whatsapp" placeholder="Whastapp" />
 
-      <div class="image-upload-container">
+      <div class="image-upload-container flex flex-col items-center">
         <label class="file-input-label">
           <input type="file" accept="image/*" @change="handleFotoUpload" class="file-input" />
           <span class="upload-button">Selecionar Foto</span>
-          <div v-if="foto" class="image-preview">
-            <img :src="foto" alt="Pré-visualização" class="preview-image" />
-            <button @click.stop="removeFoto" class="remove-image-button">
-              ×
-            </button>
-          </div>
         </label>
+        <div v-if="foto" class="image-preview">
+          <img :src="foto" alt="Pré-visualização" class="preview-image" />
+          <button @click.stop="removeFoto" class="remove-image-button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
       </div>
 
       <div class="loja-list">
@@ -219,6 +219,7 @@ onMounted(() => {
 <style scoped>
 .image-upload-container {
   margin: 1rem 0;
+  /* width: max-content; */
 }
 
 .file-input-label {

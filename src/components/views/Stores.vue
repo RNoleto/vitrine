@@ -7,6 +7,7 @@ import Button from '../ui/Button.vue'
 import EditStoreModal from '../ui/EditStoreModal.vue'
 import IconSelect from '../ui/IconSelect.vue'
 import Loading from '../ui/Loading.vue'
+import StoreCard from '../ui/StoreCard.vue'
 
 const router = useRouter()
 
@@ -177,7 +178,7 @@ onMounted(() => {
 <template>
     <div>
         <!-- Formulário de cadastro -->
-        <h3 class="text-lg font-bold text-zinc-800">Cadastro de Lojas</h3>
+        <h3 class="text-lg font-bold text-zinc-800">Cadastro de Vitrines</h3>
         <div class="space-y-3 my-6">
             <Input v-model="novaLojaNome" placeholder="Nome da loja" id="nova-loja" name="nova-loja" />
             <div class="mt-2">
@@ -217,11 +218,11 @@ onMounted(() => {
 
         <!-- Listagem de lojas -->
         <section>
-            <h3 class="text-lg font-semibold mb-3">Lojas Cadastradas</h3>
+            <h3 class="text-lg font-semibold mb-3">Vitrines Cadastradas</h3>
             <Loading v-if="lojaStore.carregando" text="" />
             <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
             <ul v-else class="flex flex-col flex-wrap gap-2 sm:grid sm:grid-cols-2 md:grid-cols-3">
-                <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
+                <!-- <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
                     class="border p-3 rounded flex flex-col justify-between ">
                     <div class="flex items-center gap-3 mb-2">
                         <img :src="loja.logo_url" alt="logo" class="w-8 h-8 object-contain" />
@@ -233,7 +234,17 @@ onMounted(() => {
                         <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>
                         <Button size="sm" variant="excluir" @click="deletarLoja(idx)">Excluir</Button>
                     </div>
-                </li>
+                </li> -->
+                <StoreCard
+  v-for="(loja, idx) in lojaStore.lojas"
+  :key="loja.id"
+  :store="loja"
+  :index="idx"
+  @access="acessarLoja"
+  @detail="acessarDetalheLoja"
+  @edit="openEditModal"
+  @delete="deletarLoja"
+/>
             </ul>
 
             <!-- Modal de edição -->
