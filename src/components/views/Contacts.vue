@@ -5,6 +5,7 @@ import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
 import Button from '../ui/Button.vue'
 import Loading from '../ui/Loading.vue'
+import ContactCard from '../ui/ContactCard.vue'
 
 const contactStore = useContactStore()
 const lojaStore = useLojaStore()
@@ -191,7 +192,7 @@ onMounted(() => {
       <p class="font-semibold">Contatos cadastrados</p>
       <ul class="space-y-3 mt-4">
         <Loading v-if="lojaStore.carregando" text="" />
-        <li v-else v-for="(c, i) in contactStore.contatos" :key="i"
+        <!-- <li v-else v-for="(c, i) in contactStore.contatos" :key="i"
           class="flex items-center space-x-4 border bg-zinc-100 border-gray-300 p-2 rounded-lg shadow-sm">
           <img :src="c.photo" alt="Foto" class="w-10 h-10 rounded-full object-cover" />
           <div>
@@ -210,7 +211,15 @@ onMounted(() => {
             <button class="cursor-pointer p-2 rounded-md bg-red-600  text-white hover:bg-red-500 hover:scale-105"
               @click="excluirContato(c.id)">Excluir</button>
           </div>
-        </li>
+        </li> -->
+        <ContactCard
+          v-else
+          v-for="contact in contactStore.contatos"
+          :key="contact.id"
+          :contact="contact"
+          @edit="editarContato"
+          @delete="excluirContato"
+        />
       </ul>
     </div>
   </div>
