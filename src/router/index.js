@@ -12,6 +12,12 @@ import StorePage from '../components/views/StorePage.vue'
 import StoreContactsPage from '../components/views/StoreContactsPage.vue'
 import NotFound from '@/components/views/NotFound.vue'
 
+// Rotas Admin
+import AdminUser from '@/components/admin/AdminUser.vue'
+import AdminSettings from '@/components/admin/AdminSettings.vue'
+import AdminLayout from '@/components/admin/AdminLayout.vue'
+import AdminStores from '@/components/admin/AdminStores.vue'
+
 import { useThemeStore } from '../stores/themeStore'
 import { useLojaStore } from '../stores/lojaStore'
 
@@ -95,7 +101,29 @@ const routes = [
       
     }
   },
-  // fallback 404
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminLayout,
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: 'users',
+        name: 'AdminUser',
+        component: AdminUser
+      },
+      {
+        path: 'stores',
+        name: 'AdminStores',
+        component: AdminStores
+      },
+      {
+        path: 'settings',
+        name: 'AdminSettings',
+        component: AdminSettings,
+      }
+    ]
+  },
   {
     path: '/:pathMatch(.*)*',
     redirect: '/404',
@@ -110,9 +138,15 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
+  
   if (to.meta.requiresAuth && !auth.isLoggedIn()) {
     return next({ name: 'Login' })
   }
+
+  if (to.meta.requiresAdmin && !auth.isAdmin()) {
+    return next({ name: 'Home' }) 
+  }
+
   next()
 })
 

@@ -16,6 +16,8 @@ export const useAuthStore = defineStore('auth', () => {
   })
   const storedUser = localStorage.getItem('user')
 
+  const isAdmin = () => user.value?.role === 'admin'
+
   if (storedUser) {
     user.value = JSON.parse(storedUser)
     isLoading.value.global = false
@@ -157,6 +159,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     isLoading,
     isLoggedIn,
+    isAdmin,
     loginWithEmail,
     loginWithGoogle,
     registerWithEmail,
