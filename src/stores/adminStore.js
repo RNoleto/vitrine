@@ -4,6 +4,7 @@ import api from '../services/api'
 export const useAdminStore = defineStore('adminStore', {
     state: () => ({
         stores: [],
+        contacts: [],
         loading: false,
         error: null,
     }),
@@ -17,6 +18,19 @@ export const useAdminStore = defineStore('adminStore', {
                 this.stores = response.data
             } catch (error) {
                 this.error = error.response?.data?.message || 'Erro ao buscar lojas'
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async fetchContacts(){
+            this.loading = true
+            this.error = null
+            try{
+                const response = await api.get('/contacts')
+                this.contacts = response.data
+            } catch (error){
+                this.error = error.response?.data?.message || 'Erro ao buscar contatos'
             } finally {
                 this.loading = false
             }

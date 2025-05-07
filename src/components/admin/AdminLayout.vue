@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { faUsers, faStore, faChartBar, faSignOutAlt, faGear, faBars } from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faStore, faChartBar, faSignOutAlt, faGear, faBars, faContactCard } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import { useAuthStore } from '@/stores/authStore'
@@ -17,10 +17,12 @@ const logout = () => {
 }
 
 const menuItems = [
+  { label: 'Dados Gerais', icon: faChartBar, route: '/admin/resume' },
   { label: 'Usuários', icon: faUsers, route: '/admin/users' },
-  { label: 'Lojas', icon: faStore, route: '/admin/stores' },
+  { label: 'Vitrines', icon: faStore, route: '/admin/stores' },
+  { label: 'Contatos', icon: faContactCard, route: '/admin/contacts' },
   // { label: 'Relatórios', icon: faChartBar, route: '/admin/reports' },
-  { label: 'Configurações', icon: faGear, route: '/admin/settings' },
+  // { label: 'Configurações', icon: faGear, route: '/admin/settings' },
   { label: 'Sair', icon: faSignOutAlt, action: logout },
 ]
 </script>

@@ -4,7 +4,7 @@
 <template>
   <section>
     <h1 class="text-2xl font-bold mb-4">Gerenciamento de Usuários</h1>
-    <p class="text-gray-700">Aqui você pode visualizar, editar e excluir usuários do sistema.</p>
+    <p class="text-gray-700">Aqui você pode visualizar, editar e excluir usuários do sistema (quem cadastra e configura as vitrines e os contatos).</p>
 
     <div class="overflow-x-auto mt-6">
       <table class="min-w-full bg-white border border-gray-200 text-sm">

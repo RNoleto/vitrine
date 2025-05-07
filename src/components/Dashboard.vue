@@ -14,7 +14,7 @@ const sidebarOpen = ref(false)
 
 const links = [
   { name: 'Home', route: '/home', icon: 'house' },
-  { name: 'Lojas', route: '/stores', icon: 'store' },
+  { name: 'Vitrines', route: '/stores', icon: 'store' },
   { name: 'Contatos', route: '/contacts', icon: 'address-book' },
 ]
 

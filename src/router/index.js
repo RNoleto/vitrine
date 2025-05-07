@@ -13,10 +13,12 @@ import StoreContactsPage from '../components/views/StoreContactsPage.vue'
 import NotFound from '@/components/views/NotFound.vue'
 
 // Rotas Admin
+import AdminResume from '../components/admin/AdminResume.vue'
 import AdminUser from '@/components/admin/AdminUser.vue'
 import AdminSettings from '@/components/admin/AdminSettings.vue'
 import AdminLayout from '@/components/admin/AdminLayout.vue'
 import AdminStores from '@/components/admin/AdminStores.vue'
+import AdminContacts from '../components/admin/AdminContacts.vue'
 
 import { useThemeStore } from '../stores/themeStore'
 import { useLojaStore } from '../stores/lojaStore'
@@ -108,6 +110,11 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       {
+        path: 'resume',
+        name: 'AdminResume',
+        component: AdminResume
+      },
+      {
         path: 'users',
         name: 'AdminUser',
         component: AdminUser
@@ -116,6 +123,11 @@ const routes = [
         path: 'stores',
         name: 'AdminStores',
         component: AdminStores
+      },
+      {
+        path: 'contacts',
+        name: 'AdminContacts',
+        component: AdminContacts
       },
       {
         path: 'settings',
