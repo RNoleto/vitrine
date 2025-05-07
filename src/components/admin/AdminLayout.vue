@@ -43,7 +43,7 @@ const menuItems = [
         <button
           v-for="item in menuItems"
           :key="item.label"
-          class="w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-200 transition-colors"
+          class="cursor-pointer w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-blue-100 hover:text-blue-400 focus:outline-none focus:bg-gray-200 transition-colors"
           @click="item.action ? item.action() : $router.push(item.route)"
           :aria-label="item.label"
         >
