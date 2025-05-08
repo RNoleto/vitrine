@@ -1,3 +1,69 @@
+<template>
+    <div>
+        <!-- Formulário de cadastro -->
+        <h3 class="text-lg font-bold text-zinc-800">Cadastro de Vitrines</h3>
+        <div class="space-y-3 my-6">
+            <Input v-model="novaLojaNome" placeholder="Nome da loja" id="nova-loja" name="nova-loja" />
+            <div class="mt-2">
+                <input id="upload-logo" type="file" accept=".svg" @change="handleFileUpload" class="hidden" />
+                <label for="upload-logo"
+                    class="cursor-pointer inline-block rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
+                    Enviar logo
+                </label>
+                <span v-if="novaLojaLogo" class="ml-2 text-sm text-gray-600">Arquivo pronto</span>
+            </div>
+            <div class="divider"></div>
+            <div class="space-y-2">
+                <p class="font-semibold">Links da página</p>
+                <div class="flex flex-col sm:grid sm:grid-cols-4 gap-2">
+                    <IconSelect v-model="novoIcone" :options="opcoesIcones" placeholder="Ícone" class="flex-1" />
+                    <Input id="text-new" name="text-new" v-model="novoTexto" placeholder="Texto do botão"
+                        :input-class="inputBaseClass" />
+                    <Input id="url-new" name="url-new" v-model="novaUrl" placeholder="URL"
+                        :input-class="inputBaseClass" />
+                    <Button @click="adicionarLink" class="items-center">Adicionar Link</Button>
+                </div>
+                <ul class="mt-2 space-y-1">
+                    <li v-if="novaLinks.length >= 1" class="text-gray-500 mb-2">Links adicionados</li>
+                    <li v-for="(l, i) in novaLinks" :key="i" class="flex items-center gap-2">
+                        <i :class="l.icone"></i>
+                        <span>{{ l.texto }}</span>
+                        <button @click="novaLinks.splice(i, 1)" class="text-red-500">✖</button>
+                    </li>
+                </ul>
+            </div>
+            <Button @click="cadastrarLoja" :disabled="lojaStore.cadastrando || lojaStore.carregando">
+                {{ lojaStore.cadastrando ? 'Cadastrando...' : 'Cadastrar vitrine' }}
+            </Button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Listagem de lojas -->
+        <section>
+            <h3 class="text-lg font-semibold mb-3">Vitrines Cadastradas</h3>
+            <Loading v-if="lojaStore.carregando" text="" />
+            <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
+            <ul v-else class="flex flex-col flex-wrap gap-2 sm:grid sm:grid-cols-2 md:grid-cols-3">
+                <StoreCard v-for="(loja, idx) in lojaStore.lojas" :key="loja.id" :store="loja" :index="idx"
+                    @access="acessarLoja" @detail="acessarDetalheLoja" @edit="openEditModal" @delete="deletarLoja" />
+            </ul>
+
+            <!-- Modal de edição -->
+            <EditStoreModal :isOpen="isEditModalOpen" :storeData="{
+                id: editId,
+                nome: editNome,
+                logo: editLogo,
+                links: editLinks
+            }" :opcoesIcones="opcoesIcones" :inputBaseClass="inputBaseClass" @save="(dados) => {
+                lojaStore.editarLoja(dados.id, dados)
+                closeEditModal()
+            }" @cancel="closeEditModal" />
+        </section>
+
+    </div>
+</template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -174,90 +240,3 @@ onMounted(() => {
     lojaStore.listarLojas()
 })
 </script>
-
-<template>
-    <div>
-        <!-- Formulário de cadastro -->
-        <h3 class="text-lg font-bold text-zinc-800">Cadastro de Vitrines</h3>
-        <div class="space-y-3 my-6">
-            <Input v-model="novaLojaNome" placeholder="Nome da loja" id="nova-loja" name="nova-loja" />
-            <div class="mt-2">
-                <input id="upload-logo" type="file" accept=".svg" @change="handleFileUpload" class="hidden" />
-                <label for="upload-logo"
-                    class="cursor-pointer inline-block rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
-                    Enviar logo
-                </label>
-                <span v-if="novaLojaLogo" class="ml-2 text-sm text-gray-600">Arquivo pronto</span>
-            </div>
-            <div class="divider"></div>
-            <div class="space-y-2">
-                <p class="font-semibold">Links da página</p>
-                <div class="flex flex-col sm:grid sm:grid-cols-4 gap-2">
-                    <IconSelect v-model="novoIcone" :options="opcoesIcones" placeholder="Ícone" class="flex-1" />
-                    <Input id="text-new" name="text-new" v-model="novoTexto" placeholder="Texto do botão"
-                        :input-class="inputBaseClass" />
-                    <Input id="url-new" name="url-new" v-model="novaUrl" placeholder="URL"
-                        :input-class="inputBaseClass" />
-                    <Button @click="adicionarLink" class="items-center">Adicionar Link</Button>
-                </div>
-                <ul class="mt-2 space-y-1">
-                    <li v-if="novaLinks.length >= 1" class="text-gray-500 mb-2">Links adicionados</li>
-                    <li v-for="(l, i) in novaLinks" :key="i" class="flex items-center gap-2">
-                        <i :class="l.icone"></i>
-                        <span>{{ l.texto }}</span>
-                        <button @click="novaLinks.splice(i, 1)" class="text-red-500">✖</button>
-                    </li>
-                </ul>
-            </div>
-            <Button @click="cadastrarLoja" :disabled="lojaStore.cadastrando || lojaStore.carregando">
-                {{ lojaStore.cadastrando ? 'Cadastrando...' : 'Cadastrar loja' }}
-            </Button>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- Listagem de lojas -->
-        <section>
-            <h3 class="text-lg font-semibold mb-3">Vitrines Cadastradas</h3>
-            <Loading v-if="lojaStore.carregando" text="" />
-            <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
-            <ul v-else class="flex flex-col flex-wrap gap-2 sm:grid sm:grid-cols-2 md:grid-cols-3">
-                <!-- <li v-for="(loja, idx) in lojaStore.lojas" :key="loja.id"
-                    class="border p-3 rounded flex flex-col justify-between ">
-                    <div class="flex items-center gap-3 mb-2">
-                        <img :src="loja.logo_url" alt="logo" class="w-8 h-8 object-contain" />
-                        <span class="font-medium">{{ loja.name }}</span>
-                    </div>
-                    <div class="flex gap-2 mt-1 sm:grid sm:grid-cols-2">
-                        <Button size="sm" variant="acessar" @click="acessarLoja(loja.slug)">Acessar</Button>
-                        <Button size="sm" variant="detalhe" @click="acessarDetalheLoja(loja.slug)">Detalhe</Button>
-                        <Button size="sm" variant="editar" @click="openEditModal(idx)">Editar</Button>
-                        <Button size="sm" variant="excluir" @click="deletarLoja(idx)">Excluir</Button>
-                    </div>
-                </li> -->
-                <StoreCard
-  v-for="(loja, idx) in lojaStore.lojas"
-  :key="loja.id"
-  :store="loja"
-  :index="idx"
-  @access="acessarLoja"
-  @detail="acessarDetalheLoja"
-  @edit="openEditModal"
-  @delete="deletarLoja"
-/>
-            </ul>
-
-            <!-- Modal de edição -->
-            <EditStoreModal :isOpen="isEditModalOpen" :storeData="{
-                id: editId,
-                nome: editNome,
-                logo: editLogo,
-                links: editLinks
-            }" :opcoesIcones="opcoesIcones" :inputBaseClass="inputBaseClass" @save="(dados) => {
-                lojaStore.editarLoja(dados.id, dados)
-                closeEditModal()
-            }" @cancel="closeEditModal" />
-        </section>
-
-    </div>
-</template>

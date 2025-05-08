@@ -23,37 +23,46 @@ const menuItems = [
   { label: 'Contatos', icon: faContactCard, route: '/admin/contacts' },
   // { label: 'Relatórios', icon: faChartBar, route: '/admin/reports' },
   // { label: 'Configurações', icon: faGear, route: '/admin/settings' },
-  { label: 'Sair', icon: faSignOutAlt, action: logout },
+  // { label: 'Sair', icon: faSignOutAlt, action: logout },
 ]
 </script>
 
 <template>
   <div class="flex flex-col sm:flex-row h-screen bg-gray-100 text-gray-800">
     <!-- Sidebar -->
-    <aside
-      :class="[
-        'fixed sm:static z-40 top-0 left-0 h-full w-64 bg-white shadow-md transform transition-transform duration-200 ease-in-out',
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-        'sm:translate-x-0'
-      ]"
-      aria-label="Navegação lateral"
-    >
-      <div class="p-4 text-2xl font-bold text-blue-600 border-b border-gray-200">
-        Admin
+    <aside :class="[
+      'fixed sm:static z-40 top-0 left-0 h-full w-64 bg-white shadow-md transform transition-transform duration-200 ease-in-out',
+      sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      'sm:translate-x-0'
+    ]" aria-label="Navegação lateral">
+      <div class="flex flex-col h-full justify-between">
+        <!-- Topo: Título e navegação -->
+        <div>
+          <div class="p-4 text-2xl font-bold text-blue-600 border-b border-gray-200">
+            Admin
+          </div>
+          <nav class="mt-4 space-y-1">
+            <button v-for="item in menuItems" :key="item.label"
+              class="cursor-pointer w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-blue-100 hover:text-blue-400 focus:outline-none focus:bg-gray-200 transition-colors"
+              @click="item.action ? item.action() : $router.push(item.route)" :aria-label="item.label">
+              <FontAwesomeIcon :icon="item.icon" class="w-5 h-5 mr-3" />
+              <span class="text-sm font-medium">{{ item.label }}</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- Rodapé: Botão de logout -->
+        <div class="p-4 border-t border-gray-200">
+          <button
+            class="cursor-pointer w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-red-100 hover:text-red-500 focus:outline-none focus:bg-gray-200 transition-colors"
+            @click="logout" aria-label="Sair">
+            <FontAwesomeIcon :icon="faSignOutAlt" class="w-5 h-5 mr-3" />
+            <span class="text-sm font-medium">Sair</span>
+          </button>
+        </div>
       </div>
-      <nav class="mt-4 space-y-1">
-        <button
-          v-for="item in menuItems"
-          :key="item.label"
-          class="cursor-pointer w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-blue-100 hover:text-blue-400 focus:outline-none focus:bg-gray-200 transition-colors"
-          @click="item.action ? item.action() : $router.push(item.route)"
-          :aria-label="item.label"
-        >
-          <FontAwesomeIcon :icon="item.icon" class="w-5 h-5 mr-3" />
-          <span class="text-sm font-medium">{{ item.label }}</span>
-        </button>
-      </nav>
     </aside>
+
 
     <!-- Main content -->
     <div class="flex-1 flex flex-col">
@@ -76,7 +85,8 @@ const menuItems = [
 <style scoped>
 /* Garantia de acessibilidade para foco */
 button:focus-visible {
-  outline: 2px solid #2563eb; /* azul */
+  outline: 2px solid #2563eb;
+  /* azul */
   outline-offset: 2px;
 }
 </style>

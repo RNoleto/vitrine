@@ -1,6 +1,3 @@
-<script setup>
-</script>
-
 <template>
   <section>
     <h1 class="text-2xl font-bold mb-4">Gerenciamento de Usuários</h1>
@@ -17,10 +14,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="px-4 py-2 border-b">João Silva</td>
-            <td class="px-4 py-2 border-b">joao@example.com</td>
-            <td class="px-4 py-2 border-b">User</td>
+          <tr v-for="user in adminStore.users" :key="user.id">
+            <td class="px-4 py-2 border-b">{{ user.name }}</td>
+            <td class="px-4 py-2 border-b">{{ user.email }}</td>
+            <td class="px-4 py-2 border-b">{{ user.role }}</td>
             <td class="px-4 py-2 border-b">
               <div class="flex gap-2">
                 <button class="text-blue-600 hover:underline">Editar</button>
@@ -33,3 +30,14 @@
     </div>
   </section>
 </template>
+
+<script setup>
+import { onMounted } from 'vue';
+import { useAdminStore } from '../../stores/adminStore';
+
+const adminStore = useAdminStore();
+
+onMounted(() => {
+  adminStore.fetchUsers();
+});
+</script>

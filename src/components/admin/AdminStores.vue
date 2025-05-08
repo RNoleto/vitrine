@@ -28,11 +28,15 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr v-for="store in adminStore.stores" :key="store.id">
-            <td class="px-4 py-2 border-b"><img :src="store.logo" class="w-[30px] h-[30px]" :alt="'foto ' + store.name"></td>
-            <td class="px-4 py-2 border-b">{{ store.name }}</td>
+            <td class="px-4 py-2 border-b"><img :src="store.logo" class="w-[30px] h-[30px]" :alt="'foto ' + store.name">
+            </td>
+            <td class="px-4 py-2 border-b font-semibold">{{ store.name }}</td>
             <td class="px-4 py-2 border-b">{{ new Date(store.created_at).toLocaleDateString('pt-BR') }}</td>
-            <td class="px-4 py-2 border-b">{{ store.ativo === 1 ? 'Ativo' : 'Inativo' }}</td>
-            <td class="px-4 py-2 border-b">{{ store.ativo === 0 ? new Date(store.updated_at).toLocaleDateString('pt-BR') : '-' }}</td>
+            <td class="px-4 py-2 border-b"><span class="font-semibold px-2 py-1 rounded-full"
+                :class="store.ativo === 1 ? 'text-green-600  bg-green-100' : 'text-red-600 bg-red-100'">{{ store.ativo
+                  === 1 ? 'Ativo' : 'Inativo' }}</span></td>
+            <td class="px-4 py-2 border-b font-semibold"><span class="text-red-600">{{ store.ativo === 0 ? new Date(store.updated_at).toLocaleDateString('pt-BR')
+              : '-' }}</span></td>
           </tr>
         </tbody>
       </table>

@@ -1,3 +1,78 @@
+<template>
+  <div>
+    <p class="font-semibold">Cadastrar Contato</p>
+
+    <div v-if="erros.length" class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+      <p class="font-semibold">Corrija os seguintes erros:</p>
+      <ul class="list-disc pl-5 mt-2">
+        <li v-for="(erro, index) in erros" :key="index">{{ erro }}</li>
+      </ul>
+    </div>
+
+    <div class="flex flex-col gap-2 mt-5">
+      <Input id="name" name="name" v-model="name" placeholder="Nome do contato" />
+      <Input id="whatsapp" name="whatsapp" v-model="whatsapp" placeholder="Whastapp" />
+
+      <div class="image-upload-container flex flex-col items-center">
+        <label class="file-input-label">
+          <input type="file" accept="image/*" @change="handleFotoUpload" class="file-input" />
+          <span class="upload-button">Selecionar Foto</span>
+        </label>
+        <div v-if="foto" class="image-preview">
+          <img :src="foto" alt="Pré-visualização" class="preview-image" />
+          <button @click.stop="removeFoto" class="remove-image-button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <p class="font-semibold mb-1">Vitrines:</p>
+      <div class="loja-list">
+        <div v-for="loja in lojaStore.lojas" :key="loja.id" class="loja-item"
+          :class="{ 'selected': empresaSelecionada.includes(loja.id) }" @click="toggleLoja(loja.id)">
+          <input type="checkbox" :checked="empresaSelecionada.includes(loja.id)" class="checkbox-hidden"
+            :value="loja.id">
+          <span class="loja-name">{{ loja.name }}</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <Button v-if="editIndex !== null" @click="cancelarEdicao" variant="cancelar">
+          <span>Cancelar Edição</span>
+        </Button>
+
+        <Button @click="cadastrarContato" :disabled="contactStore.cadastrando || contactStore.carregando">
+          <template v-if="contactStore.cadastrando">
+            <span class="animate-pulse">Salvando...</span>
+          </template>
+          <template v-else>
+            {{ editIndex !== null ? 'Atualizar' : 'Cadastrar' }}
+          </template>
+        </Button>
+      </div>
+
+
+    </div>
+
+    <div class="divider"></div>
+    <!-- Lista de contatos cadastrados -->
+    <div class="mt-8">
+      <p class="font-semibold">Contatos cadastrados</p>
+      <ul class="space-y-3 mt-4">
+        <Loading v-if="lojaStore.carregando" text="" />
+        <ContactCard
+          v-else
+          v-for="contact in contactStore.contatos"
+          :key="contact.id"
+          :contact="contact"
+          @edit="editarContato"
+          @delete="excluirContato"
+        />
+      </ul>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useContactStore } from '../../stores/contactStore'
@@ -74,6 +149,12 @@ async function cadastrarContato() {
   }
 }
 
+async function cancelarEdicao() {
+  if(confirm('Deseja cancelar a edição? Todas as alterações serão perdidas.')){
+    resetForm()
+  }
+}
+
 function editarContato(id) {
   const c = contactStore.contatos.find(contato => contato.id === id)
   if (!c) return
@@ -135,75 +216,6 @@ onMounted(() => {
   contactStore.listarContatos();
 })
 </script>
-
-
-<template>
-  <div>
-    <p class="font-semibold">Cadastrar Contato</p>
-
-    <div v-if="erros.length" class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-      <p class="font-semibold">Corrija os seguintes erros:</p>
-      <ul class="list-disc pl-5 mt-2">
-        <li v-for="(erro, index) in erros" :key="index">{{ erro }}</li>
-      </ul>
-    </div>
-
-    <div class="flex flex-col gap-2 mt-5">
-      <Input id="name" name="name" v-model="name" placeholder="Nome do contato" />
-      <Input id="whatsapp" name="whatsapp" v-model="whatsapp" placeholder="Whastapp" />
-
-      <div class="image-upload-container flex flex-col items-center">
-        <label class="file-input-label">
-          <input type="file" accept="image/*" @change="handleFotoUpload" class="file-input" />
-          <span class="upload-button">Selecionar Foto</span>
-        </label>
-        <div v-if="foto" class="image-preview">
-          <img :src="foto" alt="Pré-visualização" class="preview-image" />
-          <button @click.stop="removeFoto" class="remove-image-button">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="loja-list">
-        <div v-for="loja in lojaStore.lojas" :key="loja.id" class="loja-item"
-          :class="{ 'selected': empresaSelecionada.includes(loja.id) }" @click="toggleLoja(loja.id)">
-          <input type="checkbox" :checked="empresaSelecionada.includes(loja.id)" class="checkbox-hidden"
-            :value="loja.id">
-          <span class="loja-name">{{ loja.name }}</span>
-        </div>
-      </div>
-
-      <Button @click="cadastrarContato" :disabled="contactStore.cadastrando || contactStore.carregando">
-        <template v-if="contactStore.cadastrando">
-          <span class="animate-pulse">Salvando...</span>
-        </template>
-        <template v-else>
-          {{ editIndex !== null ? 'Atualizar' : 'Cadastrar' }}
-        </template>
-      </Button>
-
-
-    </div>
-
-    <div class="divider"></div>
-    <!-- Lista de contatos cadastrados -->
-    <div class="mt-8">
-      <p class="font-semibold">Contatos cadastrados</p>
-      <ul class="space-y-3 mt-4">
-        <Loading v-if="lojaStore.carregando" text="" />
-        <ContactCard
-          v-else
-          v-for="contact in contactStore.contatos"
-          :key="contact.id"
-          :contact="contact"
-          @edit="editarContato"
-          @delete="excluirContato"
-        />
-      </ul>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .image-upload-container {

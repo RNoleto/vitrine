@@ -3,6 +3,7 @@ import api from '../services/api'
 
 export const useAdminStore = defineStore('adminStore', {
     state: () => ({
+        users: [],
         stores: [],
         contacts: [],
         loading: false,
@@ -10,6 +11,19 @@ export const useAdminStore = defineStore('adminStore', {
     }),
 
     actions: {
+        async fetchUsers(){
+            this.loading = true
+            this.error = null
+            try {
+                const response = await api.get('/users')
+                this.users = response.data
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Erro ao buscar usuários'
+            } finally {
+                this.loading = false
+            }
+        },
+
         async fetchStores(){
             this.loading = true
             this.error = null
