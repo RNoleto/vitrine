@@ -225,6 +225,22 @@ export const useLojaStore = defineStore('loja', {
       }
     },
 
+    async registrarVisita(slug){
+      try {
+        await api.post(`/public/stores/${slug}/visit`);
+      } catch (error) {
+        console.error('Erro ao registrar visita:', error);
+      }
+    },
+
+    async registrarCliqueLink(linkId) {
+      try {
+        await api.post(`/public/stores/links/${linkId}/click`)
+      } catch (error) {
+        console.error('Erro ao registrar clique no link:', error)
+      }
+    },    
+
     getTema(id) {
       const loja = this.lojas.find(l => l.id === id);
       return loja?.theme || 'default';

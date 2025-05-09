@@ -1,3 +1,40 @@
+<template>
+  <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
+    <main class="flex flex-col">
+      <div class="max-w-[800px] mx-auto w-full">
+        <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="custom-loading" />
+        <div v-else-if="loja" class="storePage text-center">
+          <div class="mt-6">
+            <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" v-if="loja.logo_url" />
+            <h1 class="title font-bold">{{ loja.name }}</h1>
+          </div>
+          <div class="mt-10">
+            <!-- Links da loja -->
+            <div class="space-y-3">
+              <div v-for="(link, index) in loja.links" :key="index">
+                <Card :text="link.texto" :icon="link.icone" class="w-full" @click="handleClickLink(link)"/>
+              </div>
+            </div>
+            <!-- Lista de Contatos da Loja -->
+            <div v-if="contatos.length === 1" class="space-y-3 mb-2">
+              <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="abrirWhatsapp(contatos[0], loja?.name)" />
+            </div>
+            <div v-else-if="contatos.length > 1">
+              <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset icon" @click="irParaContatos" />
+            </div>
+          </div>
+        </div>
+        <div v-else class="flex flex-1 items-center justify-center min-h-screen">
+          <div class="text-center text-red-600 p-6 rounded shadow">
+            <p class="text-sm">Loja não encontrada.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </section>
+</template>
+
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useWhatsapp } from '@/composables/useWhatsapp'
@@ -40,6 +77,8 @@ onMounted(async () => {
     if (loja.value) {
       themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
       contatos.value = loja.value.contacts || []
+
+      await lojaStore.registrarVisita(slug)
     }
   } catch (error) {
     console.error('Erro ao carregar dados públicos da loja:', error)
@@ -53,44 +92,15 @@ function irParaContatos() {
   router.push(`/${route.params.slug}/contacts`) // ← Use slug ao invés de ID
 }
 
-</script>
+function handleClickLink(link){
+  if(link.id){
+    lojaStore.registrarCliqueLink(link.id)
+  }
 
-<template>
-  <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
-    <main class="flex flex-col">
-      <div class="max-w-[800px] mx-auto w-full">
-        <Loading v-if="lojaStore.carregando" text="Carregando vitrine da loja" class="custom-loading" />
-        <div v-else-if="loja" class="storePage text-center">
-          <div class="mt-6">
-            <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain" v-if="loja.logo_url" />
-            <h1 class="title font-bold">{{ loja.name }}</h1>
-          </div>
-          <div class="mt-10">
-            <!-- Links da loja -->
-            <div class="space-y-3">
-              <div v-for="(link, index) in loja.links" :key="index">
-                <Card :text="link.texto" :icon="link.icone" :link="link.url"  class="w-full"/>
-              </div>
-            </div>
-            <!-- Lista de Contatos da Loja -->
-            <div v-if="contatos.length === 1" class="space-y-3 mb-2">
-              <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="abrirWhatsapp(contatos[0], loja?.name)" />
-            </div>
-            <div v-else-if="contatos.length > 1">
-              <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset icon" @click="irParaContatos" />
-            </div>
-          </div>
-        </div>
-        <div v-else class="flex flex-1 items-center justify-center min-h-screen">
-          <div class="text-center text-red-600 p-6 rounded shadow">
-            <p class="text-sm">Loja não encontrada.</p>
-          </div>
-        </div>
-      </div>
-    </main>
-    <Footer />
-  </section>
-</template>
+  window.open(link.url, '_blank')
+}
+
+</script>
 
 <style scoped>
 .store-page {
