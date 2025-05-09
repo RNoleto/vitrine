@@ -17,6 +17,7 @@ export const useAdminStore = defineStore('adminStore', {
             try {
                 const response = await api.get('/users')
                 this.users = response.data
+                this.users = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) //Ordenar por data de cadastro
             } catch (error) {
                 this.error = error.response?.data?.message || 'Erro ao buscar usuários'
             } finally {
@@ -28,8 +29,9 @@ export const useAdminStore = defineStore('adminStore', {
             this.loading = true
             this.error = null
             try {
-                const response = await api.get('/stores')
+                const response = await api.get('/public/stores')
                 this.stores = response.data
+                this.stores = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) //Ordenar por data de cadastro
             } catch (error) {
                 this.error = error.response?.data?.message || 'Erro ao buscar lojas'
             } finally {
@@ -41,7 +43,7 @@ export const useAdminStore = defineStore('adminStore', {
             this.loading = true
             this.error = null
             try{
-                const response = await api.get('/contacts')
+                const response = await api.get("/admin/contacts")
                 this.contacts = response.data
             } catch (error){
                 this.error = error.response?.data?.message || 'Erro ao buscar contatos'
