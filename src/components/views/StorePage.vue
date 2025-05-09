@@ -17,7 +17,7 @@
             </div>
             <!-- Lista de Contatos da Loja -->
             <div v-if="contatos.length === 1" class="space-y-3 mb-2">
-              <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="abrirWhatsapp(contatos[0], loja?.name)" />
+              <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="handleClickContact(contatos[0], loja?.id)" />
             </div>
             <div v-else-if="contatos.length > 1">
               <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset icon" @click="irParaContatos" />
@@ -98,6 +98,16 @@ function handleClickLink(link){
   }
 
   window.open(link.url, '_blank')
+}
+
+function handleClickContact(contato){
+  if(contato.id){
+    lojaStore.registrarCliqueContato(contato.id)
+  }
+
+  if(contato.whatsapp){
+    abrirWhatsapp(contato)
+  }
 }
 
 </script>

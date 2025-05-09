@@ -239,7 +239,16 @@ export const useLojaStore = defineStore('loja', {
       } catch (error) {
         console.error('Erro ao registrar clique no link:', error)
       }
-    },    
+    },
+    
+    async registrarCliqueContato(contactId) {
+      const storeId = this.lojaSelecionada.id
+      try {
+        await api.post(`/stores/${storeId}/contacts/${contactId}/click`)
+      } catch (error) {
+        console.error('Erro ao registrar clique no contato:', error)
+      }
+    },
 
     getTema(id) {
       const loja = this.lojas.find(l => l.id === id);
