@@ -4,13 +4,15 @@
         <h3 class="text-lg font-bold text-zinc-800">Cadastro de Vitrines</h3>
         <div class="space-y-3 my-6">
             <Input v-model="novaLojaNome" placeholder="Nome da loja" id="nova-loja" name="nova-loja" />
+            <span v-if="errosFormulario.nome" class="text-red-500 text-sm">{{ errosFormulario.nome }}</span>
             <div class="mt-2">
-                <input id="upload-logo" type="file" accept=".svg" @change="handleFileUpload" class="hidden" />
+                <input id="upload-logo" type="file" accept="image/*" @change="handleFileUpload" class="hidden" />
                 <label for="upload-logo"
                     class="cursor-pointer inline-block rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
                     Enviar logo
                 </label>
                 <span v-if="novaLojaLogo" class="ml-2 text-sm text-gray-600">Arquivo pronto</span>
+                <span v-if="errosFormulario.logo" class="ml-2 text-red-500 text-sm">{{ errosFormulario.logo }}</span>
             </div>
             <div class="divider"></div>
             <div class="space-y-2">
@@ -25,6 +27,7 @@
                 </div>
                 <ul class="mt-2 space-y-1">
                     <li v-if="novaLinks.length >= 1" class="text-gray-500 mb-2">Links adicionados</li>
+                    <span v-if="errosFormulario.links" class="text-red-500 text-sm">{{ errosFormulario.links }}</span>
                     <li v-for="(l, i) in novaLinks" :key="i" class="flex items-center gap-2">
                         <i :class="l.icone"></i>
                         <span>{{ l.texto }}</span>
@@ -65,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import Input from '../ui/Input.vue'
@@ -86,6 +89,29 @@ const novaLinks = ref([])
 const novoIcone = ref('')
 const novoTexto = ref('')
 const novaUrl = ref('')
+const errosFormulario = ref({
+    nome: '',
+    logo: '',
+    links: ''
+})
+
+watch(novaLojaNome, (novoValor) => {
+    if (novoValor.trim().length >= 3 && /^[\p{L}\d\s\-_]+$/u.test(novoValor)) {
+        errosFormulario.value.nome = ''
+    }
+})
+
+watch(novaLojaLogo, (novoValor) => {
+    if (novoValor) {
+        errosFormulario.value.logo = ''
+    }
+})
+
+watch(novaLinks, (novoValor) => {
+    if (novoValor.length > 0) {
+        errosFormulario.value.links = ''
+    }
+}, { deep: true })
 
 const inputBaseClass = 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'
 
@@ -110,6 +136,7 @@ function adicionarLink() {
         alert('Preencha ícone, texto e URL do link.')
         return
     }
+
     novaLinks.value.push({ icone: novoIcone.value, texto: novoTexto.value, url: novaUrl.value })
     novoIcone.value = ''
     novoTexto.value = ''
@@ -117,20 +144,50 @@ function adicionarLink() {
 }
 
 async function cadastrarLoja() {
+    errosFormulario.value = {
+        nome: '',
+        logo: '',
+        links: ''
+    }
+
     const nomeLimpo = novaLojaNome.value.trim();
     if (nomeLimpo.length < 3 || !/^[\p{L}\d\s\-_]+$/u.test(nomeLimpo)) {
-        alert('Nome inválido. Use pelo menos 3 caracteres alfanuméricos.');
+        errosFormulario.value.nome = 'Nome inválido. Use pelo menos 3 caracteres alfanuméricos.';
         return;
     }
+    
     // lojaStore.adicionarLoja(novaLojaNome.value, novaLojaLogo.value, [...novaLinks.value])
-    await lojaStore.adicionarLoja({
-        name: novaLojaNome.value,
-        logoBase64: novaLojaLogo.value,
-        links: novaLinks.value
-    })
-    novaLojaNome.value = ''
-    novaLojaLogo.value = null
-    novaLinks.value = []
+
+    // if(Object.values(errosFormulario.value).some(msg => msg !== '')){
+    //     return
+    // }
+
+    if(!novaLojaLogo.value){
+        errosFormulario.value.logo = 'O logo da loja é obrigatório.';
+    }
+
+    if(novaLinks.value.length < 1){
+        errosFormulario.value.links = 'Adicione pelo menos um link.';
+    }
+
+    if(Object.values(errosFormulario.value).some(msg => msg !== '')){
+        return;
+    }
+
+    try {
+        await lojaStore.adicionarLoja({
+            name: novaLojaNome.value,
+            logoBase64: novaLojaLogo.value,
+            links: novaLinks.value
+        })
+        // Limpar campos após o cadastro
+        novaLojaNome.value = ''
+        novaLojaLogo.value = null
+        novaLinks.value = []
+    } catch (error) {
+        alert('Erro ao cadastrar a loja. Tente novamente.')
+    }
+
 }
 
 // modal edição
