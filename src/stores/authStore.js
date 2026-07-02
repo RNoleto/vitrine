@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth, googleProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signInWithPopup, signOut } from '../services/firebase'
 import api from '../services/api'
+import { useFeedbackStore } from './feedbackStore'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
@@ -77,7 +78,8 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.removeItem('user')
       localStorage.removeItem('firebaseToken')
 
-      alert('Cadastro realizado! Faça login para continuar')
+      const feedbackStore = useFeedbackStore()
+      feedbackStore.showSuccess('Cadastro realizado! Faça login para continuar')
       router.push('/login')
     } catch (err) {
       localStorage.removeItem('pendingSync')
@@ -150,7 +152,8 @@ export const useAuthStore = defineStore('auth', () => {
   async function resetPassword(email) {
     try {
       await sendPasswordResetEmail(auth, email)
-      alert('Email de recuperação enviado!')
+      const feedbackStore = useFeedbackStore()
+      feedbackStore.showSuccess('Email de recuperação enviado!')
     } catch (e) {
       throw new Error('Falha ao enviar email de recuperação')
     }

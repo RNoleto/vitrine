@@ -71,6 +71,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
+import { useFeedbackStore } from '../../stores/feedbackStore'
 import Input from '../ui/Input.vue'
 import Button from '../ui/Button.vue'
 import EditStoreModal from '../ui/EditStoreModal.vue'
@@ -81,6 +82,7 @@ import StoreCard from '../ui/StoreCard.vue'
 const router = useRouter()
 
 const lojaStore = useLojaStore()
+const feedbackStore = useFeedbackStore()
 
 // criação de loja
 const novaLojaNome = ref('')
@@ -184,8 +186,9 @@ async function cadastrarLoja() {
         novaLojaNome.value = ''
         novaLojaLogo.value = null
         novaLinks.value = []
+        feedbackStore.showSuccess('Vitrine cadastrada com sucesso!')
     } catch (error) {
-        alert('Erro ao cadastrar a loja. Tente novamente.')
+        feedbackStore.showError(error.message || 'Erro ao cadastrar a loja. Tente novamente.')
     }
 
 }
@@ -247,28 +250,36 @@ function removerLinkEdit(i) {
     editLinks.value.splice(i, 1)
 }
 
-function salvarEdicao() {
+async function salvarEdicao() {
     if (!editId.value) {
-        alert('Erro: ID da loja não definido para edição.')
+        feedbackStore.showError('Erro: ID da loja não definido para edição.')
         return
     }
 
-    lojaStore.editarLoja(editId.value, {
-        name: editNome.value,
-        logo: editLogo.value,
-        links: [...editLinks.value]
-    })
-
-    closeEditModal()
+    try {
+        await lojaStore.editarLoja(editId.value, {
+            name: editNome.value,
+            logo: editLogo.value,
+            links: [...editLinks.value]
+        })
+        feedbackStore.showSuccess('Vitrine editada com sucesso!')
+        closeEditModal()
+    } catch (error) {
+        feedbackStore.showError(error.message || 'Erro ao editar a loja.')
+    }
 }
 
 const deletarLoja = async (index) => {
-    if (confirm('Deseja realmente excluir esta loja?')) {
+    const confirmed = await feedbackStore.confirm({
+        title: 'Excluir Vitrine',
+        message: 'Deseja realmente excluir esta vitrine?'
+    })
+    if (confirmed) {
         try {
             await lojaStore.excluirLoja(lojaStore.lojas[index].id)
-            alert('Loja excluída com sucesso!');
+            feedbackStore.showSuccess('Loja excluída com sucesso!')
         } catch (error) {
-            alert('Erro ao excluir loja: ' + (error.message || 'Tente novamente mais tarde.'))
+            feedbackStore.showError('Erro ao excluir loja: ' + (error.message || 'Tente novamente mais tarde.'))
         }
     }
 }

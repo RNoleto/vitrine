@@ -70,6 +70,7 @@ export const useLojaStore = defineStore('loja', {
         this.erro = null
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao criar loja'
+        throw new Error(this.erro)
       } finally {
         this.carregando = false
         this.cadastrando = false
@@ -148,8 +149,8 @@ export const useLojaStore = defineStore('loja', {
         if (idx !== -1) this.lojas[idx] = updated
 
       } catch (err) {
-        this.erro = 'Erro ao editar loja.'
-        console.error(err)
+        this.erro = err.response?.data?.error || 'Erro ao editar loja.'
+        throw new Error(this.erro)
       } finally {
         this.carregando = false
       }

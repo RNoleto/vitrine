@@ -77,6 +77,7 @@
 import { ref, onMounted } from 'vue'
 import { useContactStore } from '../../stores/contactStore'
 import { useLojaStore } from '../../stores/lojaStore'
+import { useFeedbackStore } from '../../stores/feedbackStore'
 import Input from '../ui/Input.vue'
 import Button from '../ui/Button.vue'
 import Loading from '../ui/Loading.vue'
@@ -84,6 +85,7 @@ import ContactCard from '../ui/ContactCard.vue'
 
 const contactStore = useContactStore()
 const lojaStore = useLojaStore()
+const feedbackStore = useFeedbackStore()
 
 const name = ref('')
 const whatsapp = ref('')
@@ -101,7 +103,7 @@ function handleFotoUpload(event) {
     }
     reader.readAsDataURL(file)
   } else {
-    alert('Por favor, envie uma imagem válida.')
+    feedbackStore.showError('Por favor, envie uma imagem válida.')
   }
 }
 
@@ -137,20 +139,26 @@ async function cadastrarContato() {
   try {
     if (editIndex.value !== null) {
       await contactStore.editarContato(editIndex.value, contato)
+      feedbackStore.showSuccess('Contato editado com sucesso!')
     } else {
       await contactStore.adicionarContato(contato)
+      feedbackStore.showSuccess('Contato cadastrado com sucesso!')
     }
 
     await contactStore.listarContatos()
     resetForm()
 
   } catch (error) {
-    alert(error.message || 'Erro na operação')
+    feedbackStore.showError(error.message || 'Erro na operação')
   }
 }
 
 async function cancelarEdicao() {
-  if(confirm('Deseja cancelar a edição? Todas as alterações serão perdidas.')){
+  const confirmed = await feedbackStore.confirm({
+    title: 'Cancelar Edição',
+    message: 'Deseja cancelar a edição? Todas as alterações serão perdidas.'
+  })
+  if (confirmed) {
     resetForm()
   }
 }
@@ -176,12 +184,16 @@ function removeFoto() {
 }
 
 async function excluirContato(id) {
-  if (confirm('Deseja realmente excluir esse contato?')) {
+  const confirmed = await feedbackStore.confirm({
+    title: 'Excluir Contato',
+    message: 'Deseja realmente excluir esse contato?'
+  })
+  if (confirmed) {
     try {
       await contactStore.excluirContato(id)
-      alert('Contato excluído com sucesso!')
+      feedbackStore.showSuccess('Contato excluído com sucesso!')
     } catch (error) {
-      alert('Erro ao excluir contato: ' + (error.message || 'Tente novamente mais tarde'))
+      feedbackStore.showError('Erro ao excluir contato: ' + (error.message || 'Tente novamente mais tarde'))
     }
   }
 }

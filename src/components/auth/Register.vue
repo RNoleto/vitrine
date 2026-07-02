@@ -51,19 +51,21 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import { useRouter } from 'vue-router'
+import { useFeedbackStore } from '../../stores/feedbackStore'
 
 const fullName = ref('')
 const email = ref('')
 const password = ref('')
 const auth = useAuthStore()
 const router = useRouter()
+const feedbackStore = useFeedbackStore()
 
 async function register() {
     try {
         await auth.registerWithEmail( fullName.value, email.value, password.value)
         router.push({ path: '/home' })
     } catch (e) {
-        alert('Erro no cadastro: ' + e.message)
+        feedbackStore.showError('Erro no cadastro: ' + (e.response?.data?.error || e.message))
     }
 }
 </script>

@@ -125,6 +125,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useContactStore } from '../../stores/contactStore'
 import { useThemeStore } from '../../stores/themeStore'
+import { useFeedbackStore } from '../../stores/feedbackStore'
 import Loading from '../ui/Loading.vue'
 
 const route = useRoute()
@@ -152,10 +153,10 @@ async function aplicarTema() {
     themeStore.applyTheme(previewTheme.value, loja.value.id);
     selectedTheme.value = previewTheme.value;
     // isPreview.value = false
-    alert('Tema aplicado com sucesso!');
+    feedbackStore.showSuccess('Tema aplicado com sucesso!');
   } catch (error) {
     console.error('Erro ao aplicar tema:', error);
-    alert('Erro ao aplicar tema: ' + (error.message || 'Tente novamente'));
+    feedbackStore.showError('Erro ao aplicar tema: ' + (error.message || 'Tente novamente'));
   }
 }
 
@@ -169,6 +170,7 @@ function cancelarPreview() {
 // Fim do teste de temas
 const lojaStore = useLojaStore()
 const contactStore = useContactStore()
+const feedbackStore = useFeedbackStore()
 
 // const lojaId = parseInt(route.params.id)
 const loja = ref(null)
@@ -211,8 +213,8 @@ onMounted(async () => {
 function copyLink() {
   const text = shortUrl.value || longUrl.value
   navigator.clipboard.writeText(text)
-    .then(() => alert('Link copiado!'))
-    .catch(() => alert('Falha ao copiar link.'))
+    .then(() => feedbackStore.showSuccess('Link copiado para a área de transferência!'))
+    .catch(() => feedbackStore.showError('Falha ao copiar link.'))
 }
 
 const back = () => {

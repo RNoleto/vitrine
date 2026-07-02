@@ -55,18 +55,20 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import { useRouter } from 'vue-router'
+import { useFeedbackStore } from '../../stores/feedbackStore'
 
 const email = ref('')
 const password = ref('')
 const auth = useAuthStore()
 const router = useRouter()
+const feedbackStore = useFeedbackStore()
 
 async function loginEmail() {
   try {
     await auth.loginWithEmail(email.value, password.value)
     router.push({ path: '/home' })
   } catch (error) {
-    alert('Falha no login: ' + error.message)
+    feedbackStore.showError('Falha no login: ' + (error.response?.data?.error || error.message))
   }
 }
 
@@ -89,7 +91,7 @@ async function login() {
       default:
         message = e.message
     }
-    alert('Falha no login: ' + message)
+    feedbackStore.showError('Falha no login: ' + message)
   }
 }
 </script>
