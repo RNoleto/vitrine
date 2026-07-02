@@ -7,11 +7,21 @@
     >
       <Transition name="zoom">
         <div
-          class="w-full max-w-md bg-white rounded-2xl shadow-xl border overflow-hidden transform transition-all duration-300"
+          class="relative w-full max-w-md bg-white rounded-2xl shadow-xl border overflow-hidden transform transition-all duration-300"
           :class="borderClass"
         >
+          <!-- Botão Fechar (Apenas para não-confirmação) -->
+          <button
+            v-if="store.type !== 'confirm'"
+            @click="store.handleConfirm"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-hidden hover:bg-gray-100 rounded-lg p-1.5 transition-all duration-200 cursor-pointer"
+            title="Fechar"
+          >
+            <FontAwesomeIcon :icon="faTimes" class="w-4.5 h-4.5" />
+          </button>
+
           <!-- Ícone do Cabeçalho -->
-          <div class="flex flex-col items-center pt-8 pb-4 px-6 text-center">
+          <div class="flex flex-col items-center pt-8 px-6 text-center" :class="store.type === 'success' ? 'pb-8' : 'pb-4'">
             <div
               class="w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl animate-scale-up"
               :class="iconBgClass"
@@ -30,8 +40,8 @@
             </p>
           </div>
 
-          <!-- Rodapé de Ações -->
-          <div class="px-6 py-4 bg-gray-50 flex gap-3 justify-end border-t border-gray-100">
+          <!-- Rodapé de Ações (Ocultado no modal de sucesso) -->
+          <div v-if="store.type !== 'success'" class="px-6 py-4 bg-gray-50 flex gap-3 justify-end border-t border-gray-100">
             <!-- Botão Cancelar (Apenas no tipo Confirm) -->
             <button
               v-if="store.type === 'confirm'"
@@ -63,7 +73,8 @@ import {
   faCheckCircle,
   faTimesCircle,
   faInfoCircle,
-  faQuestionCircle
+  faQuestionCircle,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons'
 import { useFeedbackStore } from '../../stores/feedbackStore'
 
