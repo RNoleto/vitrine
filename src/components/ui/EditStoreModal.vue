@@ -42,12 +42,13 @@ watch(
 
 function onFileChange(event) {
   const file = event.target.files[0]
-  if (file && file.type === 'image/svg+xml') {
+  const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp']
+  if (file && allowedTypes.includes(file.type)) {
     const reader = new FileReader()
     reader.onload = () => (editLogo.value = reader.result)
     reader.readAsDataURL(file)
   } else {
-    alert('Por favor, envie um arquivo SVG válido.')
+    alert('Por favor, envie uma imagem válida (SVG, PNG, JPEG ou WebP).')
   }
 }
 
@@ -86,9 +87,9 @@ function saveLocal() {
       <!-- Logo Preview & Upload -->
       <div class="flex items-center gap-4">
         <img :src="editLogo" alt="Logo Editada" class="w-16 h-16 object-contain rounded" />
-        <input id="edit-upload-logo" type="file" accept=".svg" @change="onFileChange" class="hidden" />
+        <input id="edit-upload-logo" type="file" accept="image/svg+xml, image/png, image/jpeg, image/webp" @change="onFileChange" class="hidden" />
         <label for="edit-upload-logo" class="cursor-pointer rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
-          Alterar logo (.svg)
+          Alterar logo (.svg, .png, .jpeg, .webp)
         </label>
       </div>
 

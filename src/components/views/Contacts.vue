@@ -213,7 +213,6 @@ onMounted(() => {
   lojaStore.listarLojas();
   contactStore.listarContatos();
   contactStore.carregarNomesLojas();
-  contactStore.listarContatos();
 })
 </script>
 

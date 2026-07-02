@@ -29,14 +29,10 @@ const themeClass = computed(() => ({
 }))
 
 // Contatos
-const contatos = computed(() => 
-  contactStore.contatos.filter(contato => 
-    contato.stores?.some(store => 
-      store.id === loja.value?.id && 
-      store.pivot.ativo === 1 // Verifica ativo na relação
-    )
-  )
-)
+const contatos = computed(() => {
+  if (!loja.value) return []
+  return loja.value.contacts || []
+})
 
 // const loja = computed(() => lojaStore.lojas.find(l => l.id === lojaId))
 
@@ -49,8 +45,7 @@ onMounted(async () => {
     
     if (loja.value) {
       themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
-      await contactStore.listarContatosPublicosPorLoja(loja.value.id)
-      console.log('Contatos carregados:', contactStore.contatos) // ← Log de depuração
+      console.log('Contatos carregados:', loja.value.contacts) // ← Log de depuração
     }
   } catch (error) {
     console.error('Erro ao carregar contatos:', error)

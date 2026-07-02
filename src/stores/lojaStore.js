@@ -19,6 +19,15 @@ function base64ToBlob(base64Data, contentType = '') {
   return new Blob(byteArrays, { type: contentType })
 }
 
+function getExtensionFromMimeType(mimeType) {
+  if (mimeType === 'image/svg+xml') return 'svg';
+  if (mimeType === 'image/png') return 'png';
+  if (mimeType === 'image/jpeg') return 'jpeg';
+  if (mimeType === 'image/jpg') return 'jpg';
+  if (mimeType === 'image/webp') return 'webp';
+  return 'png'; // fallback
+}
+
 export const useLojaStore = defineStore('loja', {
   state: () => ({
     lojas: [],
@@ -44,7 +53,8 @@ export const useLojaStore = defineStore('loja', {
         if (loja.logoBase64) {
           const contentType = loja.logoBase64.split(';')[0].split(':')[1]
           const blob = base64ToBlob(loja.logoBase64, contentType)
-          formData.append('logo', blob, 'logo.png')
+          const ext = getExtensionFromMimeType(contentType)
+          formData.append('logo', blob, `logo.${ext}`)
         }
 
         if (Array.isArray(loja.links)) {
@@ -111,7 +121,8 @@ export const useLojaStore = defineStore('loja', {
           // converte base64 em Blob
           const ct = dados.logoBase64.split(';')[0].split(':')[1]
           const blob = base64ToBlob(dados.logoBase64, ct)
-          form.append('logo', blob, `logo.${ct.split('/')[1]}`)
+          const ext = getExtensionFromMimeType(ct)
+          form.append('logo', blob, `logo.${ext}`)
 
           // reenvia todos os links (pode ser [])
           dados.links.forEach((l, i) => {

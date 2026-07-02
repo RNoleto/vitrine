@@ -2,10 +2,15 @@ import { defineStore } from 'pinia'
 
 export const useThemeStore = defineStore('theme', {
   state: () => ({
+    themeName: 'default',
+    hasGradient: false,
     themes: { }
   }),
   actions: {
     applyTheme(themeName, lojaId) {
+      this.themeName = themeName;
+      this.hasGradient = themeName ? themeName.includes('gradient') : false;
+
       // Remove todos os temas anteriores
       document.body.classList.remove(...this.getThemeClasses());
       

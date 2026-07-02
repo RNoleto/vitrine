@@ -162,7 +162,7 @@ async function aplicarTema() {
 function cancelarPreview() {
   previewTheme.value = ''
   isPreview.value = false
-  themeStore.applyTheme(selectedTheme.value, lojaId)
+  themeStore.applyTheme(selectedTheme.value, loja.value?.id)
 }
 
 
