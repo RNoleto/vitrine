@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
+import { version } from '../../package.json'
 import { useAuthStore } from '../stores/authStore'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -86,7 +87,7 @@ watch(sidebarOpen, (newVal) => {
                 </router-link>
               </li>
             </ul>
-            <div class="pt-4 border-t border-gray-100 mt-auto sticky bottom-0 bg-white">
+            <div class="pt-4 border-t border-gray-100 mt-auto sticky bottom-0 bg-white flex flex-col gap-2">
               <Button 
                 @click="logout" 
                 class="w-full gap-2 flex items-center justify-center hover:bg-red-600 transition-colors duration-300"
@@ -94,6 +95,9 @@ watch(sidebarOpen, (newVal) => {
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 Sair
               </Button>
+              <div class="text-[10px] text-gray-400 text-center font-mono select-none">
+                Versão v{{ version }}
+              </div>
             </div>
           </nav>
         </div>
