@@ -28,6 +28,9 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value.global = true
     if (firebaseUser) {
       try {
+        const idToken = await firebaseUser.getIdToken()
+        localStorage.setItem('firebaseToken', idToken)
+
         // Verificação de consistência aprimorada
         const shouldSync = !user.value || 
                           user.value.firebase_uid !== firebaseUser.uid || 
