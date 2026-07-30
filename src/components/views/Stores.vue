@@ -119,18 +119,25 @@ const inputBaseClass = 'block w-full rounded-md bg-white px-3 py-1.5 text-base t
 
 function handleFileUpload(event) {
     const file = event.target.files[0]
+    if (!file) return
 
     const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp']
 
-    if (file && allowedTypes.includes(file.type)) {
-        const reader = new FileReader()
-        reader.onload = () => {
-            novaLojaLogo.value = reader.result
-        }
-        reader.readAsDataURL(file)
-    } else {
+    if (!allowedTypes.includes(file.type)) {
         alert('Por favor, envie uma imagem válida (SVG, PNG, JPEG ou WebP).')
+        return
     }
+
+    if (file.size > 2 * 1024 * 1024) {
+        alert('A imagem enviada excede o limite de 2MB do servidor local. Escolha um arquivo menor.')
+        return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+        novaLojaLogo.value = reader.result
+    }
+    reader.readAsDataURL(file)
 }
 
 function adicionarLink() {

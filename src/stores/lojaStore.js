@@ -48,7 +48,9 @@ export const useLojaStore = defineStore('loja', {
       try {
         const formData = new FormData()
         formData.append('name', loja.name)
-        formData.append('firebase_uid', firebase_uid)
+        if (firebase_uid) {
+          formData.append('firebase_uid', firebase_uid)
+        }
 
         if (loja.logoBase64) {
           const contentType = loja.logoBase64.split(';')[0].split(':')[1]
@@ -69,7 +71,11 @@ export const useLojaStore = defineStore('loja', {
         this.lojas.push(data)
         this.erro = null
       } catch (e) {
-        this.erro = e.response?.data?.error || 'Erro ao criar loja'
+        const errorDetails = e.response?.data?.errors 
+          ? Object.values(e.response.data.errors).flat().join(', ') 
+          : (e.response?.data?.error || 'Erro ao criar loja')
+        this.erro = errorDetails
+        console.error('Erro na validação/criação da loja:', e.response?.data)
         throw new Error(this.erro)
       } finally {
         this.carregando = false
