@@ -172,7 +172,7 @@ async function cadastrarLoja() {
     // }
 
     if(!novaLojaLogo.value){
-        errosFormulario.value.logo = 'O logo da loja é obrigatório.';
+        novaLojaLogo.value = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzRGNjZFNSIgcng9IjIwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMzAiIGZpbGw9IiNGRkZGRkYiLz48L3N2Zz4=';
     }
 
     if(novaLinks.value.length < 1){
