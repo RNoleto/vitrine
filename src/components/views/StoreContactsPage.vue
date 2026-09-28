@@ -91,15 +91,11 @@ onMounted(async () => {
 <style scoped>
 section {
   background: var(--color-background);
-  color: var(--color-primary);
+  color: var(--color-text);
+  min-height: 100vh;
 }
 
-section.gradient {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  color: var(--color-primary);
-}
-
-.custom-loading{
+.custom-loading {
   min-height: calc(100vh - 200px);
 }
 
@@ -108,15 +104,11 @@ section.gradient {
   border-top: 4px solid var(--color-accent);
 }
 
-section.gradient ::v-deep(.footer) {
+.title {
   color: var(--color-text);
 }
 
-.title{
-  color: var(--color-accent);
-}
-
-.back{
+.back {
   color: var(--color-text);
   background: var(--color-foreground);
   border: 1px solid var(--color-accent);
@@ -125,13 +117,9 @@ section.gradient ::v-deep(.footer) {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.back:hover{
+.back:hover {
   transform: scale(1.01);
   box-shadow: 0 0 8px var(--color-accent);
-}
-
-section.gradient ::v-deep(footer) {
-  color: var(--color-text);
 }
 
 section ::v-deep(footer) {

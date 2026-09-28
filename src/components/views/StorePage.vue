@@ -113,26 +113,17 @@ function handleClickContact(contato){
 </script>
 
 <style scoped>
-.store-page {
-  background-color: var(--color-background);
-  color: var(--color-text);
-}
-
 section {
   background: var(--color-background);
-  color: var(--color-primary);
-}
-
-section.gradient {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  color: var(--color-primary);
+  color: var(--color-text);
+  min-height: 100vh;
 }
 
 .title {
-  color: var(--color-accent);
+  color: var(--color-text);
 }
 
-.custom-loading{
+.custom-loading {
   min-height: calc(100vh - 200px);
 }
 
@@ -145,12 +136,7 @@ section.gradient {
   color: var(--color-accent);
 }
 
-section.gradient ::v-deep(footer) {
-  color: var(--color-text);
-}
-
 section ::v-deep(footer) {
   color: var(--color-text);
 }
-
 </style>
