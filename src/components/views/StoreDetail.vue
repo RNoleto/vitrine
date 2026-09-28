@@ -38,8 +38,8 @@
         <div class="flex flex-col gap-4 items-center mb-4">
           <select v-model="selectedTheme" @change="handleThemeChange" class="p-2 border rounded w-full">
             <option value="">Selecione um tema</option>
-            <option v-for="theme in themes" :key="theme" :value="theme">
-              {{ theme.charAt(0).toUpperCase() + theme.slice(1) }}
+            <option v-for="t in themesList" :key="t.id" :value="t.id">
+              {{ t.label }}
             </option>
           </select>
           <div v-if="isPreview" class="flex gap-2 w-full">
@@ -137,7 +137,20 @@ const selectedTheme = ref('')
 const previewTheme = ref('')
 const isPreview = ref(true)
 
-const themes = ['default', 'dark', 'light', 'pastel', 'aqua', 'light-gradient']
+const themesList = [
+  { id: 'default', label: 'Default Minimal' },
+  { id: 'dark', label: 'Elegance Dark' },
+  { id: 'light', label: 'Modern Light' },
+  { id: 'pastel', label: 'Pastel Dreams' },
+  { id: 'aqua', label: 'Cyan Aqua' },
+  { id: 'light-gradient', label: 'Aurora Gradient' },
+  { id: 'cyberpunk', label: '⚡ Cyberpunk Neon' },
+  { id: 'emerald', label: '🌲 Emerald & Gold' },
+  { id: 'sunset-gradient', label: '🌅 Sunset Gradient' },
+  { id: 'ocean-gradient', label: '🌌 Ocean Gradient' },
+  { id: 'midnight-purple', label: '👑 Royal Midnight' },
+  { id: 'rose-gold', label: '🌸 Rose Gold' }
+]
 
 async function handleThemeChange() {
   if (!selectedTheme.value) return;
