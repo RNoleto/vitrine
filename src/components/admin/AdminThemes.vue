@@ -6,7 +6,10 @@ import { useFeedbackStore } from '@/stores/feedbackStore'
 const themeStore = useThemeStore()
 const feedbackStore = useFeedbackStore()
 
-// State do Formulário do Criador de Tema
+const editorFormRef = ref(null)
+
+// State do Formulário do Criador/Editor de Tema
+const editingThemeId = ref(null) // null = criando novo, string = editando existente
 const newThemeLabel = ref('')
 const bgType = ref('solid') // 'solid' | 'gradient'
 const bgColorSolid = ref('#1E1B4B')
@@ -28,6 +31,7 @@ const computedBackground = computed(() => {
 })
 
 const generatedId = computed(() => {
+  if (editingThemeId.value) return editingThemeId.value
   if (!newThemeLabel.value.trim()) return 'custom-theme'
   return newThemeLabel.value
     .toLowerCase()
@@ -41,6 +45,8 @@ function saveTheme() {
     feedbackStore.showError('Por favor, informe o nome do tema.')
     return
   }
+
+  const isEditing = !!editingThemeId.value
 
   const themeObj = {
     id: generatedId.value,
@@ -56,31 +62,86 @@ function saveTheme() {
   }
 
   themeStore.addCustomTheme(themeObj)
-  feedbackStore.showSuccess(`Tema "${themeObj.label}" criado e disponibilizado com sucesso!`)
 
-  // Reset do formulário
+  if (isEditing) {
+    feedbackStore.showSuccess(`Tema "${themeObj.label}" atualizado com sucesso!`)
+  } else {
+    feedbackStore.showSuccess(`Tema "${themeObj.label}" criado e disponibilizado com sucesso!`)
+  }
+
+  cancelEditing()
+}
+
+function editCustomTheme(theme) {
+  editingThemeId.value = theme.id
+  newThemeLabel.value = theme.label
+  fgColor.value = theme.colors.foreground.startsWith('rgba') ? '#ffffff' : theme.colors.foreground
+  primaryColor.value = theme.colors.primary
+  accentColor.value = theme.colors.accent
+  textColor.value = theme.colors.text
+  backdropBlur.value = theme.backdropBlur || 0
+
+  if (theme.colors.background && theme.colors.background.includes('gradient')) {
+    bgType.value = 'gradient'
+    // Tenta extrair cores do gradiente se estiver no formato linear-gradient(deg, col1, col2)
+    const matches = theme.colors.background.match(/#([a-fA-F0-9]{3,8})/g)
+    if (matches && matches.length >= 2) {
+      bgGradientColor1.value = matches[0]
+      bgGradientColor2.value = matches[1]
+    }
+  } else {
+    bgType.value = 'solid'
+    bgColorSolid.value = theme.colors.background || '#1E1B4B'
+  }
+
+  if (editorFormRef.value) {
+    editorFormRef.value.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
+function cancelEditing() {
+  editingThemeId.value = null
   newThemeLabel.value = ''
+  bgType.value = 'solid'
+  bgColorSolid.value = '#1E1B4B'
+  bgGradientColor1.value = '#4F46E5'
+  bgGradientColor2.value = '#7C3AED'
+  bgGradientAngle.value = '135deg'
+  fgColor.value = '#2E2A72'
+  primaryColor.value = '#818CF8'
+  accentColor.value = '#F43F5E'
+  textColor.value = '#F8FAFC'
+  backdropBlur.value = 0
 }
 
 function deleteCustomTheme(theme) {
   if (confirm(`Deseja realmente excluir o tema "${theme.label}"?`)) {
+    if (editingThemeId.value === theme.id) {
+      cancelEditing()
+    }
     themeStore.removeCustomTheme(theme.id)
     feedbackStore.showSuccess(`Tema "${theme.label}" excluído.`)
   }
 }
 
 function applyPresetToEditor(theme) {
+  editingThemeId.value = null
   newThemeLabel.value = `${theme.label} (Cópia)`
   fgColor.value = theme.colors.foreground.startsWith('rgba') ? '#ffffff' : theme.colors.foreground
   primaryColor.value = theme.colors.primary
   accentColor.value = theme.colors.accent
   textColor.value = theme.colors.text
+  backdropBlur.value = theme.backdropBlur || 0
 
   if (theme.colors.background.includes('gradient')) {
     bgType.value = 'gradient'
   } else {
     bgType.value = 'solid'
     bgColorSolid.value = theme.colors.background
+  }
+
+  if (editorFormRef.value) {
+    editorFormRef.value.scrollIntoView({ behavior: 'smooth' })
   }
 }
 
@@ -96,19 +157,29 @@ onMounted(() => {
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Gerenciador & Criador de Temas</h1>
         <p class="text-sm text-gray-600 mt-1">
-          Crie novos temas de visualização personalizados. Todos os temas criados aqui ficam disponíveis para as vitrines dos usuários.
+          Crie e edite temas de visualização personalizados. Todos os temas criados ficam disponíveis para as vitrines dos usuários.
         </p>
       </div>
     </div>
 
-    <!-- Layout Principal: Criador + Live Preview Mockup Celular -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- Formulário de Criação (7 Colunas) -->
+    <!-- Layout Principal: Criador/Editor + Live Preview Mockup Celular -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6" ref="editorFormRef">
+      <!-- Formulário de Criação/Edição (7 Colunas) -->
       <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-5">
-        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-3">
-          <i class="fa-solid fa-palette text-indigo-600"></i>
-          Criar Novo Tema Visual
-        </h2>
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <i class="fa-solid fa-palette" :class="editingThemeId ? 'text-purple-600' : 'text-indigo-600'"></i>
+            {{ editingThemeId ? 'Editar Tema Visual' : 'Criar Novo Tema Visual' }}
+          </h2>
+
+          <span 
+            v-if="editingThemeId"
+            class="text-xs font-bold px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200 flex items-center gap-1"
+          >
+            <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+            Modo Edição (#{{ editingThemeId }})
+          </span>
+        </div>
 
         <!-- Nome do Tema -->
         <div>
@@ -119,7 +190,7 @@ onMounted(() => {
             placeholder="Ex: Neon Wave, Golden Sunset, Minimal Mint..."
             class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all"
           />
-          <p class="text-[11px] text-gray-400 mt-1 font-mono">ID gerado: theme-{{ generatedId }}</p>
+          <p class="text-[11px] text-gray-400 mt-1 font-mono">ID do tema: theme-{{ generatedId }}</p>
         </div>
 
         <!-- Tipo de Fundo -->
@@ -228,14 +299,27 @@ onMounted(() => {
           <input v-model.number="backdropBlur" type="range" min="0" max="20" step="2" class="w-full accent-indigo-600 cursor-pointer" />
         </div>
 
-        <button 
-          type="button" 
-          @click="saveTheme"
-          class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
-        >
-          <i class="fa-solid fa-floppy-disk text-sm"></i>
-          Salvar e Criar Tema
-        </button>
+        <!-- Botões de Ação do Formulário -->
+        <div class="flex items-center gap-3 pt-2">
+          <button 
+            type="button" 
+            @click="saveTheme"
+            class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+          >
+            <i class="fa-solid fa-floppy-disk text-sm"></i>
+            {{ editingThemeId ? 'Salvar Alterações do Tema' : 'Salvar e Criar Tema' }}
+          </button>
+
+          <button 
+            v-if="editingThemeId"
+            type="button" 
+            @click="cancelEditing"
+            class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+          >
+            <i class="fa-solid fa-xmark text-sm"></i>
+            Cancelar
+          </button>
+        </div>
       </div>
 
       <!-- Live Preview Smartphone Mockup Realista (5 Colunas) -->
@@ -388,7 +472,10 @@ onMounted(() => {
           v-for="theme in themeStore.allThemes" 
           :key="theme.id"
           class="border rounded-xl p-3.5 space-y-3 relative group hover:shadow-md transition-all bg-gray-50"
-          :class="theme.isCustom ? 'border-purple-300' : 'border-gray-200'"
+          :class="[
+            theme.isCustom ? 'border-purple-300' : 'border-gray-200',
+            editingThemeId === theme.id ? 'ring-2 ring-purple-500 bg-purple-50/30' : ''
+          ]"
         >
           <!-- Fundo Miniatura -->
           <div class="h-20 rounded-lg p-2.5 flex flex-col justify-between shadow-inner border border-black/10"
@@ -409,7 +496,21 @@ onMounted(() => {
             <span class="text-[11px] font-mono text-gray-500">#{{ theme.id }}</span>
 
             <div class="flex items-center gap-1.5">
+              <!-- Botão de Editar para Temas Customizados -->
               <button 
+                v-if="theme.isCustom"
+                type="button" 
+                @click="editCustomTheme(theme)"
+                title="Editar este tema"
+                class="px-2 py-1 text-[11px] font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 cursor-pointer flex items-center gap-1"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+                Editar
+              </button>
+
+              <!-- Botão Copiar para Presets do Sistema -->
+              <button 
+                v-else
                 type="button" 
                 @click="applyPresetToEditor(theme)"
                 title="Copiar cores para o criador"
@@ -418,6 +519,7 @@ onMounted(() => {
                 Copiar
               </button>
 
+              <!-- Botão Excluir -->
               <button 
                 v-if="theme.isCustom"
                 type="button" 
