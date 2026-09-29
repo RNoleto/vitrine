@@ -115,18 +115,14 @@ watch(sidebarOpen, (newVal) => {
               </li>
             </ul>
 
-            <!-- Botão Retornar ao App do Usuário -->
-            <div class="mt-6 pt-4 border-t border-gray-100">
+            <div class="pt-4 border-t border-gray-100 mt-auto sticky bottom-0 bg-white flex flex-col gap-2">
               <router-link 
                 to="/home"
-                class="flex items-center justify-center gap-2 p-2.5 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 hover:text-gray-900 rounded-lg border border-gray-200 transition-all duration-200"
+                class="w-full gap-2 flex items-center justify-center py-2 px-4 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold transition-colors duration-200 border border-indigo-200/80"
               >
-                <font-awesome-icon icon="arrow-left" class="w-3.5 h-3.5" />
+                <font-awesome-icon icon="arrow-left" class="w-4 h-4" />
                 Voltar ao App
               </router-link>
-            </div>
-
-            <div class="pt-4 border-t border-gray-100 mt-auto sticky bottom-0 bg-white flex flex-col gap-2">
               <Button 
                 @click="logout" 
                 class="w-full gap-2 flex items-center justify-center hover:bg-red-600 transition-colors duration-300"
@@ -134,7 +130,7 @@ watch(sidebarOpen, (newVal) => {
                 <font-awesome-icon icon="arrow-right-from-bracket" />
                 Sair
               </Button>
-              <div class="text-[10px] text-gray-400 text-center font-mono select-none">
+              <div class="text-[10px] text-gray-400 text-center font-mono select-none pt-1">
                 Versão Admin v{{ version }}
               </div>
             </div>
