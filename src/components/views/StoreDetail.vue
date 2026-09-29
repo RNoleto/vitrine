@@ -144,6 +144,19 @@
               <p class="text-xs text-gray-500">Edite a biografia, as métricas e as perguntas frequentes exibidas nos temas VIP</p>
             </div>
 
+            <!-- 0. Subtítulo / Slogan da Vitrine -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                <i class="fa-solid fa-quote-left text-indigo-500"></i> Subtítulo / Descrição Curta da Vitrine:
+              </label>
+              <input 
+                v-model="formDescription" 
+                placeholder="Ex: Atendimento estratégico, advocacia especializada e consultoria..." 
+                class="w-full p-2.5 border border-gray-300 rounded-xl text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
+              />
+              <span class="text-[10px] text-gray-400">Exibido no cabeçalho da vitrine abaixo do nome.</span>
+            </div>
+
             <!-- 1. Biografia / Sobre mim -->
             <div class="space-y-1.5">
               <div class="flex items-center justify-between">
@@ -516,6 +529,7 @@ function cancelarPreview() {
   themeStore.applyTheme(savedTheme, loja.value?.id)
 }
 
+const formDescription = ref('')
 const formBio = ref('')
 const formMetrics = ref([
   { value: '+500', label: 'Clientes' },
@@ -544,11 +558,13 @@ async function salvarConteudoCustomizado() {
     const validFaqs = formFaqs.value.filter(f => f.question && f.question.trim() && f.answer && f.answer.trim())
 
     await lojaStore.atualizarConteudoCustomizado(loja.value.id, {
+      description: formDescription.value,
       bio: formBio.value,
       metrics: validMetrics,
       faqs: validFaqs
     })
 
+    loja.value.description = formDescription.value
     loja.value.bio = formBio.value
     loja.value.metrics = validMetrics
     loja.value.faqs = validFaqs
@@ -579,6 +595,7 @@ onMounted(async () => {
     previewTheme.value = selectedTheme.value
     themeStore.applyTheme(selectedTheme.value, loja.value.id)
 
+    formDescription.value = loja.value.description || ''
     formBio.value = loja.value.bio || ''
     if (loja.value.metrics && Array.isArray(loja.value.metrics) && loja.value.metrics.length > 0) {
       formMetrics.value = JSON.parse(JSON.stringify(loja.value.metrics))

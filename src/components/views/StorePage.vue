@@ -12,10 +12,17 @@
             <div class="relative z-10 flex flex-col items-center">
               <div class="relative mb-4">
                 <img 
-                  :src="loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
-                  alt="Foto de perfil" 
+                  v-if="loja.logo_url"
+                  :src="loja.logo_url" 
+                  alt="Logo da vitrine" 
                   class="w-36 h-36 rounded-2xl object-cover shadow-2xl ring-4 ring-[var(--color-accent)] transform hover:scale-105 transition-all duration-300" 
                 />
+                <div 
+                  v-else 
+                  class="w-36 h-36 rounded-2xl bg-[var(--color-foreground)] border-2 border-[var(--color-accent)] flex items-center justify-center shadow-2xl ring-4 ring-[var(--color-accent)]/30 text-[var(--color-accent)] transform hover:scale-105 transition-all duration-300"
+                >
+                  <i class="fa-solid fa-store text-5xl"></i>
+                </div>
                 <span class="absolute -bottom-2 -right-2 bg-[var(--color-accent)] text-[var(--color-background)] w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
                   <i class="fa-solid fa-check text-xs"></i>
                 </span>
@@ -24,16 +31,16 @@
               <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 text-[var(--color-text)]">
                 {{ loja.name }}
               </h1>
-              <p class="text-sm font-medium opacity-90 max-w-md mx-auto leading-relaxed text-[var(--color-text)]">
-                {{ loja.description || 'Atendimento exclusivo, estratégias personalizadas e excelência para transformar seus resultados.' }}
+              <p v-if="loja.description" class="text-sm font-medium opacity-90 max-w-md mx-auto leading-relaxed text-[var(--color-text)]">
+                {{ loja.description }}
               </p>
             </div>
           </div>
 
           <!-- Store Links Section -->
-          <div class="space-y-3">
+          <div v-if="loja.links && loja.links.length" class="space-y-3">
             <h2 class="text-xs uppercase tracking-widest font-bold opacity-60 text-center mb-4 text-[var(--color-text)]">
-              ✨ Serviços & Links em Destaque
+              ✨ Links em Destaque
             </h2>
             <div v-for="(link, index) in loja.links" :key="index">
               <Card 
@@ -44,48 +51,48 @@
                 @click="handleClickLink(link)"
               />
             </div>
+          </div>
 
-            <!-- Contacts Cards -->
-            <div v-if="contatos.length === 1" class="pt-1">
-              <Card 
-                :text="contatos[0].name" 
-                :photo="contatos[0].photo" 
-                subtitle="Atendimento direto via WhatsApp"
-                :show-arrow="true"
-                @click="handleClickContact(contatos[0])" 
-              />
-            </div>
-            <div v-else-if="contatos.length > 1" class="pt-1">
-              <Card 
-                text="Fale com a nossa equipe de especialistas" 
-                icon="fa-solid fa-headset" 
-                subtitle="Equipe disponível para atendimento"
-                :show-arrow="true"
-                @click="irParaContatos" 
-              />
-            </div>
+          <!-- Contacts Cards -->
+          <div v-if="contatos.length === 1" class="pt-1">
+            <Card 
+              :text="contatos[0].name" 
+              :photo="contatos[0].photo" 
+              subtitle="Atendimento direto via WhatsApp"
+              :show-arrow="true"
+              @click="handleClickContact(contatos[0])" 
+            />
+          </div>
+          <div v-else-if="contatos.length > 1" class="pt-1">
+            <Card 
+              text="Fale com a nossa equipe de especialistas" 
+              icon="fa-solid fa-headset" 
+              subtitle="Equipe disponível para atendimento"
+              :show-arrow="true"
+              @click="irParaContatos" 
+            />
           </div>
 
           <!-- Section "Sobre mim / Quem sou eu" -->
-          <div class="premium-about-card p-6 sm:p-8 rounded-2xl border border-[var(--color-accent)] bg-[var(--color-foreground)] shadow-lg space-y-3">
+          <div v-if="loja.bio && loja.bio.trim()" class="premium-about-card p-6 sm:p-8 rounded-2xl border border-[var(--color-accent)] bg-[var(--color-foreground)] shadow-lg space-y-3">
             <h3 class="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
               <i class="fa-solid fa-user-check text-base text-[var(--color-accent)]"></i>
               Sobre mim
             </h3>
             <p class="text-sm leading-relaxed opacity-85 text-[var(--color-text)] whitespace-pre-line">
-              {{ displayBio }}
+              {{ loja.bio }}
             </p>
-            <div class="pt-2">
+            <div v-if="contatos.length" class="pt-2">
               <button @click="irParaContatos" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--color-primary)] text-[var(--color-background)] font-medium text-xs tracking-wider uppercase shadow-md hover:opacity-90 transition-all">
-                Minha abordagem <i class="fa-solid fa-arrow-right"></i>
+                Fazer contato <i class="fa-solid fa-arrow-right"></i>
               </button>
             </div>
           </div>
 
           <!-- Social Proof Counter Cards -->
-          <div v-if="displayMetrics.length" class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-md text-center">
+          <div v-if="loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-md text-center">
             <div 
-              v-for="(metric, mIdx) in displayMetrics.slice(0, 3)" 
+              v-for="(metric, mIdx) in loja.metrics.slice(0, 3)" 
               :key="mIdx"
               :class="['space-y-1', mIdx === 1 ? 'border-x border-[var(--color-accent)]/30 px-2' : '']"
             >
@@ -122,25 +129,21 @@
           </div>
 
           <!-- Bottom Call to Action Footer -->
-          <div class="text-center py-6 space-y-4">
-            <h4 class="text-lg font-bold text-[var(--color-text)]">
-              Vamos criar algo incrível juntos? ♥
+          <div v-if="socialLinks.length" class="text-center py-6 space-y-4">
+            <h4 class="text-base sm:text-lg font-bold text-[var(--color-text)]">
+              Acompanhe nas redes sociais
             </h4>
-            <p class="text-xs opacity-75 text-[var(--color-text)]">
-              Acompanhe minhas atualizações e novidades nas redes sociais
-            </p>
-            <div class="flex items-center justify-center gap-4 text-lg">
-              <a href="#" class="w-10 h-10 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] transition-all">
-                <i class="fa-brands fa-instagram"></i>
-              </a>
-              <a href="#" class="w-10 h-10 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] transition-all">
-                <i class="fa-brands fa-whatsapp"></i>
-              </a>
-              <a href="#" class="w-10 h-10 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] transition-all">
-                <i class="fa-brands fa-linkedin-in"></i>
-              </a>
-              <a href="#" class="w-10 h-10 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] transition-all">
-                <i class="fa-brands fa-youtube"></i>
+            <div class="flex items-center justify-center flex-wrap gap-4 text-lg">
+              <a 
+                v-for="(sLink, sIdx) in socialLinks" 
+                :key="sIdx"
+                :href="sLink.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                :title="sLink.label"
+                class="w-10 h-10 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] transition-all shadow-sm hover:scale-105"
+              >
+                <i :class="sLink.icon"></i>
               </a>
             </div>
           </div>
@@ -202,26 +205,54 @@ const loja = ref(null)
 const contatos = ref([])
 const activeFaqs = ref([])
 
-// Dynamic FAQs para a Landing Page (fallback)
-const defaultFaqs = [
-  { question: 'Como funciona o atendimento presencial ou online?', answer: 'Realizamos consultorias personalizadas tanto de forma 100% remota com flexibilidade de horários quanto presencialmente com agendamento prévio.', open: false },
-  { question: 'Quais são as etapas do acompanhamento?', answer: 'Iniciamos com um diagnóstico inicial detalhado, mapeamento de necessidades e estruturação de um plano estratégico contínuo.', open: false },
-  { question: 'Como faço para tirar dúvidas antes de contratar?', answer: 'Basta clicar no botão de atendimento pelo WhatsApp ou selecionar um dos nossos consultores para falar diretamente conosco.', open: false }
-]
+const socialLinks = computed(() => {
+  if (!loja.value) return []
+  const links = []
 
-const displayBio = computed(() => {
-  return loja.value?.bio || 'Especialista dedicada a oferecer soluções sob medida para cada cliente. Com foco em segurança, estratégia e atenção aos detalhes, ajudo você a alcançar seus objetivos com agilidade e clareza.'
-})
+  if (Array.isArray(loja.value.links)) {
+    loja.value.links.forEach(l => {
+      if (!l.url) return
+      const icon = (l.icone || '').toLowerCase()
+      const url = l.url.toLowerCase()
+      let brandIcon = null
 
-const displayMetrics = computed(() => {
-  if (loja.value?.metrics && Array.isArray(loja.value.metrics) && loja.value.metrics.length > 0) {
-    return loja.value.metrics
+      if (icon.includes('instagram') || url.includes('instagram.com')) brandIcon = 'fa-brands fa-instagram'
+      else if (icon.includes('whatsapp') || url.includes('wa.me') || url.includes('whatsapp.com')) brandIcon = 'fa-brands fa-whatsapp'
+      else if (icon.includes('linkedin') || url.includes('linkedin.com')) brandIcon = 'fa-brands fa-linkedin-in'
+      else if (icon.includes('youtube') || url.includes('youtube.com') || url.includes('youtu.be')) brandIcon = 'fa-brands fa-youtube'
+      else if (icon.includes('facebook') || url.includes('facebook.com')) brandIcon = 'fa-brands fa-facebook-f'
+      else if (icon.includes('twitter') || icon.includes('x-twitter') || url.includes('twitter.com') || url.includes('x.com')) brandIcon = 'fa-brands fa-x-twitter'
+      else if (icon.includes('tiktok') || url.includes('tiktok.com')) brandIcon = 'fa-brands fa-tiktok'
+      else if (icon.includes('github') || url.includes('github.com')) brandIcon = 'fa-brands fa-github'
+      else if (icon.includes('globe') || icon.includes('website') || icon.includes('site')) brandIcon = 'fa-solid fa-globe'
+
+      if (brandIcon) {
+        links.push({
+          url: l.url,
+          icon: brandIcon,
+          label: l.texto || 'Rede social'
+        })
+      }
+    })
   }
-  return [
-    { value: '+500', label: 'Clientes' },
-    { value: '8 ANOS', label: 'Experiência' },
-    { value: '95%', label: 'Satisfação' }
-  ]
+
+  if (Array.isArray(contatos.value)) {
+    contatos.value.forEach(c => {
+      if (c.whatsapp) {
+        const waNum = c.whatsapp.replace(/\D/g, '')
+        const waUrl = `https://wa.me/${waNum}`
+        if (!links.some(item => item.url.includes(waNum) || item.url.includes('wa.me'))) {
+          links.push({
+            url: waUrl,
+            icon: 'fa-brands fa-whatsapp',
+            label: c.name || 'WhatsApp'
+          })
+        }
+      }
+    })
+  }
+
+  return links
 })
 
 const currentTheme = computed(() => themeStore.currentThemeObject)
@@ -245,7 +276,7 @@ onMounted(async () => {
       if (loja.value.faqs && Array.isArray(loja.value.faqs) && loja.value.faqs.length > 0) {
         activeFaqs.value = loja.value.faqs.map(f => ({ ...f, open: false }))
       } else {
-        activeFaqs.value = defaultFaqs.map(f => ({ ...f }))
+        activeFaqs.value = []
       }
 
       await lojaStore.registrarVisita(slug)
