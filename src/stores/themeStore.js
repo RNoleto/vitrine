@@ -191,8 +191,8 @@ export const useThemeStore = defineStore('theme', {
           100% { background-position: 0% 50%; }
         }
         @keyframes bgOrbPulse {
-          0%, 100% { transform: scale(1) translateY(0); opacity: 0.8; }
-          50% { transform: scale(1.2) translateY(-20px); opacity: 1; }
+          0%, 100% { background-position: 0% 0%, 100% 100%, 0 0; }
+          50% { background-position: 60% 40%, 40% 60%, 0 0; }
         }
       `
 
@@ -203,6 +203,8 @@ export const useThemeStore = defineStore('theme', {
         let bgSizeCss = theme.bgSize || 'cover'
         let bgPositionCss = theme.bgPosition || 'center'
         let animCss = 'none'
+        const animType = theme.bgAnimationType || 'gradient-flow'
+        const duration = theme.bgAnimationDuration || (animType === 'gradient-flow' ? '12s' : '8s')
 
         if (bgType === 'image' && theme.bgImageUrl) {
           bgCss = `url("${theme.bgImageUrl}")`
@@ -210,15 +212,16 @@ export const useThemeStore = defineStore('theme', {
             bgAttachmentCss = 'fixed'
           }
         } else if (bgType === 'animation') {
-          const animType = theme.bgAnimationType || 'gradient-flow'
           if (animType === 'gradient-flow') {
             bgCss = (theme.colors.background && theme.colors.background.includes('gradient')) 
               ? theme.colors.background 
               : 'linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)'
-            animCss = 'bgGradientFlow 12s ease infinite'
+            animCss = `bgGradientFlow ${duration} ease infinite`
           } else if (animType === 'floating-orbs') {
-            bgCss = `radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.45) 0%, transparent 40%), radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.45) 0%, transparent 40%), ${theme.colors.background || '#0f172a'}`
-            animCss = 'bgOrbPulse 8s ease-in-out infinite'
+            bgCss = (theme.colors.background && theme.colors.background.includes('radial-gradient'))
+              ? theme.colors.background
+              : `radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.45) 0%, transparent 40%), radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.45) 0%, transparent 40%), ${theme.colors.background || '#0f172a'}`
+            animCss = `bgOrbPulse ${duration} ease-in-out infinite`
           }
         }
 
@@ -272,8 +275,8 @@ export const useThemeStore = defineStore('theme', {
           background-image: ${bgType === 'image' ? bgCss : (bgType === 'animation' || bgType === 'gradient' ? bgCss : 'none')} !important;
           background-color: ${bgType === 'solid' ? theme.colors.background : '#FAFAFA'} !important;
           background-attachment: ${bgAttachmentCss} !important;
-          background-size: ${bgType === 'animation' && theme.bgAnimationType === 'gradient-flow' ? '400% 400%' : bgSizeCss} !important;
-          background-position: ${bgPositionCss} !important;
+          background-size: ${bgType === 'animation' && animType === 'gradient-flow' ? '400% 400%' : (bgType === 'animation' && animType === 'floating-orbs' ? '180% 180%, 180% 180%, 100% 100%' : bgSizeCss)} !important;
+          ${bgType === 'animation' ? '' : `background-position: ${bgPositionCss} !important;`}
           animation: ${animCss} !important;
           position: relative;
         }\n`

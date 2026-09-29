@@ -91,6 +91,23 @@ function parsePositionToCoordinates(posStr) {
 
 // Configurações de Animação de Fundo
 const bgAnimationType = ref('gradient-flow') // 'gradient-flow' | 'floating-orbs'
+const bgAnimationDuration = ref(12) // 4s - 30s
+const bgAnimColor3 = ref('#23a6d5')
+const bgAnimColor4 = ref('#23d5ab')
+const bgOrbColor1 = ref('#6366F1')
+const bgOrbColor2 = ref('#EC4899')
+
+function hexToRgba(hex, alpha = 0.45) {
+  if (!hex || typeof hex !== 'string') return `rgba(99, 102, 241, ${alpha})`
+  if (hex.startsWith('rgba') || hex.startsWith('rgb')) return hex
+  let c = hex.replace('#', '')
+  if (c.length === 3) c = c.split('').map(x => x + x).join('')
+  if (c.length !== 6) return `rgba(99, 102, 241, ${alpha})`
+  const r = parseInt(c.substring(0, 2), 16)
+  const g = parseInt(c.substring(2, 4), 16)
+  const b = parseInt(c.substring(4, 6), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
 
 // Configurações de Overlay (Camada de Contraste)
 const bgOverlayEnabled = ref(false)
@@ -123,10 +140,12 @@ const computedBackground = computed(() => {
   }
   if (bgType.value === 'animation') {
     if (bgAnimationType.value === 'gradient-flow') {
-      return `linear-gradient(-45deg, ${bgGradientColor1.value}, ${bgGradientColor2.value}, ${primaryColor.value}, ${accentColor.value})`
+      return `linear-gradient(${bgGradientAngle.value || '-45deg'}, ${bgGradientColor1.value}, ${bgGradientColor2.value}, ${bgAnimColor3.value}, ${bgAnimColor4.value})`
     }
     if (bgAnimationType.value === 'floating-orbs') {
-      return `radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.45) 0%, transparent 40%), radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.45) 0%, transparent 40%), ${bgColorSolid.value}`
+      const orb1 = hexToRgba(bgOrbColor1.value, 0.45)
+      const orb2 = hexToRgba(bgOrbColor2.value, 0.45)
+      return `radial-gradient(circle at 20% 20%, ${orb1} 0%, transparent 40%), radial-gradient(circle at 80% 80%, ${orb2} 0%, transparent 40%), ${bgColorSolid.value}`
     }
   }
   return bgColorSolid.value
@@ -147,10 +166,11 @@ const mockupContainerStyle = computed(() => {
     if (bgAnimationType.value === 'gradient-flow') {
       style.backgroundImage = computedBackground.value
       style.backgroundSize = '400% 400%'
-      style.animation = 'bgGradientFlow 12s ease infinite'
+      style.animation = `bgGradientFlow ${bgAnimationDuration.value}s ease infinite`
     } else {
       style.backgroundImage = computedBackground.value
-      style.animation = 'bgOrbPulse 8s ease-in-out infinite'
+      style.backgroundSize = '180% 180%, 180% 180%, 100% 100%'
+      style.animation = `bgOrbPulse ${bgAnimationDuration.value}s ease-in-out infinite`
     }
   } else if (bgType.value === 'gradient') {
     style.backgroundImage = computedBackground.value
@@ -226,6 +246,7 @@ async function saveTheme() {
     bgSize: computedBgSize.value,
     bgPosition: computedBgPosition.value,
     bgAnimationType: bgAnimationType.value,
+    bgAnimationDuration: `${bgAnimationDuration.value}s`,
     bgOverlay: {
       enabled: bgOverlayEnabled.value,
       color: bgOverlayColor.value,
@@ -282,6 +303,31 @@ function editCustomTheme(theme) {
   bgPosition.value = theme.bgPosition || 'center'
   parsePositionToCoordinates(theme.bgPosition)
   bgAnimationType.value = theme.bgAnimationType || 'gradient-flow'
+  if (theme.bgAnimationDuration) {
+    bgAnimationDuration.value = parseInt(theme.bgAnimationDuration, 10) || (bgAnimationType.value === 'gradient-flow' ? 12 : 8)
+  } else {
+    bgAnimationDuration.value = bgAnimationType.value === 'gradient-flow' ? 12 : 8
+  }
+
+  if (theme.colors?.background && theme.colors.background.includes('linear-gradient')) {
+    const matches = theme.colors.background.match(/#([a-fA-F0-9]{3,8})/g)
+    if (matches && matches.length >= 4) {
+      bgGradientColor1.value = matches[0]
+      bgGradientColor2.value = matches[1]
+      bgAnimColor3.value = matches[2]
+      bgAnimColor4.value = matches[3]
+    } else if (matches && matches.length >= 2) {
+      bgGradientColor1.value = matches[0]
+      bgGradientColor2.value = matches[1]
+    }
+  } else if (theme.colors?.background && theme.colors.background.includes('radial-gradient')) {
+    const matches = theme.colors.background.match(/#([a-fA-F0-9]{3,8})/g)
+    if (matches && matches.length >= 3) {
+      bgOrbColor1.value = matches[0]
+      bgOrbColor2.value = matches[1]
+      bgColorSolid.value = matches[2]
+    }
+  }
 
   if (theme.bgOverlay) {
     bgOverlayEnabled.value = theme.bgOverlay.enabled || (theme.bgOverlay.opacity > 0)
@@ -340,6 +386,11 @@ function cancelEditing() {
   bgSizeOption.value = 'cover'
   bgCustomScale.value = 100
   bgAnimationType.value = 'gradient-flow'
+  bgAnimationDuration.value = 12
+  bgAnimColor3.value = '#23a6d5'
+  bgAnimColor4.value = '#23d5ab'
+  bgOrbColor1.value = '#6366F1'
+  bgOrbColor2.value = '#EC4899'
 
   bgOverlayEnabled.value = false
   bgOverlayColor.value = '#000000'
@@ -690,8 +741,9 @@ onMounted(async () => {
         </div>
 
         <!-- PAINEL DE ANIMAÇÃO DE FUNDO (ANIMATION CONFIGS) -->
-        <div v-if="bgType === 'animation'" class="p-4 bg-indigo-50/40 border border-indigo-100 rounded-2xl space-y-3">
-          <label class="block text-xs font-bold text-gray-800">Selecione a Animação CSS Dinâmica</label>
+        <div v-if="bgType === 'animation'" class="p-4 bg-indigo-50/40 border border-indigo-100 rounded-2xl space-y-4">
+          <label class="block text-xs font-bold text-gray-800">Selecione o Estilo de Animação CSS Dinâmica</label>
+          
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div 
               @click="bgAnimationType = 'gradient-flow'"
@@ -719,6 +771,93 @@ onMounted(async () => {
                 <span>Orbes de Luz Flutuantes</span>
               </div>
               <i class="fa-solid fa-check text-xs" v-if="bgAnimationType === 'floating-orbs'"></i>
+            </div>
+          </div>
+
+          <!-- CONFIGURAÇÕES DE CORES DO GRADIENTE EM MOVIMENTO -->
+          <div v-if="bgAnimationType === 'gradient-flow'" class="p-3 bg-white rounded-xl border border-gray-200 space-y-3">
+            <label class="block text-xs font-bold text-gray-800">Paleta de Cores do Gradiente Fluido (4 Cores)</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Cor 1</label>
+                <div class="flex items-center gap-1.5">
+                  <input v-model="bgGradientColor1" type="color" class="w-7 h-7 rounded cursor-pointer border border-gray-300" />
+                  <input v-model="bgGradientColor1" type="text" class="text-[10px] font-mono bg-gray-50 border border-gray-200 rounded px-1 py-1 w-full uppercase" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Cor 2</label>
+                <div class="flex items-center gap-1.5">
+                  <input v-model="bgGradientColor2" type="color" class="w-7 h-7 rounded cursor-pointer border border-gray-300" />
+                  <input v-model="bgGradientColor2" type="text" class="text-[10px] font-mono bg-gray-50 border border-gray-200 rounded px-1 py-1 w-full uppercase" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Cor 3</label>
+                <div class="flex items-center gap-1.5">
+                  <input v-model="bgAnimColor3" type="color" class="w-7 h-7 rounded cursor-pointer border border-gray-300" />
+                  <input v-model="bgAnimColor3" type="text" class="text-[10px] font-mono bg-gray-50 border border-gray-200 rounded px-1 py-1 w-full uppercase" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Cor 4</label>
+                <div class="flex items-center gap-1.5">
+                  <input v-model="bgAnimColor4" type="color" class="w-7 h-7 rounded cursor-pointer border border-gray-300" />
+                  <input v-model="bgAnimColor4" type="text" class="text-[10px] font-mono bg-gray-50 border border-gray-200 rounded px-1 py-1 w-full uppercase" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Ângulo / Direção do Fluxo</label>
+              <select v-model="bgGradientAngle" class="text-xs bg-white border border-gray-300 rounded-lg px-2 py-1.5 w-full font-medium">
+                <option value="-45deg">Diagonal Inclinada (-45°)</option>
+                <option value="135deg">Diagonal Descendente (135°)</option>
+                <option value="90deg">Horizontal (90°)</option>
+                <option value="180deg">Vertical (180°)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- CONFIGURAÇÕES DE CORES DAS ORBES DE LUZ -->
+          <div v-if="bgAnimationType === 'floating-orbs'" class="p-3 bg-white rounded-xl border border-gray-200 space-y-3">
+            <label class="block text-xs font-bold text-gray-800">Cores das Orbes & Fundo Base</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Cor do Fundo Base</label>
+                <div class="flex items-center gap-1.5">
+                  <input v-model="bgColorSolid" type="color" class="w-7 h-7 rounded cursor-pointer border border-gray-300" />
+                  <input v-model="bgColorSolid" type="text" class="text-[10px] font-mono bg-gray-50 border border-gray-200 rounded px-1 py-1 w-full uppercase" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Orbe de Luz 1 (Superior)</label>
+                <div class="flex items-center gap-1.5">
+                  <input v-model="bgOrbColor1" type="color" class="w-7 h-7 rounded cursor-pointer border border-gray-300" />
+                  <input v-model="bgOrbColor1" type="text" class="text-[10px] font-mono bg-gray-50 border border-gray-200 rounded px-1 py-1 w-full uppercase" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Orbe de Luz 2 (Inferior)</label>
+                <div class="flex items-center gap-1.5">
+                  <input v-model="bgOrbColor2" type="color" class="w-7 h-7 rounded cursor-pointer border border-gray-300" />
+                  <input v-model="bgOrbColor2" type="text" class="text-[10px] font-mono bg-gray-50 border border-gray-200 rounded px-1 py-1 w-full uppercase" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VELOCIDADE DA ANIMAÇÃO -->
+          <div class="p-3 bg-white rounded-xl border border-gray-200 space-y-1">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-gray-800">Velocidade da Animação: {{ bgAnimationDuration }}s por ciclo</label>
+              <span class="text-[10px] font-bold text-indigo-600">
+                {{ bgAnimationDuration <= 6 ? '⚡ Rápida' : bgAnimationDuration <= 15 ? '🌊 Suave' : '🧘 Muito Lenta' }}
+              </span>
+            </div>
+            <div class="flex items-center gap-3">
+              <input type="range" min="4" max="30" step="1" v-model.number="bgAnimationDuration" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+              <input type="number" min="4" max="30" v-model.number="bgAnimationDuration" class="w-16 text-xs font-mono text-center border border-gray-300 rounded px-1 py-0.5 bg-white" />
             </div>
           </div>
         </div>
