@@ -2,9 +2,15 @@
 import { ref, computed, onMounted } from 'vue'
 import { useThemeStore } from '@/stores/themeStore'
 import { useFeedbackStore } from '@/stores/feedbackStore'
+import { useFontStore } from '@/stores/fontStore'
 
 const themeStore = useThemeStore()
 const feedbackStore = useFeedbackStore()
+const fontStore = useFontStore()
+
+onMounted(async () => {
+  await fontStore.carregarFontes()
+})
 
 const editorFormRef = ref(null)
 
@@ -437,9 +443,16 @@ onMounted(async () => {
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Tipografia (Fonte)</label>
             <select v-model="fontFamily" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
-              <option value="serif">Serifada Elegante (Playfair)</option>
-              <option value="cinzel">Nobre / Jurídica (Cinzel)</option>
-              <option value="sans">Moderna Clean (Inter)</option>
+              <optgroup label="Fontes Cadastradas no Sistema">
+                <option v-for="f in fontStore.fonts" :key="f.id" :value="f.id || f.family_name">
+                  {{ f.display_name || f.family_name }}
+                </option>
+              </optgroup>
+              <optgroup label="Aliases de Compatibilidade">
+                <option value="sans">Moderna Clean (Inter)</option>
+                <option value="serif">Serifada Elegante (Playfair)</option>
+                <option value="cinzel">Nobre / Jurídica (Cinzel)</option>
+              </optgroup>
             </select>
           </div>
 

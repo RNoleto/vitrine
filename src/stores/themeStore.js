@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '../services/api'
+import { useFontStore } from './fontStore'
 
 export function getContrastColor(hexColor) {
   if (!hexColor || typeof hexColor !== 'string') return '#FFFFFF';
@@ -162,6 +163,8 @@ export const useThemeStore = defineStore('theme', {
             backdropBlur: t.backdrop_blur || 0
           }))
         }
+        const fontStore = useFontStore()
+        await fontStore.carregarFontes()
         this.initDynamicCss()
       } catch (err) {
         console.error('Erro ao carregar temas do banco de dados:', err)
@@ -231,9 +234,18 @@ export const useThemeStore = defineStore('theme', {
         const blur = theme.backdropBlur ? `blur(${theme.backdropBlur}px)` : 'none'
 
         let fontCss = 'inherit'
+        const fontStore = useFontStore()
         if (theme.fontFamily === 'serif') fontCss = "'Playfair Display', serif"
         else if (theme.fontFamily === 'cinzel') fontCss = "'Cinzel', serif"
         else if (theme.fontFamily === 'sans') fontCss = "'Inter', sans-serif"
+        else if (theme.fontFamily) {
+          const fontObj = fontStore.fonts.find(f => f.id === theme.fontFamily || f.family_name.toLowerCase() === theme.fontFamily.toLowerCase())
+          if (fontObj) {
+            fontCss = `'${fontObj.family_name}', ${fontObj.category || 'sans-serif'}`
+          } else {
+            fontCss = `'${theme.fontFamily}', sans-serif`
+          }
+        }
 
         const overlayEnabled = theme.bgOverlay?.enabled || (theme.bgOverlayOpacity > 0)
         const overlayColor = theme.bgOverlay?.color || theme.bgOverlayColor || '#000000'
@@ -379,9 +391,20 @@ export const useThemeStore = defineStore('theme', {
       if (!theme) return {}
       const bgType = theme.bgType || (theme.colors?.background?.includes('gradient') ? 'gradient' : 'solid')
       
+      const fontStore = useFontStore()
+      let fontFamilyCss = "'Inter', sans-serif"
+      if (theme.fontFamily === 'serif') fontFamilyCss = "'Playfair Display', serif"
+      else if (theme.fontFamily === 'cinzel') fontFamilyCss = "'Cinzel', serif"
+      else if (theme.fontFamily === 'sans') fontFamilyCss = "'Inter', sans-serif"
+      else if (theme.fontFamily) {
+        const fontObj = fontStore.fonts.find(f => f.id === theme.fontFamily || f.family_name.toLowerCase() === theme.fontFamily.toLowerCase())
+        if (fontObj) fontFamilyCss = `'${fontObj.family_name}', ${fontObj.category || 'sans-serif'}`
+        else fontFamilyCss = `'${theme.fontFamily}', sans-serif`
+      }
+
       let styleObj = {
         color: theme.colors?.text || '#000000',
-        fontFamily: theme.fontFamily === 'serif' ? "'Playfair Display', serif" : theme.fontFamily === 'cinzel' ? "'Cinzel', serif" : "'Inter', sans-serif"
+        fontFamily: fontFamilyCss
       }
 
       if (bgType === 'image' && theme.bgImageUrl) {

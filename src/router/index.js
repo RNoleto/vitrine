@@ -20,6 +20,7 @@ import AdminLayout from '@/components/admin/AdminLayout.vue'
 import AdminStores from '@/components/admin/AdminStores.vue'
 import AdminContacts from '../components/admin/AdminContacts.vue'
 import AdminThemes from '@/components/admin/AdminThemes.vue'
+import AdminFonts from '@/components/admin/AdminFonts.vue'
 
 import { useThemeStore } from '../stores/themeStore'
 import { useLojaStore } from '../stores/lojaStore'
@@ -134,6 +135,11 @@ const routes = [
         path: 'themes',
         name: 'AdminThemes',
         component: AdminThemes
+      },
+      {
+        path: 'fonts',
+        name: 'AdminFonts',
+        component: AdminFonts
       },
       {
         path: 'settings',
