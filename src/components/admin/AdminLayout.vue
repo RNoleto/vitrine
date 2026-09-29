@@ -1,7 +1,8 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { version } from '../../../package.json'
 import { useAuthStore } from '@/stores/authStore'
+import { useThemeStore } from '@/stores/themeStore'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { 
@@ -19,7 +20,12 @@ import Button from '@/components/ui/Button.vue'
 library.add(faChartPie, faUsers, faStore, faAddressBook, faArrowLeft, faShieldHalved, faArrowRightFromBracket, faPalette)
 
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 const sidebarOpen = ref(false)
+
+onMounted(() => {
+  themeStore.clearBodyTheme()
+})
 
 const links = [
   { name: 'Visão Geral', route: '/admin/resume', icon: 'chart-pie' },

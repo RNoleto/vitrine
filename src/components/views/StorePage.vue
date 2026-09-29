@@ -1,6 +1,6 @@
 <template>
-  <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
-    <main class="flex flex-col flex-1 pb-10">
+  <section :class="[`theme-${themeStore.themeName}`, 'public-store-page flex flex-col min-h-[100vh] flex-1 relative overflow-hidden']">
+    <main class="flex flex-col flex-1 pb-10 relative z-10">
       <div class="max-w-[720px] mx-auto w-full px-4 pt-6">
         <Loading v-if="lojaStore.carregando" text="Carregando vitrine..." class="custom-loading" />
 
@@ -183,7 +183,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useWhatsapp } from '@/composables/useWhatsapp'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
@@ -231,11 +231,6 @@ const isPremiumLayout = computed(() => {
   return currentTheme.value.isPremium || ['portrait-hero', 'landing-page'].includes(currentTheme.value.layoutStyle)
 })
 
-const themeClass = computed(() => ({
-  [`theme-${themeStore.themeName}`]: true,
-  'gradient': themeStore.hasGradient
-}))
-
 onMounted(async () => {
   lojaStore.carregando = true
   const slug = route.params.slug
@@ -244,7 +239,7 @@ onMounted(async () => {
     loja.value = await lojaStore.obterLojaPublica(slug)
     
     if (loja.value) {
-      themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
+      themeStore.applyTheme(loja.value.theme || 'default', loja.value.id, true)
       contatos.value = loja.value.contacts || []
 
       if (loja.value.faqs && Array.isArray(loja.value.faqs) && loja.value.faqs.length > 0) {
@@ -260,6 +255,10 @@ onMounted(async () => {
   } finally {
     lojaStore.carregando = false
   }
+})
+
+onUnmounted(() => {
+  themeStore.clearBodyTheme()
 })
 
 function irParaContatos() {
@@ -287,7 +286,6 @@ function handleClickContact(contato){
 
 <style scoped>
 section {
-  background: var(--color-background);
   color: var(--color-text);
   min-height: 100vh;
 }

@@ -120,7 +120,7 @@ export const useThemeStore = defineStore('theme', {
 
       this.allThemes.forEach(theme => {
         const bgType = theme.bgType || (theme.colors?.background?.includes('gradient') ? 'gradient' : 'solid')
-        let bgCss = theme.colors.background || '#ffffff'
+        let bgCss = theme.colors?.background || '#ffffff'
         let bgAttachmentCss = theme.bgAttachment || 'scroll'
         let bgSizeCss = theme.bgSize || 'cover'
         let bgPositionCss = theme.bgPosition || 'center'
@@ -160,6 +160,7 @@ export const useThemeStore = defineStore('theme', {
         const overlayOpacity = theme.bgOverlay?.opacity ?? theme.bgOverlayOpacity ?? 0
         const overlayBlur = theme.bgOverlay?.blur ?? theme.bgOverlayBlur ?? 0
 
+        // Injeção de variáveis isoladas
         cssString += `
         .theme-${theme.id}, [data-theme="${theme.id}"] {
           --color-background: ${bgType === 'solid' ? theme.colors.background : 'transparent'};
@@ -171,18 +172,20 @@ export const useThemeStore = defineStore('theme', {
           font-family: ${fontCss};
         }
 
-        body.theme-${theme.id} {
+        /* Estilos de fundo aplicados EXCLUSIVAMENTE nas paginas publicas de vitrine */
+        .public-store-page.theme-${theme.id}, body.public-store-body.theme-${theme.id} {
           background-image: ${bgType === 'image' ? bgCss : (bgType === 'animation' || bgType === 'gradient' ? bgCss : 'none')} !important;
-          background-color: ${bgType === 'solid' ? theme.colors.background : 'transparent'} !important;
+          background-color: ${bgType === 'solid' ? theme.colors.background : '#FAFAFA'} !important;
           background-attachment: ${bgAttachmentCss} !important;
           background-size: ${bgType === 'animation' && theme.bgAnimationType === 'gradient-flow' ? '400% 400%' : bgSizeCss} !important;
           background-position: ${bgPositionCss} !important;
           animation: ${animCss} !important;
+          position: relative;
         }\n`
 
         if (overlayEnabled && overlayOpacity > 0) {
           cssString += `
-          body.theme-${theme.id}::before {
+          .public-store-page.theme-${theme.id}::before, body.public-store-body.theme-${theme.id}::before {
             content: '';
             position: fixed;
             inset: 0;
@@ -233,16 +236,24 @@ export const useThemeStore = defineStore('theme', {
       this.initDynamicCss()
     },
 
-    applyTheme(themeName, lojaId) {
+    clearBodyTheme() {
+      if (typeof document === 'undefined') return
+      document.body.classList.remove('public-store-body', ...this.getThemeClasses())
+    },
+
+    applyTheme(themeName, lojaId, applyToBody = false) {
       this.initDynamicCss()
       this.themeName = themeName || 'default';
       this.hasGradient = themeName ? themeName.includes('gradient') : false;
 
-      // Remove todos os temas anteriores
-      document.body.classList.remove(...this.getThemeClasses());
+      // Limpa temas do body por padrão para isolar a Dashboard
+      this.clearBodyTheme()
       
-      // Aplica novo tema
-      document.body.classList.add(`theme-${this.themeName}`);
+      // Aplica no document.body SOMENTE se for uma página pública externa (StorePage)
+      if (applyToBody && typeof document !== 'undefined') {
+        document.body.classList.add('public-store-body', `theme-${this.themeName}`);
+      }
+
       if (lojaId) {
         localStorage.setItem(`theme_${lojaId}`, this.themeName);
       }
@@ -257,10 +268,10 @@ export const useThemeStore = defineStore('theme', {
     initTheme(lojaId) {
       this.initDynamicCss()
       const savedTheme = localStorage.getItem(`theme_${lojaId}`) || 'default';
-      this.applyTheme(savedTheme, lojaId);
+      this.applyTheme(savedTheme, lojaId, false);
     },
 
-    // Helper para gerar o objeto de estilo inline para o mockup de celular
+    // Helper para gerar o objeto de estilo inline para o mockup de celular no Admin/Dashboard
     getThemePreviewStyle(theme) {
       if (!theme) return {}
       const bgType = theme.bgType || (theme.colors?.background?.includes('gradient') ? 'gradient' : 'solid')

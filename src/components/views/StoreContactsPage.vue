@@ -44,8 +44,7 @@ onMounted(async () => {
     loja.value = lojaStore.lojaSelecionada
     
     if (loja.value) {
-      themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
-      console.log('Contatos carregados:', loja.value.contacts) // ← Log de depuração
+      themeStore.applyTheme(loja.value.theme || 'default', loja.value.id, true)
     }
   } catch (error) {
     console.error('Erro ao carregar contatos:', error)
@@ -56,8 +55,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section :class="[{ ...themeClass }, 'flex flex-col min-h-[100vh] flex-1']">
-    <main class="flex-col w-full">
+  <section :class="[`theme-${themeStore.themeName}`, 'public-store-page flex flex-col min-h-[100vh] flex-1 relative overflow-hidden']">
+    <main class="flex-col w-full relative z-10">
       <div class="max-w-[800px] mx-auto w-full">
         <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" class="custom-loading" />
         <div v-else class="storePage text-center">
