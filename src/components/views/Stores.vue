@@ -1,317 +1,483 @@
 <template>
-    <div>
-        <!-- Formulário de cadastro -->
-        <h3 class="text-lg font-bold text-zinc-800">Cadastro de Vitrines</h3>
-        <div class="space-y-3 my-6">
-            <Input v-model="novaLojaNome" placeholder="Nome da loja" id="nova-loja" name="nova-loja" />
-            <span v-if="errosFormulario.nome" class="text-red-500 text-sm">{{ errosFormulario.nome }}</span>
-            <div class="mt-2">
-                <input id="upload-logo" type="file" accept="image/*" @change="handleFileUpload" class="hidden" />
-                <label for="upload-logo"
-                    class="cursor-pointer inline-block rounded-md bg-indigo-50 border px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
-                    Enviar logo
-                </label>
-                <span v-if="novaLojaLogo" class="ml-2 text-sm text-gray-600">Arquivo pronto</span>
-                <span v-if="errosFormulario.logo" class="ml-2 text-red-500 text-sm">{{ errosFormulario.logo }}</span>
-            </div>
-            <div class="divider"></div>
-            <div class="space-y-2">
-                <p class="font-semibold">Links da página</p>
-                <div class="flex flex-col sm:grid sm:grid-cols-4 gap-2">
-                    <IconSelect v-model="novoIcone" :options="opcoesIcones" placeholder="Ícone" class="flex-1" />
-                    <Input id="text-new" name="text-new" v-model="novoTexto" placeholder="Texto do botão"
-                        :input-class="inputBaseClass" />
-                    <Input id="url-new" name="url-new" v-model="novaUrl" placeholder="URL"
-                        :input-class="inputBaseClass" />
-                    <Button @click="adicionarLink" class="items-center">Adicionar Link</Button>
-                </div>
-                <ul class="mt-2 space-y-1">
-                    <li v-if="novaLinks.length >= 1" class="text-gray-500 mb-2">Links adicionados</li>
-                    <span v-if="errosFormulario.links" class="text-red-500 text-sm">{{ errosFormulario.links }}</span>
-                    <li v-for="(l, i) in novaLinks" :key="i" class="flex items-center gap-2">
-                        <i :class="l.icone"></i>
-                        <span>{{ l.texto }}</span>
-                        <button @click="novaLinks.splice(i, 1)" class="text-red-500">✖</button>
-                    </li>
-                </ul>
-            </div>
-            <Button @click="cadastrarLoja" :disabled="lojaStore.cadastrando || lojaStore.carregando">
-                {{ lojaStore.cadastrando ? 'Cadastrando...' : 'Cadastrar vitrine' }}
-            </Button>
+  <div class="space-y-6 max-w-7xl mx-auto pb-10">
+    
+    <!-- Top Header Card -->
+    <div class="bg-white p-6 rounded-3xl border border-gray-200/90 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1">
+            <i class="fa-solid fa-store text-[10px]"></i> Gestão de Lojas
+          </span>
+          <span class="text-xs text-gray-400 font-medium">({{ lojaStore.lojas.length }} vitrines ativas)</span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-black text-gray-900">
+          Minhas Vitrines Digitais
+        </h1>
+        <p class="text-xs text-gray-500">
+          Crie, altere temas e gerencie todos os links das suas vitrines.
+        </p>
+      </div>
+
+      <!-- Tab Switcher Navigation Bar -->
+      <div class="flex items-center gap-2 p-1.5 bg-gray-100/80 rounded-2xl border border-gray-200 shrink-0">
+        <button
+          @click="activeTab = 'list'"
+          :class="[
+            'px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer',
+            activeTab === 'list' 
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' 
+              : 'text-gray-600 hover:text-gray-900 hover:bg-white/60'
+          ]"
+        >
+          <i class="fa-solid fa-list-check"></i>
+          <span>Minhas Vitrines ({{ lojaStore.lojas.length }})</span>
+        </button>
+
+        <button
+          @click="activeTab = 'create'"
+          :class="[
+            'px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer',
+            activeTab === 'create' 
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' 
+              : 'text-gray-600 hover:text-gray-900 hover:bg-white/60'
+          ]"
+        >
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Cadastrar Vitrine</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 1: LISTA DE VITRINES -->
+    <div v-show="activeTab === 'list'" class="space-y-4 animate-fade-in">
+      
+      <!-- Filter & Search Bar -->
+      <div v-if="lojaStore.lojas.length > 0" class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="relative w-full sm:w-80">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Buscar por nome da vitrine..."
+            class="w-full pl-9 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+          />
         </div>
 
-        <div class="divider"></div>
+        <span class="text-xs text-gray-500 font-medium">
+          Exibindo {{ filteredLojas.length }} de {{ lojaStore.lojas.length }} vitrines
+        </span>
+      </div>
 
-        <!-- Listagem de lojas -->
-        <section>
-            <h3 class="text-lg font-semibold mb-3">Vitrines Cadastradas</h3>
-            <Loading v-if="lojaStore.carregando" text="" />
-            <div v-else-if="lojaStore.erro" class="text-red-500">{{ lojaStore.erro }}</div>
-            <ul v-else class="flex flex-col flex-wrap gap-2 sm:grid sm:grid-cols-2 md:grid-cols-3">
-                <StoreCard v-for="(loja, idx) in lojaStore.lojas" :key="loja.id" :store="loja" :index="idx"
-                    @access="acessarLoja" @detail="acessarDetalheLoja" @edit="openEditModal" @delete="deletarLoja" />
-            </ul>
+      <!-- Loading State -->
+      <Loading v-if="lojaStore.carregando" text="Carregando suas vitrines..." />
 
-            <!-- Modal de edição -->
-            <EditStoreModal :isOpen="isEditModalOpen" :storeData="{
-                id: editId,
-                nome: editNome,
-                logo: editLogo,
-                links: editLinks
-            }" :opcoesIcones="opcoesIcones" :inputBaseClass="inputBaseClass" @save="(dados) => {
-                lojaStore.editarLoja(dados.id, dados)
-                closeEditModal()
-            }" @cancel="closeEditModal" />
-        </section>
+      <!-- Erro -->
+      <div v-else-if="lojaStore.erro" class="p-4 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-600 font-semibold">
+        {{ lojaStore.erro }}
+      </div>
+
+      <!-- Empty State -->
+      <div v-else-if="filteredLojas.length === 0" class="bg-white p-12 rounded-3xl border border-gray-200 shadow-sm text-center space-y-4">
+        <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+          <i class="fa-solid fa-store-slash"></i>
+        </div>
+        <h3 class="text-base font-bold text-gray-900">
+          {{ searchQuery ? 'Nenhuma vitrine encontrada para a busca.' : 'Nenhuma vitrine cadastrada.' }}
+        </h3>
+        <p class="text-xs text-gray-500 max-w-sm mx-auto">
+          {{ searchQuery ? 'Tente buscar por outro termo.' : 'Clique no botão abaixo para criar sua primeira vitrine digital.' }}
+        </p>
+        <button
+          @click="activeTab = 'create'"
+          class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
+        >
+          <i class="fa-solid fa-plus"></i> Cadastrar Nova Vitrine
+        </button>
+      </div>
+
+      <!-- Grid de Vitrines -->
+      <ul v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StoreCard
+          v-for="(loja, idx) in filteredLojas"
+          :key="loja.id"
+          :store="loja"
+          :index="idx"
+          @access="acessarLoja"
+          @detail="acessarDetalheLoja"
+          @edit="openEditModal"
+          @delete="deletarLoja"
+        />
+      </ul>
 
     </div>
+
+    <!-- TAB 2: FORMULÁRIO DE CADASTRO DE VITRINE -->
+    <div v-show="activeTab === 'create'" class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6 animate-fade-in max-w-3xl mx-auto">
+      
+      <div class="border-b pb-4">
+        <h2 class="text-base font-bold text-gray-900 flex items-center gap-2">
+          <i class="fa-solid fa-circle-plus text-indigo-600"></i> Cadastrar Nova Vitrine
+        </h2>
+        <p class="text-xs text-gray-500">Defina o nome, logo e adicione os primeiros links da sua vitrine</p>
+      </div>
+
+      <div class="space-y-5">
+        <!-- 1. Nome da Loja -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-gray-700">
+            <i class="fa-solid fa-signature text-indigo-500 mr-1"></i> Nome da Vitrine *
+          </label>
+          <input
+            v-model="novaLojaNome"
+            type="text"
+            placeholder="Ex: Dra. Mariana Silva - Advocacia"
+            class="w-full p-3 border border-gray-300 rounded-xl text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-semibold"
+          />
+          <span v-if="errosFormulario.nome" class="text-red-500 text-[11px] font-semibold block">{{ errosFormulario.nome }}</span>
+        </div>
+
+        <!-- 2. Logo Upload Preview -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-gray-700">
+            <i class="fa-solid fa-image text-indigo-500 mr-1"></i> Logo ou Foto da Vitrine
+          </label>
+          <div class="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 rounded-2xl">
+            <img
+              :src="novaLojaLogo || 'https://via.placeholder.com/64?text=Logo'"
+              alt="Preview"
+              class="w-16 h-16 rounded-2xl object-cover border border-gray-200 shadow-xs shrink-0"
+            />
+            <div class="space-y-1">
+              <input id="upload-logo-main" type="file" accept="image/*" @change="handleFileUpload" class="hidden" />
+              <label
+                for="upload-logo-main"
+                class="cursor-pointer inline-flex items-center gap-1.5 rounded-xl bg-white border border-gray-300 px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100 hover:border-indigo-400 transition-all shadow-xs"
+              >
+                <i class="fa-solid fa-cloud-arrow-up text-indigo-600"></i> Selecionar Imagem (.png, .jpg, .svg)
+              </label>
+              <p class="text-[10px] text-gray-400">Recomendado formato quadrado até 2MB.</p>
+            </div>
+          </div>
+          <span v-if="errosFormulario.logo" class="text-red-500 text-[11px] font-semibold block">{{ errosFormulario.logo }}</span>
+        </div>
+
+        <!-- 3. Adicionar Links Inicial -->
+        <div class="space-y-3 pt-2">
+          <label class="block text-xs font-bold text-gray-700">
+            <i class="fa-solid fa-link text-indigo-500 mr-1"></i> Links Principais da Vitrine *
+          </label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 bg-gray-50 border border-gray-200 rounded-2xl">
+            <div class="sm:col-span-4">
+              <IconSelect v-model="novoIcone" :options="opcoesIcones" placeholder="Selecione o Ícone" />
+            </div>
+            <div class="sm:col-span-4">
+              <input
+                v-model="novoTexto"
+                type="text"
+                placeholder="Ex: Instagram Oficial"
+                class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div class="sm:col-span-4 flex gap-2">
+              <input
+                v-model="novaUrl"
+                type="text"
+                placeholder="https://..."
+                class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+              />
+              <button
+                @click="adicionarLink"
+                class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs shrink-0 transition-all cursor-pointer"
+              >
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <span v-if="errosFormulario.links" class="text-red-500 text-[11px] font-semibold block">{{ errosFormulario.links }}</span>
+
+          <!-- Lista de links adicionados -->
+          <div v-if="novaLinks.length" class="space-y-2 pt-1">
+            <span class="text-[11px] font-bold text-gray-500 block">Links Adicionados ({{ novaLinks.length }}):</span>
+            <div class="space-y-1.5">
+              <div
+                v-for="(l, i) in novaLinks"
+                :key="i"
+                class="flex items-center justify-between p-2.5 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs"
+              >
+                <div class="flex items-center gap-2 min-w-0">
+                  <i :class="l.icone" class="text-indigo-600"></i>
+                  <span class="font-bold text-gray-800 truncate">{{ l.texto }}</span>
+                  <span class="text-gray-400 text-[10px] truncate max-w-[180px]">({{ l.url }})</span>
+                </div>
+                <button @click="novaLinks.splice(i, 1)" class="text-red-500 hover:text-red-700 text-xs p-1">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão Final Cadastrar -->
+        <div class="pt-4 border-t flex items-center justify-end gap-3">
+          <button
+            @click="activeTab = 'list'"
+            class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition-all cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="cadastrarLoja"
+            :disabled="lojaStore.cadastrando || lojaStore.carregando"
+            class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <i v-if="lojaStore.cadastrando" class="fa-solid fa-circle-notch fa-spin"></i>
+            <i v-else class="fa-solid fa-check"></i>
+            <span>{{ lojaStore.cadastrando ? 'Cadastrando...' : 'Criar Vitrine Digital' }}</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Modal de Edição de Loja -->
+    <EditStoreModal
+      :isOpen="isEditModalOpen"
+      :storeData="{
+        id: editId,
+        nome: editNome,
+        logo: editLogo,
+        links: editLinks
+      }"
+      :opcoesIcones="opcoesIcones"
+      :inputBaseClass="inputBaseClass"
+      @save="salvarEdicaoFinal"
+      @cancel="closeEditModal"
+    />
+
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
+import { useThemeStore } from '../../stores/themeStore'
 import { useFeedbackStore } from '../../stores/feedbackStore'
-import Input from '../ui/Input.vue'
-import Button from '../ui/Button.vue'
-import EditStoreModal from '../ui/EditStoreModal.vue'
-import IconSelect from '../ui/IconSelect.vue'
 import Loading from '../ui/Loading.vue'
 import StoreCard from '../ui/StoreCard.vue'
+import IconSelect from '../ui/IconSelect.vue'
+import EditStoreModal from '../ui/EditStoreModal.vue'
 
+const route = useRoute()
 const router = useRouter()
-
 const lojaStore = useLojaStore()
+const themeStore = useThemeStore()
 const feedbackStore = useFeedbackStore()
 
-// criação de loja
+const activeTab = ref('list') // 'list' | 'create'
+const searchQuery = ref('')
+
 const novaLojaNome = ref('')
 const novaLojaLogo = ref(null)
 const novaLinks = ref([])
 const novoIcone = ref('')
 const novoTexto = ref('')
 const novaUrl = ref('')
+
 const errosFormulario = ref({
-    nome: '',
-    logo: '',
-    links: ''
+  nome: '',
+  logo: '',
+  links: ''
+})
+
+const filteredLojas = computed(() => {
+  if (!searchQuery.value.trim()) return lojaStore.lojas
+  const query = searchQuery.value.toLowerCase().trim()
+  return lojaStore.lojas.filter(l => 
+    l.name?.toLowerCase().includes(query) || 
+    l.slug?.toLowerCase().includes(query)
+  )
 })
 
 watch(novaLojaNome, (novoValor) => {
-    if (novoValor.trim().length >= 3 && /^[\p{L}\d\s\-_]+$/u.test(novoValor)) {
-        errosFormulario.value.nome = ''
-    }
+  if (novoValor.trim().length >= 3 && /^[\p{L}\d\s\-_]+$/u.test(novoValor)) {
+    errosFormulario.value.nome = ''
+  }
 })
 
 watch(novaLojaLogo, (novoValor) => {
-    if (novoValor) {
-        errosFormulario.value.logo = ''
-    }
+  if (novoValor) errosFormulario.value.logo = ''
 })
 
-watch(novaLinks, (novoValor) => {
-    if (novoValor.length > 0) {
-        errosFormulario.value.links = ''
-    }
-}, { deep: true })
-
-const inputBaseClass = 'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'
+const inputBaseClass = 'w-full p-2 border border-gray-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-indigo-500'
 
 function handleFileUpload(event) {
-    const file = event.target.files[0]
-    if (!file) return
+  const file = event.target.files[0]
+  if (!file) return
 
-    const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp']
+  const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp']
+  if (!allowedTypes.includes(file.type)) {
+    feedbackStore.showError('Envie uma imagem válida (SVG, PNG, JPEG ou WebP).')
+    return
+  }
 
-    if (!allowedTypes.includes(file.type)) {
-        alert('Por favor, envie uma imagem válida (SVG, PNG, JPEG ou WebP).')
-        return
-    }
+  if (file.size > 2 * 1024 * 1024) {
+    feedbackStore.showError('A imagem excede 2MB. Escolha um arquivo menor.')
+    return
+  }
 
-    if (file.size > 2 * 1024 * 1024) {
-        alert('A imagem enviada excede o limite de 2MB do servidor local. Escolha um arquivo menor.')
-        return
-    }
-
-    const reader = new FileReader()
-    reader.onload = () => {
-        novaLojaLogo.value = reader.result
-    }
-    reader.readAsDataURL(file)
+  const reader = new FileReader()
+  reader.onload = () => {
+    novaLojaLogo.value = reader.result
+  }
+  reader.readAsDataURL(file)
 }
 
 function adicionarLink() {
-    if (!novoIcone.value || !novoTexto.value || !novaUrl.value) {
-        alert('Preencha ícone, texto e URL do link.')
-        return
-    }
-
-    novaLinks.value.push({ icone: novoIcone.value, texto: novoTexto.value, url: novaUrl.value })
-    novoIcone.value = ''
-    novoTexto.value = ''
-    novaUrl.value = ''
+  if (!novoIcone.value || !novoTexto.value || !novaUrl.value) {
+    feedbackStore.showError('Preencha ícone, texto e URL do link.')
+    return
+  }
+  novaLinks.value.push({ icone: novoIcone.value, texto: novoTexto.value, url: novaUrl.value })
+  novoIcone.value = ''
+  novoTexto.value = ''
+  novaUrl.value = ''
+  errosFormulario.value.links = ''
 }
 
 async function cadastrarLoja() {
-    errosFormulario.value = {
-        nome: '',
-        logo: '',
-        links: ''
-    }
+  errosFormulario.value = { nome: '', logo: '', links: '' }
 
-    const nomeLimpo = novaLojaNome.value.trim();
-    if (nomeLimpo.length < 3 || !/^[\p{L}\d\s\-_]+$/u.test(nomeLimpo)) {
-        errosFormulario.value.nome = 'Nome inválido. Use pelo menos 3 caracteres alfanuméricos.';
-        return;
-    }
-    
-    // lojaStore.adicionarLoja(novaLojaNome.value, novaLojaLogo.value, [...novaLinks.value])
+  const nomeLimpo = novaLojaNome.value.trim()
+  if (nomeLimpo.length < 3 || !/^[\p{L}\d\s\-_]+$/u.test(nomeLimpo)) {
+    errosFormulario.value.nome = 'Nome inválido. Use pelo menos 3 caracteres alfanuméricos.'
+    return
+  }
 
-    // if(Object.values(errosFormulario.value).some(msg => msg !== '')){
-    //     return
-    // }
+  if (!novaLojaLogo.value) {
+    novaLojaLogo.value = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzRGNjZFNSIgcng9IjIwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMzAiIGZpbGw9IiNGRkZGRkYiLz48L3N2Zz4='
+  }
 
-    if(!novaLojaLogo.value){
-        novaLojaLogo.value = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzRGNjZFNSIgcng9IjIwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMzAiIGZpbGw9IiNGRkZGRkYiLz48L3N2Zz4=';
-    }
+  if (novaLinks.value.length < 1) {
+    errosFormulario.value.links = 'Adicione pelo menos um link.'
+    return
+  }
 
-    if(novaLinks.value.length < 1){
-        errosFormulario.value.links = 'Adicione pelo menos um link.';
-    }
-
-    if(Object.values(errosFormulario.value).some(msg => msg !== '')){
-        return;
-    }
-
-    try {
-        await lojaStore.adicionarLoja({
-            name: novaLojaNome.value,
-            logoBase64: novaLojaLogo.value,
-            links: novaLinks.value
-        })
-        // Limpar campos após o cadastro
-        novaLojaNome.value = ''
-        novaLojaLogo.value = null
-        novaLinks.value = []
-        feedbackStore.showSuccess('Vitrine cadastrada com sucesso!')
-    } catch (error) {
-        feedbackStore.showError(error.message || 'Erro ao cadastrar a loja. Tente novamente.')
-    }
-
+  try {
+    await lojaStore.adicionarLoja({
+      name: novaLojaNome.value,
+      logoBase64: novaLojaLogo.value,
+      links: novaLinks.value
+    })
+    novaLojaNome.value = ''
+    novaLojaLogo.value = null
+    novaLinks.value = []
+    activeTab.value = 'list'
+    feedbackStore.showSuccess('Vitrine cadastrada com sucesso!')
+  } catch (error) {
+    feedbackStore.showError(error.message || 'Erro ao cadastrar a vitrine.')
+  }
 }
 
-// modal edição
+// Modal edição
 const isEditModalOpen = ref(false)
 const editIndex = ref(null)
-const editId = ref(null);
+const editId = ref(null)
 const editNome = ref('')
 const editLogo = ref('')
 const editLinks = ref([])
-const editIcone = ref('')
-const editTexto = ref('')
-const editUrl = ref('')
-
-function onFileChange(event) {
-    const file = event.target.files[0]
-    if (file && file.type === 'image/svg+xml') {
-        const reader = new FileReader()
-        reader.onload = () => editLogo.value = reader.result
-        reader.readAsDataURL(file)
-    } else {
-        alert('Por favor, envie um arquivo SVG válido.')
-    }
-}
 
 function openEditModal(index) {
-    const loja = lojaStore.lojas[index]
-    editIndex.value = index
-    editId.value = loja.id
-    editNome.value = loja.name
-    editLogo.value = loja.logo_url
-    editLinks.value = loja.links.map(l => ({ ...l }))
-    // limpar campos de novo link
-    editIcone.value = ''
-    editTexto.value = ''
-    editUrl.value = ''
-    isEditModalOpen.value = true
+  const loja = filteredLojas.value[index] || lojaStore.lojas[index]
+  if (!loja) return
+  editIndex.value = index
+  editId.value = loja.id
+  editNome.value = loja.name
+  editLogo.value = loja.logo_url
+  editLinks.value = loja.links ? loja.links.map(l => ({ ...l })) : []
+  isEditModalOpen.value = true
 }
 
 function closeEditModal() {
-    isEditModalOpen.value = false
-    editIndex.value = null
-    editLinks.value = []
+  isEditModalOpen.value = false
+  editIndex.value = null
+  editLinks.value = []
 }
 
-function adicionarLinkEdit() {
-    if (!editIcone.value || !editTexto.value || !editUrl.value) {
-        alert('Preencha ícone, texto e URL do link.')
-        return
-    }
-    editLinks.value.push({ icone: editIcone.value, texto: editTexto.value, url: editUrl.value })
-    editIcone.value = ''
-    editTexto.value = ''
-    editUrl.value = ''
-}
-
-function removerLinkEdit(i) {
-    editLinks.value.splice(i, 1)
-}
-
-async function salvarEdicao() {
-    if (!editId.value) {
-        feedbackStore.showError('Erro: ID da loja não definido para edição.')
-        return
-    }
-
-    try {
-        await lojaStore.editarLoja(editId.value, {
-            name: editNome.value,
-            logo: editLogo.value,
-            links: [...editLinks.value]
-        })
-        feedbackStore.showSuccess('Vitrine editada com sucesso!')
-        closeEditModal()
-    } catch (error) {
-        feedbackStore.showError(error.message || 'Erro ao editar a loja.')
-    }
+async function salvarEdicaoFinal(dados) {
+  try {
+    await lojaStore.editarLoja(dados.id, {
+      name: dados.name,
+      logo: dados.logoBase64,
+      links: dados.links
+    })
+    feedbackStore.showSuccess('Vitrine editada com sucesso!')
+    closeEditModal()
+  } catch (error) {
+    feedbackStore.showError(error.message || 'Erro ao editar a vitrine.')
+  }
 }
 
 const deletarLoja = async (index) => {
-    const confirmed = await feedbackStore.confirm({
-        title: 'Excluir Vitrine',
-        message: 'Deseja realmente excluir esta vitrine?'
-    })
-    if (confirmed) {
-        try {
-            await lojaStore.excluirLoja(lojaStore.lojas[index].id)
-            feedbackStore.showSuccess('Loja excluída com sucesso!')
-        } catch (error) {
-            feedbackStore.showError('Erro ao excluir loja: ' + (error.message || 'Tente novamente mais tarde.'))
-        }
+  const loja = filteredLojas.value[index] || lojaStore.lojas[index]
+  if (!loja) return
+  const confirmed = await feedbackStore.confirm({
+    title: 'Excluir Vitrine',
+    message: `Deseja realmente excluir a vitrine "${loja.name}"?`
+  })
+  if (confirmed) {
+    try {
+      await lojaStore.excluirLoja(loja.id)
+      feedbackStore.showSuccess('Vitrine excluída com sucesso!')
+    } catch (error) {
+      feedbackStore.showError('Erro ao excluir vitrine: ' + (error.message || 'Tente novamente.'))
     }
+  }
 }
 
-// opções de ícones
 const opcoesIcones = [
-    { label: 'Facebook', value: 'fa-brands fa-facebook' },
-    { label: 'Instagram', value: 'fa-brands fa-instagram' },
-    { label: 'Twitter', value: 'fa-brands fa-twitter' },
-    { label: 'YouTube', value: 'fa-brands fa-youtube' },
-    { label: 'LinkedIn', value: 'fa-brands fa-linkedin' },
-    { label: 'Website', value: 'fa-solid fa-globe' },
-    { label: 'Localização', value: 'fa-solid fa-location-dot' }
+  { label: 'Facebook', value: 'fa-brands fa-facebook' },
+  { label: 'Instagram', value: 'fa-brands fa-instagram' },
+  { label: 'Twitter', value: 'fa-brands fa-twitter' },
+  { label: 'YouTube', value: 'fa-brands fa-youtube' },
+  { label: 'LinkedIn', value: 'fa-brands fa-linkedin' },
+  { label: 'WhatsApp', value: 'fa-brands fa-whatsapp' },
+  { label: 'Website', value: 'fa-solid fa-globe' },
+  { label: 'Localização', value: 'fa-solid fa-location-dot' },
+  { label: 'E-mail', value: 'fa-solid fa-envelope' },
+  { label: 'Telefone', value: 'fa-solid fa-phone' }
 ]
 
 function acessarLoja(slug) {
-    const url = router.resolve(`/${slug}`).href
-    window.open(url, '_blank', 'noopener,noreferrer')
+  const url = router.resolve(`/${slug}`).href
+  window.open(url, '_blank', 'noopener,noreferrer')
 }
 
 function acessarDetalheLoja(slug) {
-    router.push(`/stores/${slug}/detail`)
+  router.push(`/stores/${slug}/detail`)
 }
 
 onMounted(() => {
-    lojaStore.listarLojas()
+  if (route.query.tab === 'create') {
+    activeTab.value = 'create'
+  }
+  lojaStore.listarLojas()
+  themeStore.initDynamicCss()
 })
 </script>
+
+<style scoped>
+button {
+  cursor: pointer;
+}
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>

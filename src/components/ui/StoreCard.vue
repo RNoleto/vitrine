@@ -1,128 +1,110 @@
 <template>
-    <li class="relative p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100">
-      <!-- Botão de excluir flutuante -->
-      <button
-        class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors duration-200 shadow-sm z-10"
-        @click="$emit('delete', index)"
-        title="Excluir vitrine"
-      >
-        <FontAwesomeIcon :icon="trashIcon" class="text-xs" />
-      </button>
-  
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <!-- Informações da loja -->
+  <li class="bg-white p-5 rounded-2xl border border-gray-200/90 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between group relative">
+    
+    <!-- Top row: Logo, Store Name, Status & Actions -->
+    <div>
+      <div class="flex items-start justify-between gap-3 mb-3">
         <div class="flex items-center gap-3 min-w-0">
           <img
-            :src="store.logo_url"
-            alt="Logo"
-            class="w-10 h-10 object-contain rounded-md flex-shrink-0 border border-gray-100"
+            :src="store.logo_url || 'https://via.placeholder.com/48'"
+            alt="Logo da Vitrine"
+            class="w-12 h-12 rounded-xl object-cover p-1 bg-gray-50 border border-gray-200 shrink-0 shadow-xs"
           />
-          <span class="text-gray-900 font-medium truncate">{{ store.name }}</span>
-        </div>
-  
-        <!-- Ações -->
-        <div class="flex items-center gap-2 sm:gap-3 border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100">
-          <!-- Acessar -->
-          <div class="tooltip-container">
-            <button
-              class="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-              @click="$emit('access', store.slug)"
-            >
-              <FontAwesomeIcon :icon="doorOpenIcon" class="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            <span class="tooltip">Acessar vitrine</span>
-          </div>
-  
-          <!-- Detalhes -->
-          <div class="tooltip-container">
-            <button
-              class="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-              @click="$emit('detail', store.slug)"
-            >
-              <FontAwesomeIcon :icon="eyeIcon" class="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            <span class="tooltip">Ver detalhes da vitrine</span>
-          </div>
-  
-          <!-- Divisor -->
-          <div class="h-6 w-px bg-gray-200 hidden sm:block"></div>
-  
-          <!-- Editar -->
-          <div class="tooltip-container">
-            <button
-              class="p-2 text-gray-500 hover:text-yellow-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-              @click="$emit('edit', index)"
-            >
-              <FontAwesomeIcon :icon="penIcon" class="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            <span class="tooltip">Editar Vitrine</span>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+                {{ store.name }}
+              </h3>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> Ativa
+              </span>
+            </div>
+            <p class="text-[11px] text-gray-400 font-mono truncate mt-0.5">
+              /{{ store.slug }}
+            </p>
           </div>
         </div>
+
+        <!-- Botão de Excluir -->
+        <button
+          @click="$emit('delete', index)"
+          class="text-gray-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors shrink-0"
+          title="Excluir vitrine"
+        >
+          <i class="fa-solid fa-trash-can text-xs"></i>
+        </button>
       </div>
-    </li>
-  </template>
-  
-  <script setup>
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faDoorOpen, faEye, faPen, faTrash } from '@fortawesome/free-solid-svg-icons'
-  
-  const doorOpenIcon = faDoorOpen
-  const eyeIcon = faEye
-  const penIcon = faPen
-  const trashIcon = faTrash
-  
-  defineProps({
-    store: { type: Object, required: true },
-    index: { type: Number, required: true }
-  })
-  
-  defineEmits(['access', 'detail', 'edit', 'delete'])
-  </script>
-  
-  <style scoped>
-  button{
-    cursor: pointer;
-  }
-  
-  .tooltip-container {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .tooltip {
-    visibility: hidden;
-    width: max-content;
-    background-color: #1f2937;
-    color: #fff;
-    text-align: center;
-    border-radius: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    position: absolute;
-    z-index: 20;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    font-size: 0.75rem;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-  
-  .tooltip::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #1f2937 transparent transparent transparent;
-  }
-  
-  .tooltip-container:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
-    transition-delay: 0.3s;
-  }
-  </style>
+
+      <!-- Theme Badge & Metrics Summary -->
+      <div class="flex flex-wrap items-center gap-2 mb-4 pt-1">
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+          <i class="fa-solid fa-palette text-[10px]"></i>
+          <span>{{ getThemeName(store.theme) }}</span>
+        </span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-600">
+          <i class="fa-solid fa-link text-[10px]"></i>
+          <span>{{ store.links ? store.links.length : 0 }} Links</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Bottom Actions Bar -->
+    <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-1.5">
+        <!-- Ver Pública -->
+        <button
+          @click="$emit('access', store.slug)"
+          class="px-2.5 py-1.5 text-xs font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-all flex items-center gap-1.5"
+          title="Ver página pública"
+        >
+          <i class="fa-solid fa-arrow-up-right-from-square text-[11px] text-indigo-600"></i>
+          <span>Ver Pública</span>
+        </button>
+
+        <!-- Editar Dados Básicos -->
+        <button
+          @click="$emit('edit', index)"
+          class="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+          title="Editar nome/logo/links"
+        >
+          <i class="fa-solid fa-pen-to-square text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Ir para Detalhes / Customização -->
+      <button
+        @click="$emit('detail', store.slug)"
+        class="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition-all flex items-center gap-1.5"
+      >
+        <span>Gerenciar</span>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+      </button>
+    </div>
+
+  </li>
+</template>
+
+<script setup>
+import { useThemeStore } from '../../stores/themeStore'
+
+const themeStore = useThemeStore()
+
+defineProps({
+  store: { type: Object, required: true },
+  index: { type: Number, required: true }
+})
+
+defineEmits(['access', 'detail', 'edit', 'delete'])
+
+function getThemeName(themeId) {
+  if (!themeId) return 'Padrão Minimal'
+  const found = themeStore.allThemes.find(t => t.id === themeId)
+  return found ? found.label : themeId
+}
+</script>
+
+<style scoped>
+button {
+  cursor: pointer;
+}
+</style>
