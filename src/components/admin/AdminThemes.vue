@@ -30,8 +30,58 @@ const bgGradientAngle = ref('135deg')
 // Configurações de Imagem de Fundo
 const bgImageUrl = ref('')
 const bgAttachment = ref('parallax') // 'scroll' | 'fixed' | 'parallax'
-const bgSize = ref('cover') // 'cover' | 'contain' | 'auto'
-const bgPosition = ref('center') // 'center' | 'top' | 'bottom' | 'left' | 'right'
+const bgSize = ref('cover') // 'cover' | 'contain' | 'auto' | 'custom'
+const bgPosition = ref('center')
+const bgPositionX = ref(50) // 0% - 100%
+const bgPositionY = ref(50) // 0% - 100%
+const bgSizeOption = ref('cover') // 'cover' | 'contain' | 'auto' | 'custom'
+const bgCustomScale = ref(100) // % scale se bgSizeOption === 'custom'
+
+const computedBgPosition = computed(() => {
+  return `${bgPositionX.value}% ${bgPositionY.value}%`
+})
+
+const computedBgSize = computed(() => {
+  if (bgSizeOption.value === 'custom') {
+    return `${bgCustomScale.value}%`
+  }
+  return bgSizeOption.value
+})
+
+function setGridFocalPoint(x, y) {
+  bgPositionX.value = x
+  bgPositionY.value = y
+}
+
+function parsePositionToCoordinates(posStr) {
+  if (!posStr) {
+    bgPositionX.value = 50
+    bgPositionY.value = 50
+    return
+  }
+
+  const str = posStr.toString().toLowerCase().trim()
+  const percentMatch = str.match(/(\d+)%\s+(\d+)%/)
+  if (percentMatch) {
+    bgPositionX.value = Math.min(100, Math.max(0, parseInt(percentMatch[1], 10)))
+    bgPositionY.value = Math.min(100, Math.max(0, parseInt(percentMatch[2], 10)))
+    return
+  }
+
+  let x = 50
+  let y = 50
+
+  if (str.includes('left')) x = 0
+  else if (str.includes('right')) x = 100
+  else if (str.includes('center')) x = 50
+
+  if (str.includes('top')) y = 0
+  else if (str.includes('bottom')) y = 100
+  else if (str.includes('center')) y = 50
+
+  bgPositionX.value = x
+  bgPositionY.value = y
+}
 
 // Configurações de Animação de Fundo
 const bgAnimationType = ref('gradient-flow') // 'gradient-flow' | 'floating-orbs'
@@ -84,8 +134,8 @@ const mockupContainerStyle = computed(() => {
 
   if (bgType.value === 'image' && bgImageUrl.value) {
     style.backgroundImage = `url("${bgImageUrl.value}")`
-    style.backgroundSize = bgSize.value
-    style.backgroundPosition = bgPosition.value
+    style.backgroundSize = computedBgSize.value
+    style.backgroundPosition = computedBgPosition.value
     style.backgroundAttachment = bgAttachment.value === 'parallax' || bgAttachment.value === 'fixed' ? 'fixed' : 'scroll'
   } else if (bgType.value === 'animation') {
     if (bgAnimationType.value === 'gradient-flow') {
@@ -167,8 +217,8 @@ async function saveTheme() {
     bgType: bgType.value,
     bgImageUrl: bgImageUrl.value,
     bgAttachment: bgAttachment.value,
-    bgSize: bgSize.value,
-    bgPosition: bgPosition.value,
+    bgSize: computedBgSize.value,
+    bgPosition: computedBgPosition.value,
     bgAnimationType: bgAnimationType.value,
     bgOverlay: {
       enabled: bgOverlayEnabled.value,
@@ -215,7 +265,16 @@ function editCustomTheme(theme) {
   bgImageUrl.value = theme.bgImageUrl || ''
   bgAttachment.value = theme.bgAttachment || 'parallax'
   bgSize.value = theme.bgSize || 'cover'
+  if (theme.bgSize && theme.bgSize.endsWith('%')) {
+    bgSizeOption.value = 'custom'
+    bgCustomScale.value = parseInt(theme.bgSize, 10) || 100
+  } else {
+    bgSizeOption.value = theme.bgSize || 'cover'
+    bgCustomScale.value = 100
+  }
+
   bgPosition.value = theme.bgPosition || 'center'
+  parsePositionToCoordinates(theme.bgPosition)
   bgAnimationType.value = theme.bgAnimationType || 'gradient-flow'
 
   if (theme.bgOverlay) {
@@ -270,6 +329,10 @@ function cancelEditing() {
   bgAttachment.value = 'parallax'
   bgSize.value = 'cover'
   bgPosition.value = 'center'
+  bgPositionX.value = 50
+  bgPositionY.value = 50
+  bgSizeOption.value = 'cover'
+  bgCustomScale.value = 100
   bgAnimationType.value = 'gradient-flow'
 
   bgOverlayEnabled.value = false
@@ -477,33 +540,138 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Efeito Paralax e Ajustes de Imagem -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">Efeito / Fixação (Parallax)</label>
-              <select v-model="bgAttachment" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-bold text-indigo-700">
-                <option value="parallax">✨ Paralax Suave (Fixo)</option>
-                <option value="fixed">📌 Imagem Fixa na Tela</option>
-                <option value="scroll">📜 Rolagem Normal</option>
-              </select>
+          <!-- Efeito Paralax, Ponto Focal e Ajustes Avançados da Imagem -->
+          <div class="space-y-4 pt-2 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-gray-800">
+                🎯 Posicionamento & Ponto Focal da Imagem
+              </label>
+              <span class="text-[11px] font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                Posição: {{ bgPositionX }}% X, {{ bgPositionY }}% Y
+              </span>
             </div>
 
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">Dimensionamento</label>
-              <select v-model="bgSize" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
-                <option value="cover">Preencher Tela (Cover)</option>
-                <option value="contain">Conter Imagem (Contain)</option>
-                <option value="auto">Original (Auto)</option>
-              </select>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-gray-50/80 p-3.5 rounded-2xl border border-gray-200">
+              <!-- Grade 3x3 de Pontos Focais Rápidos -->
+              <div class="md:col-span-5 space-y-1">
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Âncoras Focais Rápidas (3x3)</label>
+                <div class="grid grid-cols-3 gap-1.5 w-full max-w-[200px] mx-auto md:mx-0">
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(0, 0)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 0 && bgPositionY === 0 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Topo Esquerda (0% 0%)"
+                  >↖</button>
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(50, 0)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 50 && bgPositionY === 0 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Topo Centro (50% 0%)"
+                  >⬆</button>
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(100, 0)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 100 && bgPositionY === 0 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Topo Direita (100% 0%)"
+                  >↗</button>
+
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(0, 50)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 0 && bgPositionY === 50 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Centro Esquerda (0% 50%)"
+                  >⬅</button>
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(50, 50)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 50 && bgPositionY === 50 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Centro Absoluto (50% 50%)"
+                  >⏺</button>
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(100, 50)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 100 && bgPositionY === 50 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Centro Direita (100% 50%)"
+                  >➡</button>
+
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(0, 100)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 0 && bgPositionY === 100 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Base Esquerda (0% 100%)"
+                  >↙</button>
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(50, 100)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 50 && bgPositionY === 100 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Base Centro (50% 100%)"
+                  >⬇</button>
+                  <button 
+                    type="button"
+                    @click="setGridFocalPoint(100, 100)" 
+                    :class="['p-2 rounded-lg text-xs font-bold transition-all border flex items-center justify-center', bgPositionX === 100 && bgPositionY === 100 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100']"
+                    title="Base Direita (100% 100%)"
+                  >↘</button>
+                </div>
+              </div>
+
+              <!-- Sliders de Ajuste Fino Percentual X e Y -->
+              <div class="md:col-span-7 space-y-3">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-[11px] font-semibold text-gray-700">Horizontal (Eixo X): {{ bgPositionX }}%</label>
+                    <span class="text-[10px] text-gray-400">0% Esquerda | 100% Direita</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input type="range" min="0" max="100" v-model.number="bgPositionX" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                    <input type="number" min="0" max="100" v-model.number="bgPositionX" class="w-14 text-xs font-mono text-center border border-gray-300 rounded px-1 py-0.5 bg-white" />
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-[11px] font-semibold text-gray-700">Vertical (Eixo Y): {{ bgPositionY }}%</label>
+                    <span class="text-[10px] text-gray-400">0% Topo | 100% Base</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input type="range" min="0" max="100" v-model.number="bgPositionY" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                    <input type="number" min="0" max="100" v-model.number="bgPositionY" class="w-14 text-xs font-mono text-center border border-gray-300 rounded px-1 py-0.5 bg-white" />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">Posicionamento</label>
-              <select v-model="bgPosition" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
-                <option value="center">Centralizado</option>
-                <option value="top">Topo</option>
-                <option value="bottom">Base</option>
-              </select>
+            <!-- Controles de Efeito, Tamanho e Escala Customizada -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Efeito / Fixação (Parallax)</label>
+                <select v-model="bgAttachment" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-bold text-indigo-700">
+                  <option value="parallax">✨ Paralax Suave (Fixo)</option>
+                  <option value="fixed">📌 Imagem Fixa na Tela</option>
+                  <option value="scroll">📜 Rolagem Normal</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Dimensionamento / Escala</label>
+                <select v-model="bgSizeOption" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
+                  <option value="cover">Preencher Tela (Cover - Padrão)</option>
+                  <option value="contain">Conter Imagem Completa (Contain)</option>
+                  <option value="auto">Tamanho Original (Auto)</option>
+                  <option value="custom">🔍 Zoom / Escala Customizada (%)</option>
+                </select>
+              </div>
+            </div>
+
+            <div v-if="bgSizeOption === 'custom'" class="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl space-y-1">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-semibold text-gray-800">Escala de Zoom da Imagem: {{ bgCustomScale }}%</label>
+                <span class="text-[10px] text-indigo-600 font-bold">Resolução livre</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" min="10" max="300" step="5" v-model.number="bgCustomScale" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                <input type="number" min="10" max="300" v-model.number="bgCustomScale" class="w-16 text-xs font-mono text-center border border-gray-300 rounded px-1 py-0.5 bg-white" />
+              </div>
             </div>
           </div>
         </div>
