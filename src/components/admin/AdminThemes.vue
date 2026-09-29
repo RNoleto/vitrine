@@ -931,11 +931,21 @@ onMounted(async () => {
           <div class="flex items-center justify-between pt-1">
             <span class="text-[11px] font-mono text-gray-500">#{{ theme.id }}</span>
 
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1 flex-wrap justify-end">
+              <button 
+                type="button" 
+                @click="applyPresetToEditor(theme)"
+                title="Copiar este tema como base para um novo"
+                class="px-2 py-1 text-[11px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 cursor-pointer flex items-center gap-1"
+              >
+                <i class="fa-solid fa-copy"></i>
+                Copiar
+              </button>
+
               <button 
                 type="button" 
                 @click="editCustomTheme(theme)"
-                title="Editar este tema"
+                title="Editar este tema diretamente"
                 class="px-2 py-1 text-[11px] font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 cursor-pointer flex items-center gap-1"
               >
                 <i class="fa-solid fa-pen-to-square"></i>
