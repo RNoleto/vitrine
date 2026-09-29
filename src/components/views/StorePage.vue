@@ -23,7 +23,7 @@
                 >
                   <i class="fa-solid fa-store text-5xl"></i>
                 </div>
-                <span class="absolute -bottom-2 -right-2 bg-[var(--color-accent)] text-[var(--color-background)] w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
+                <span class="absolute -bottom-2 -right-2 bg-[var(--color-accent)] text-[var(--color-accent-text)] w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
                   <i class="fa-solid fa-check text-xs"></i>
                 </span>
               </div>
@@ -83,7 +83,7 @@
               {{ loja.bio }}
             </p>
             <div v-if="contatos.length" class="pt-2">
-              <button @click="irParaContatos" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--color-primary)] text-[var(--color-background)] font-medium text-xs tracking-wider uppercase shadow-md hover:opacity-90 transition-all">
+              <button @click="irParaContatos" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--color-primary)] text-[var(--color-primary-text)] font-semibold text-xs tracking-wider uppercase shadow-md hover:opacity-90 transition-all">
                 Fazer contato <i class="fa-solid fa-arrow-right"></i>
               </button>
             </div>
@@ -141,7 +141,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 :title="sLink.label"
-                class="w-10 h-10 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-background)] transition-all shadow-sm hover:scale-105"
+                class="w-10 h-10 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-text)] transition-all shadow-sm hover:scale-105"
               >
                 <i :class="sLink.icon"></i>
               </a>

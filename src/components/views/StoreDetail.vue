@@ -419,7 +419,7 @@
                   class="flex items-center gap-2.5 p-2.5 rounded-xl border text-left text-xs font-semibold shadow-sm transition-all"
                   style="background: var(--color-foreground); border-color: var(--color-accent); color: var(--color-text);"
                 >
-                  <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-background);">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-background-solid, var(--color-background));">
                     <i :class="link.icone || 'fa-solid fa-link'" class="text-xs" style="color: var(--color-accent);"></i>
                   </div>
                   <span class="flex-1 truncate">{{ link.texto }}</span>

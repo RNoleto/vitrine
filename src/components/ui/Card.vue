@@ -89,12 +89,12 @@ const currentCardStyle = computed(() => {
 
 .card:hover .icon-wrapper {
   background: var(--color-accent);
-  color: var(--color-foreground);
+  color: var(--color-accent-text);
   transition: background 0.3s ease;
 }
 
 .card:hover .icon {
-  color: var(--color-foreground);
+  color: var(--color-accent-text);
 }
 
 .card:hover .arrow-icon {
@@ -106,7 +106,7 @@ const currentCardStyle = computed(() => {
   width: 42px;
   height: 42px;
   min-width: 42px;
-  background: var(--color-background);
+  background: var(--color-background-solid, var(--color-background));
   border-radius: 50%;
   display: flex;
   align-items: center;

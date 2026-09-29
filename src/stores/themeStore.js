@@ -1,6 +1,40 @@
 import { defineStore } from 'pinia'
 import api from '../services/api'
 
+export function getContrastColor(hexColor) {
+  if (!hexColor || typeof hexColor !== 'string') return '#FFFFFF';
+  let color = hexColor.trim();
+  
+  if (color.startsWith('rgb')) {
+    const rgbValues = color.match(/\d+/g);
+    if (rgbValues && rgbValues.length >= 3) {
+      const r = parseInt(rgbValues[0], 10);
+      const g = parseInt(rgbValues[1], 10);
+      const b = parseInt(rgbValues[2], 10);
+      const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+      return yiq >= 128 ? '#1F2937' : '#FFFFFF';
+    }
+  }
+
+  if (color.includes('gradient')) {
+    return '#FFFFFF';
+  }
+
+  color = color.replace('#', '');
+  if (color.length === 3) {
+    color = color.split('').map(c => c + c).join('');
+  }
+
+  if (color.length !== 6) return '#FFFFFF';
+
+  const r = parseInt(color.substring(0, 2), 16);
+  const g = parseInt(color.substring(2, 4), 16);
+  const b = parseInt(color.substring(4, 6), 16);
+  
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? '#1F2937' : '#FFFFFF';
+}
+
 export const PRESET_THEMES = [
   // --- TEMAS PREMIUM VIP ---
   { 
@@ -189,6 +223,11 @@ export const useThemeStore = defineStore('theme', {
         const primary = theme.colors.primary
         const accent = theme.colors.accent
         const text = theme.colors.text
+        const primaryText = getContrastColor(primary)
+        const accentText = getContrastColor(accent)
+        const solidBg = (theme.colors?.background && !theme.colors.background.includes('gradient')) 
+          ? theme.colors.background 
+          : '#FAFAFA'
         const blur = theme.backdropBlur ? `blur(${theme.backdropBlur}px)` : 'none'
 
         let fontCss = 'inherit'
@@ -205,9 +244,12 @@ export const useThemeStore = defineStore('theme', {
         cssString += `
         .theme-${theme.id}, [data-theme="${theme.id}"] {
           --color-background: ${bgType === 'solid' ? theme.colors.background : 'transparent'};
+          --color-background-solid: ${solidBg};
           --color-foreground: ${fg};
           --color-primary: ${primary};
+          --color-primary-text: ${primaryText};
           --color-accent: ${accent};
+          --color-accent-text: ${accentText};
           --color-text: ${text};
           --backdrop-blur: ${blur};
           font-family: ${fontCss};
