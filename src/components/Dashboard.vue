@@ -87,23 +87,22 @@ watch(sidebarOpen, (newVal) => {
                   {{ link.name }}
                 </router-link>
               </li>
-
-              <!-- Link exclusivo de Administrador -->
-              <li v-if="authStore.isAdmin()">
-                <router-link 
-                  to="/admin/resume" 
-                  @click="toggleSidebar"
-                  class="flex items-center p-3 rounded-lg text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100 transition-colors duration-200 font-semibold border border-indigo-200/60 shadow-xs"
-                >
-                  <font-awesome-icon 
-                    icon="shield-halved" 
-                    class="w-5 h-5 mr-3 text-indigo-600"
-                  />
-                  Painel Admin
-                </router-link>
-              </li>
             </ul>
             <div class="pt-4 border-t border-gray-100 mt-auto sticky bottom-0 bg-white flex flex-col gap-2">
+              <!-- Link exclusivo de Administrador -->
+              <router-link 
+                v-if="authStore.isAdmin()"
+                to="/admin/resume" 
+                @click="toggleSidebar"
+                class="w-full gap-2 flex items-center justify-center py-2 px-4 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold transition-colors duration-200 border border-indigo-200/80 shadow-xs"
+              >
+                <font-awesome-icon 
+                  icon="shield-halved" 
+                  class="w-4 h-4 text-indigo-600"
+                />
+                Painel Admin
+              </router-link>
+
               <Button 
                 @click="logout" 
                 class="w-full gap-2 flex items-center justify-center hover:bg-red-600 transition-colors duration-300"
