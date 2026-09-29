@@ -611,7 +611,7 @@ const back = () => {
 const contatosDaLoja = computed(() => contactStore.contatos.filter(contato => 
   contato.stores?.some(store => 
     store.id === loja.value?.id && 
-    store.pivot.ativo === 1
+    (!store.pivot || !store.pivot.deleted_at)
   )
 ))
 </script>

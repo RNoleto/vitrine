@@ -35,10 +35,7 @@ export const useContactStore = defineStore('contact', {
         const { data } = await api.get('/contacts')
         this.contatos = data.map(contato => ({
           ...contato,
-          lojas: contato.lojas?.map(loja => ({
-            id: loja.id,
-            name: this.lojasNomes.get(loja.id) || loja.name
-          })) || []
+          stores: contato.stores || []
         }))
       } catch (e) {
         this.erro = e.response?.data?.error || 'Erro ao listar contatos';
@@ -175,10 +172,12 @@ export const useContactStore = defineStore('contact', {
         
         const index = this.contatos.findIndex(c => c.id === contactId)
         if (index !== -1) {
-          this.contatos[index].lojas = lojasIds.map(id => ({
+          const storesArray = lojasIds.map(id => ({
             id: id,
             name: this.lojasNomes.get(id) || 'Loja'
           }))
+          this.contatos[index].stores = storesArray
+          this.contatos[index].lojas = storesArray
         }
     
       } catch (e) {
