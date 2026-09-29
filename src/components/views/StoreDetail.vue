@@ -320,71 +320,76 @@
             <span class="text-[10px] font-bold text-indigo-600 truncate max-w-[140px]">{{ activeThemeObj?.label }}</span>
           </div>
 
-          <!-- Smartphone Frame Container (Side by Side) -->
-          <div class="relative mx-auto w-full max-w-[320px] bg-slate-900 rounded-[38px] p-3 shadow-2xl ring-1 ring-slate-800 border-4 border-slate-800">
-            <!-- Camera Notch -->
-            <div class="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-3.5 bg-slate-900 rounded-full z-30 flex items-center justify-center">
-              <div class="w-2.5 h-2.5 bg-slate-800 rounded-full mr-2"></div>
-              <div class="w-1.5 h-1.5 bg-slate-800 rounded-full"></div>
+          <!-- Smartphone Frame Container (iPhone 13 Proportions) -->
+          <div class="relative mx-auto w-full max-w-[340px] h-[680px] bg-slate-900 rounded-[48px] p-3.5 shadow-2xl ring-1 ring-slate-800/80 border-[5px] border-slate-800 flex flex-col">
+            <!-- Hardware Side Buttons -->
+            <div class="absolute -left-[8px] top-24 w-[3px] h-10 bg-slate-700 rounded-l"></div>
+            <div class="absolute -left-[8px] top-38 w-[3px] h-12 bg-slate-700 rounded-l"></div>
+            <div class="absolute -right-[8px] top-32 w-[3px] h-14 bg-slate-700 rounded-r"></div>
+
+            <!-- Dynamic Island / Camera Notch -->
+            <div class="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-full z-30 flex items-center justify-end px-2 gap-1 shadow-sm">
+              <div class="w-2.5 h-2.5 bg-slate-900 rounded-full border border-slate-800"></div>
+              <div class="w-1.5 h-1.5 bg-slate-900 rounded-full"></div>
             </div>
 
-            <!-- Screen Area with Active Theme Class -->
+            <!-- Screen Area with Active Theme Class & iPhone Aspect Ratio -->
             <div 
               :class="['theme-' + (previewTheme || selectedTheme)]" 
-              class="w-full h-[480px] overflow-y-auto rounded-[28px] p-4 pt-7 text-center transition-all duration-300 relative select-none"
+              class="w-full h-[640px] overflow-y-auto rounded-[36px] p-4 pt-9 text-center transition-all duration-300 relative select-none shadow-inner"
               style="background: var(--color-background); color: var(--color-text); font-family: inherit;"
             >
               <!-- Hero Header Mockup -->
-              <div class="flex flex-col items-center mb-4">
+              <div class="flex flex-col items-center mb-5">
                 <img 
                   :src="loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
                   alt="Logo" 
-                  class="w-16 h-16 rounded-2xl object-cover shadow-lg ring-2 ring-[var(--color-accent)] mb-1.5" 
+                  class="w-18 h-18 rounded-2xl object-cover shadow-lg ring-2 ring-[var(--color-accent)] mb-2" 
                 />
-                <h3 class="text-base font-bold leading-tight" style="color: var(--color-text);">{{ loja.name }}</h3>
-                <p class="text-[10px] opacity-80 max-w-[200px] mt-0.5 leading-snug truncate" style="color: var(--color-text);">
+                <h3 class="text-lg font-bold leading-tight" style="color: var(--color-text);">{{ loja.name }}</h3>
+                <p class="text-xs opacity-80 max-w-[220px] mt-1 leading-snug" style="color: var(--color-text);">
                   {{ loja.description || 'Sua vitrine digital com links e atendimento personalizado.' }}
                 </p>
               </div>
 
               <!-- Links Mockup Cards -->
-              <div class="space-y-1.5 mb-3">
+              <div class="space-y-2 mb-4">
                 <div 
                   v-for="(link, lIdx) in (loja.links && loja.links.length ? loja.links : [{ texto: 'Nosso Site Oficial', icone: 'fa-solid fa-globe' }, { texto: 'Atendimento WhatsApp', icone: 'fa-brands fa-whatsapp' }])" 
                   :key="lIdx"
-                  class="flex items-center gap-2 p-2 rounded-xl border text-left text-[11px] font-semibold shadow-sm transition-all"
+                  class="flex items-center gap-2.5 p-2.5 rounded-xl border text-left text-xs font-semibold shadow-sm transition-all"
                   style="background: var(--color-foreground); border-color: var(--color-accent); color: var(--color-text);"
                 >
-                  <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-background);">
-                    <i :class="link.icone || 'fa-solid fa-link'" class="text-[10px]" style="color: var(--color-accent);"></i>
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-background);">
+                    <i :class="link.icone || 'fa-solid fa-link'" class="text-xs" style="color: var(--color-accent);"></i>
                   </div>
                   <span class="flex-1 truncate">{{ link.texto }}</span>
-                  <i class="fa-solid fa-chevron-right text-[9px] opacity-60" style="color: var(--color-accent);"></i>
+                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60" style="color: var(--color-accent);"></i>
                 </div>
               </div>
 
               <!-- Premium Landing Page Features Preview -->
-              <div v-if="activeThemeObj?.isPremium || ['portrait-hero', 'landing-page'].includes(activeThemeObj?.layoutStyle)" class="space-y-2 pt-1 text-left">
+              <div v-if="activeThemeObj?.isPremium || ['portrait-hero', 'landing-page'].includes(activeThemeObj?.layoutStyle)" class="space-y-3 pt-2 text-left">
                 <!-- Sobre Mim Block -->
-                <div class="p-2.5 rounded-xl border text-[10px] space-y-0.5" style="background: var(--color-foreground); border-color: var(--color-accent);">
+                <div class="p-3 rounded-xl border text-xs space-y-1" style="background: var(--color-foreground); border-color: var(--color-accent);">
                   <div class="font-bold flex items-center gap-1" style="color: var(--color-text);">
-                    <i class="fa-solid fa-user-check text-[9px]" style="color: var(--color-accent);"></i> Sobre mim
+                    <i class="fa-solid fa-user-check text-[10px]" style="color: var(--color-accent);"></i> Sobre mim
                   </div>
-                  <p class="opacity-80 text-[9px] leading-tight line-clamp-3 whitespace-pre-line" style="color: var(--color-text);">
+                  <p class="opacity-80 text-xs leading-relaxed whitespace-pre-line" style="color: var(--color-text);">
                     {{ formBio || 'Atendimento estratégico com compromisso e excelência.' }}
                   </p>
                 </div>
 
                 <!-- Stats Counter Row -->
-                <div v-if="formMetrics && formMetrics.length" class="grid grid-cols-3 gap-1 p-1.5 rounded-xl text-center border" style="background: var(--color-foreground); border-color: var(--color-accent);">
+                <div v-if="formMetrics && formMetrics.length" class="grid grid-cols-3 gap-1 p-2 rounded-xl text-center border" style="background: var(--color-foreground); border-color: var(--color-accent);">
                   <div 
                     v-for="(metric, mIdx) in formMetrics.slice(0, 3)" 
                     :key="mIdx"
-                    :class="[mIdx === 1 ? 'border-x px-0.5' : '']"
+                    :class="[mIdx === 1 ? 'border-x px-1' : '']"
                     :style="mIdx === 1 ? { borderColor: 'var(--color-accent)' } : {}"
                   >
-                    <div class="font-black text-[11px]" style="color: var(--color-primary);">{{ metric.value || '-' }}</div>
-                    <div class="text-[7px] uppercase opacity-70 truncate">{{ metric.label || '-' }}</div>
+                    <div class="font-black text-xs" style="color: var(--color-primary);">{{ metric.value || '-' }}</div>
+                    <div class="text-[8px] uppercase opacity-70 truncate">{{ metric.label || '-' }}</div>
                   </div>
                 </div>
               </div>

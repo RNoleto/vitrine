@@ -422,15 +422,15 @@ onMounted(() => {
           Pré-visualização do Celular (Tempo Real)
         </h3>
 
-        <!-- Moldura Realista do Celular (iPhone Style Chassis) -->
-        <div class="relative w-[300px] h-[600px] bg-slate-900 rounded-[48px] p-3 shadow-2xl border-[4px] border-slate-800 ring-1 ring-slate-700/50 flex flex-col">
+        <!-- Moldura Realista do Celular (iPhone 13 Proportions) -->
+        <div class="relative w-full max-w-[340px] h-[680px] bg-slate-900 rounded-[48px] p-3.5 shadow-2xl border-[5px] border-slate-800 ring-1 ring-slate-700/50 flex flex-col">
           <!-- Botões Laterais do Aparelho -->
-          <div class="absolute -left-[10px] top-24 w-[3px] h-10 bg-slate-700 rounded-l"></div>
-          <div class="absolute -left-[10px] top-38 w-[3px] h-12 bg-slate-700 rounded-l"></div>
-          <div class="absolute -right-[10px] top-32 w-[3px] h-14 bg-slate-700 rounded-r"></div>
+          <div class="absolute -left-[8px] top-24 w-[3px] h-10 bg-slate-700 rounded-l"></div>
+          <div class="absolute -left-[8px] top-38 w-[3px] h-12 bg-slate-700 rounded-l"></div>
+          <div class="absolute -right-[8px] top-32 w-[3px] h-14 bg-slate-700 rounded-r"></div>
 
           <!-- Tela Interna do Celular com a fonte configurada -->
-          <div class="w-full h-full rounded-[38px] overflow-hidden flex flex-col relative transition-all duration-300 select-none shadow-inner"
+          <div class="w-full h-[640px] rounded-[36px] overflow-y-auto flex flex-col relative transition-all duration-300 select-none shadow-inner"
                :style="{
                  background: computedBackground,
                  color: textColor,
