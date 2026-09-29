@@ -285,7 +285,7 @@ export const useThemeStore = defineStore('theme', {
         styleObj.backgroundImage = `url("${theme.bgImageUrl}")`
         styleObj.backgroundSize = theme.bgSize || 'cover'
         styleObj.backgroundPosition = theme.bgPosition || 'center'
-        styleObj.backgroundAttachment = theme.bgAttachment === 'parallax' || theme.bgAttachment === 'fixed' ? 'fixed' : 'scroll'
+        styleObj.backgroundAttachment = 'scroll'
       } else if (bgType === 'animation') {
         const animType = theme.bgAnimationType || 'gradient-flow'
         if (animType === 'gradient-flow') {

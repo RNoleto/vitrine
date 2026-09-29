@@ -392,10 +392,10 @@
               }"
             ></div>
 
-            <!-- Screen Area with Active Theme Class & iPhone Aspect Ratio (pointer-events-none + overflow-hidden prevents scroll hijack) -->
+            <!-- Screen Area with Active Theme Class & iPhone Aspect Ratio -->
             <div 
               :class="['theme-' + (previewTheme || selectedTheme)]" 
-              class="w-full h-[640px] overflow-hidden rounded-[36px] p-4 pt-9 text-center transition-all duration-300 relative select-none pointer-events-none shadow-inner z-0"
+              class="w-full h-[640px] overflow-y-auto rounded-[36px] p-4 pt-9 text-center transition-all duration-300 relative select-none shadow-inner z-0"
               :style="themeStore.getThemePreviewStyle(activeThemeObj)"
             >
               <!-- Hero Header Mockup -->
