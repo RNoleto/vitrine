@@ -4,10 +4,11 @@ import { version } from '../../package.json'
 import { useAuthStore } from '../stores/authStore'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faHouse, faStore, faAddressBook, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { faHouse, faStore, faAddressBook, faSignOutAlt, faShieldHalved } from '@fortawesome/free-solid-svg-icons'
 import Button from '@/components/ui/Button.vue'
 
-library.add(faHouse, faStore, faAddressBook, faSignOutAlt)
+library.add(faHouse, faStore, faAddressBook, faSignOutAlt, faShieldHalved)
+
 
 
 const authStore = useAuthStore()
@@ -84,6 +85,21 @@ watch(sidebarOpen, (newVal) => {
                   }"
                 />
                   {{ link.name }}
+                </router-link>
+              </li>
+
+              <!-- Link exclusivo de Administrador -->
+              <li v-if="authStore.isAdmin()">
+                <router-link 
+                  to="/admin/resume" 
+                  @click="toggleSidebar"
+                  class="flex items-center p-3 rounded-lg text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100 transition-colors duration-200 font-semibold border border-indigo-200/60 shadow-xs"
+                >
+                  <font-awesome-icon 
+                    icon="shield-halved" 
+                    class="w-5 h-5 mr-3 text-indigo-600"
+                  />
+                  Painel Admin
                 </router-link>
               </li>
             </ul>
