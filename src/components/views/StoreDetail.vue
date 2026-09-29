@@ -333,11 +333,22 @@
               <div class="w-1.5 h-1.5 bg-slate-900 rounded-full"></div>
             </div>
 
+            <!-- Overlay Layer no Mockup de Detalhes -->
+            <div 
+              v-if="activeThemeObj?.bgOverlay?.enabled && activeThemeObj?.bgOverlay?.opacity > 0"
+              class="absolute inset-3.5 rounded-[36px] pointer-events-none z-10 transition-all duration-300"
+              :style="{
+                backgroundColor: activeThemeObj.bgOverlay.color || '#000',
+                opacity: activeThemeObj.bgOverlay.opacity,
+                backdropFilter: activeThemeObj.bgOverlay.blur > 0 ? `blur(${activeThemeObj.bgOverlay.blur}px)` : 'none'
+              }"
+            ></div>
+
             <!-- Screen Area with Active Theme Class & iPhone Aspect Ratio -->
             <div 
               :class="['theme-' + (previewTheme || selectedTheme)]" 
-              class="w-full h-[640px] overflow-y-auto rounded-[36px] p-4 pt-9 text-center transition-all duration-300 relative select-none shadow-inner"
-              style="background: var(--color-background); color: var(--color-text); font-family: inherit;"
+              class="w-full h-[640px] overflow-y-auto rounded-[36px] p-4 pt-9 text-center transition-all duration-300 relative select-none shadow-inner z-0"
+              :style="themeStore.getThemePreviewStyle(activeThemeObj)"
             >
               <!-- Hero Header Mockup -->
               <div class="flex flex-col items-center mb-5">
