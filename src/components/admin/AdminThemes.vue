@@ -148,7 +148,7 @@ function handleBgImageUpload(event) {
   reader.readAsDataURL(file)
 }
 
-function saveTheme() {
+async function saveTheme() {
   if (!newThemeLabel.value.trim()) {
     feedbackStore.showError('Por favor, informe o nome do tema.')
     return
@@ -186,15 +186,20 @@ function saveTheme() {
     backdropBlur: backdropBlur.value > 0 ? backdropBlur.value : 0,
   }
 
-  themeStore.addCustomTheme(themeObj)
+  try {
+    await themeStore.addCustomTheme(themeObj)
 
-  if (isEditing) {
-    feedbackStore.showSuccess(`Tema "${themeObj.label}" atualizado com sucesso!`)
-  } else {
-    feedbackStore.showSuccess(`Tema "${themeObj.label}" criado e disponibilizado com sucesso!`)
+    if (isEditing) {
+      feedbackStore.showSuccess(`Tema "${themeObj.label}" atualizado com sucesso!`)
+    } else {
+      feedbackStore.showSuccess(`Tema "${themeObj.label}" criado e disponibilizado com sucesso!`)
+    }
+
+    cancelEditing()
+  } catch (error) {
+    console.error('Erro ao salvar tema:', error)
+    feedbackStore.showError('Erro ao salvar tema no banco de dados.')
   }
-
-  cancelEditing()
 }
 
 function editCustomTheme(theme) {
@@ -279,13 +284,18 @@ function cancelEditing() {
   backdropBlur.value = 0
 }
 
-function deleteCustomTheme(theme) {
+async function deleteCustomTheme(theme) {
   if (confirm(`Deseja realmente excluir o tema "${theme.label}"?`)) {
     if (editingThemeId.value === theme.id) {
       cancelEditing()
     }
-    themeStore.removeCustomTheme(theme.id)
-    feedbackStore.showSuccess(`Tema "${theme.label}" excluído.`)
+    try {
+      await themeStore.removeCustomTheme(theme.id)
+      feedbackStore.showSuccess(`Tema "${theme.label}" excluído com sucesso!`)
+    } catch (error) {
+      console.error('Erro ao excluir tema:', error)
+      feedbackStore.showError('Erro ao excluir tema do banco de dados.')
+    }
   }
 }
 
@@ -295,8 +305,8 @@ function applyPresetToEditor(theme) {
   newThemeLabel.value = `${theme.label} (Cópia)`
 }
 
-onMounted(() => {
-  themeStore.initDynamicCss()
+onMounted(async () => {
+  await themeStore.carregarTemasDoBanco()
 })
 </script>
 
@@ -923,7 +933,6 @@ onMounted(() => {
 
             <div class="flex items-center gap-1.5">
               <button 
-                v-if="theme.isCustom"
                 type="button" 
                 @click="editCustomTheme(theme)"
                 title="Editar este tema"
@@ -934,23 +943,13 @@ onMounted(() => {
               </button>
 
               <button 
-                v-else
-                type="button" 
-                @click="applyPresetToEditor(theme)"
-                title="Copiar cores para o criador"
-                class="px-2 py-1 text-[11px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 cursor-pointer"
-              >
-                Copiar
-              </button>
-
-              <button 
-                v-if="theme.isCustom"
                 type="button" 
                 @click="deleteCustomTheme(theme)"
-                title="Excluir este tema personalizado"
-                class="px-2 py-1 text-[11px] font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 cursor-pointer"
+                title="Excluir este tema do sistema"
+                class="px-2 py-1 text-[11px] font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 cursor-pointer flex items-center gap-1"
               >
                 <i class="fa-solid fa-trash-can"></i>
+                Excluir
               </button>
             </div>
           </div>

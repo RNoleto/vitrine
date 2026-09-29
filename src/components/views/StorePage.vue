@@ -267,6 +267,7 @@ onMounted(async () => {
   const slug = route.params.slug
 
   try {
+    await themeStore.carregarTemasDoBanco()
     loja.value = await lojaStore.obterLojaPublica(slug)
     
     if (loja.value) {

@@ -656,7 +656,7 @@ async function buscarLoja() {
 }
 
 onMounted(async () => {
-  themeStore.initDynamicCss()
+  await themeStore.carregarTemasDoBanco()
   await buscarLoja()
 
   if (loja.value) {

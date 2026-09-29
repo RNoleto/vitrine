@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import api from '../services/api'
 
 export const PRESET_THEMES = [
   // --- TEMAS PREMIUM VIP ---
@@ -78,25 +79,65 @@ export const useThemeStore = defineStore('theme', {
   state: () => ({
     themeName: 'default',
     hasGradient: false,
-    customThemes: JSON.parse(localStorage.getItem('custom_vitrine_themes') || '[]'),
+    dbThemes: [],
+    carregando: false,
+    erro: null
   }),
 
   getters: {
     allThemes(state) {
-      return [...PRESET_THEMES, ...state.customThemes]
+      return state.dbThemes.length > 0 ? state.dbThemes : PRESET_THEMES
     },
     premiumThemes(state) {
-      return [...PRESET_THEMES, ...state.customThemes].filter(t => t.isPremium)
+      const themes = state.dbThemes.length > 0 ? state.dbThemes : PRESET_THEMES
+      return themes.filter(t => t.isPremium)
     },
     standardThemes(state) {
-      return [...PRESET_THEMES, ...state.customThemes].filter(t => !t.isPremium)
+      const themes = state.dbThemes.length > 0 ? state.dbThemes : PRESET_THEMES
+      return themes.filter(t => !t.isPremium)
     },
     currentThemeObject(state) {
-      return [...PRESET_THEMES, ...state.customThemes].find(t => t.id === state.themeName) || PRESET_THEMES[0]
+      const themes = state.dbThemes.length > 0 ? state.dbThemes : PRESET_THEMES
+      return themes.find(t => t.id === state.themeName) || themes[0]
     }
   },
 
   actions: {
+    async carregarTemasDoBanco() {
+      this.carregando = true
+      try {
+        const { data } = await api.get('/themes')
+        if (Array.isArray(data) && data.length > 0) {
+          this.dbThemes = data.map(t => ({
+            id: t.id,
+            label: t.label,
+            isCustom: t.is_custom !== undefined ? Boolean(t.is_custom) : false,
+            isPremium: Boolean(t.is_premium),
+            category: t.category || 'standard',
+            fontFamily: t.font_family || 'sans',
+            layoutStyle: t.layout_style || 'standard',
+            cardStyle: t.card_style || 'flat',
+            bgType: t.bg_type || 'solid',
+            bgImageUrl: t.bg_image_url || '',
+            bgAttachment: t.bg_attachment || 'scroll',
+            bgSize: t.bg_size || 'cover',
+            bgPosition: t.bg_position || 'center',
+            bgAnimationType: t.bg_animation_type || 'gradient-flow',
+            bgOverlay: t.bg_overlay || { enabled: false, color: '#000000', opacity: 0, blur: 0 },
+            colors: t.colors || { background: '#FFFFFF', foreground: '#F8FAFC', primary: '#6366F1', accent: '#4F46E5', text: '#1E293B' },
+            backdropBlur: t.backdrop_blur || 0
+          }))
+        }
+        this.initDynamicCss()
+      } catch (err) {
+        console.error('Erro ao carregar temas do banco de dados:', err)
+        this.dbThemes = PRESET_THEMES
+        this.initDynamicCss()
+      } finally {
+        this.carregando = false
+      }
+    },
+
     initDynamicCss() {
       if (typeof document === 'undefined') return
       let styleTag = document.getElementById('dynamic-custom-themes')
@@ -201,39 +242,59 @@ export const useThemeStore = defineStore('theme', {
       styleTag.textContent = cssString
     },
 
-    addCustomTheme(themeObj) {
-      const existingIndex = this.customThemes.findIndex(t => t.id === themeObj.id)
-      const formattedTheme = {
-        ...themeObj,
-        isCustom: true,
-        isPremium: themeObj.isPremium !== undefined ? themeObj.isPremium : true,
-        category: themeObj.category || 'premium',
-        fontFamily: themeObj.fontFamily || 'serif',
-        layoutStyle: themeObj.layoutStyle || 'portrait-hero',
-        cardStyle: themeObj.cardStyle || 'gold-bordered',
-        bgType: themeObj.bgType || 'solid',
-        bgImageUrl: themeObj.bgImageUrl || '',
-        bgAttachment: themeObj.bgAttachment || 'scroll',
-        bgSize: themeObj.bgSize || 'cover',
-        bgPosition: themeObj.bgPosition || 'center',
-        bgAnimationType: themeObj.bgAnimationType || 'gradient-flow',
-        bgOverlay: themeObj.bgOverlay || { enabled: false, color: '#000000', opacity: 0, blur: 0 }
-      }
+    async addCustomTheme(themeObj) {
+      this.carregando = true
+      try {
+        const payload = {
+          id: themeObj.id,
+          label: themeObj.label,
+          is_premium: themeObj.isPremium !== undefined ? themeObj.isPremium : true,
+          category: themeObj.category || 'premium',
+          font_family: themeObj.fontFamily || 'serif',
+          layout_style: themeObj.layoutStyle || 'portrait-hero',
+          card_style: themeObj.cardStyle || 'gold-bordered',
+          bg_type: themeObj.bgType || 'solid',
+          bg_image_url: themeObj.bgImageUrl || null,
+          bg_attachment: themeObj.bgAttachment || 'scroll',
+          bg_size: themeObj.bgSize || 'cover',
+          bg_position: themeObj.bgPosition || 'center',
+          bg_animation_type: themeObj.bgAnimationType || null,
+          bg_overlay: themeObj.bgOverlay || { enabled: false, color: '#000000', opacity: 0, blur: 0 },
+          colors: themeObj.colors,
+          backdrop_blur: themeObj.backdropBlur || 0
+        }
 
-      if (existingIndex !== -1) {
-        this.customThemes[existingIndex] = formattedTheme
-      } else {
-        this.customThemes.push(formattedTheme)
-      }
+        const existingTheme = this.allThemes.find(t => t.id === themeObj.id)
+        if (existingTheme) {
+          await api.put(`/themes/${themeObj.id}`, payload)
+        } else {
+          await api.post('/themes', payload)
+        }
 
-      localStorage.setItem('custom_vitrine_themes', JSON.stringify(this.customThemes))
-      this.initDynamicCss()
+        await this.carregarTemasDoBanco()
+      } catch (err) {
+        console.error('Erro ao salvar tema no banco de dados:', err)
+        throw err
+      } finally {
+        this.carregando = false
+      }
     },
 
-    removeCustomTheme(themeId) {
-      this.customThemes = this.customThemes.filter(t => t.id !== themeId)
-      localStorage.setItem('custom_vitrine_themes', JSON.stringify(this.customThemes))
-      this.initDynamicCss()
+    async removeCustomTheme(themeId) {
+      return this.removeTheme(themeId)
+    },
+
+    async removeTheme(themeId) {
+      this.carregando = true
+      try {
+        await api.delete(`/themes/${themeId}`)
+        await this.carregarTemasDoBanco()
+      } catch (err) {
+        console.error('Erro ao excluir tema do banco de dados:', err)
+        throw err
+      } finally {
+        this.carregando = false
+      }
     },
 
     clearBodyTheme() {
