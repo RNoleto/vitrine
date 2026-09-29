@@ -137,20 +137,7 @@ const selectedTheme = ref('')
 const previewTheme = ref('')
 const isPreview = ref(true)
 
-const themesList = [
-  { id: 'default', label: 'Default Minimal' },
-  { id: 'dark', label: 'Elegance Dark' },
-  { id: 'light', label: 'Modern Light' },
-  { id: 'pastel', label: 'Pastel Dreams' },
-  { id: 'aqua', label: 'Cyan Aqua' },
-  { id: 'light-gradient', label: 'Aurora Gradient' },
-  { id: 'cyberpunk', label: '⚡ Cyberpunk Neon' },
-  { id: 'emerald', label: '🌲 Emerald & Gold' },
-  { id: 'sunset-gradient', label: '🌅 Sunset Gradient' },
-  { id: 'ocean-gradient', label: '🌌 Ocean Gradient' },
-  { id: 'midnight-purple', label: '👑 Royal Midnight' },
-  { id: 'rose-gold', label: '🌸 Rose Gold' }
-]
+const themesList = computed(() => themeStore.allThemes)
 
 async function handleThemeChange() {
   if (!selectedTheme.value) return;

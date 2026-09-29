@@ -11,11 +11,12 @@ import {
   faAddressBook, 
   faArrowLeft, 
   faShieldHalved, 
-  faArrowRightFromBracket 
+  faArrowRightFromBracket,
+  faPalette
 } from '@fortawesome/free-solid-svg-icons'
 import Button from '@/components/ui/Button.vue'
 
-library.add(faChartPie, faUsers, faStore, faAddressBook, faArrowLeft, faShieldHalved, faArrowRightFromBracket)
+library.add(faChartPie, faUsers, faStore, faAddressBook, faArrowLeft, faShieldHalved, faArrowRightFromBracket, faPalette)
 
 const authStore = useAuthStore()
 const sidebarOpen = ref(false)
@@ -25,6 +26,7 @@ const links = [
   { name: 'Usuários & Roles', route: '/admin/users', icon: 'users' },
   { name: 'Vitrines', route: '/admin/stores', icon: 'store' },
   { name: 'Contatos', route: '/admin/contacts', icon: 'address-book' },
+  { name: 'Temas Visuais', route: '/admin/themes', icon: 'palette' },
 ]
 
 function toggleSidebar() {
