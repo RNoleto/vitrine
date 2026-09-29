@@ -20,9 +20,6 @@ const accentColor = ref('#F43F5E')
 const textColor = ref('#F8FAFC')
 const backdropBlur = ref(0) // 0px a 20px
 
-// Previsualização ativa na galeria
-const previewingThemeId = ref(null)
-
 const computedBackground = computed(() => {
   if (bgType.value === 'solid') {
     return bgColorSolid.value
@@ -104,7 +101,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Layout Principal: Criador + Live Preview -->
+    <!-- Layout Principal: Criador + Live Preview Mockup Celular -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Formulário de Criação (7 Colunas) -->
       <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-5">
@@ -144,7 +141,7 @@ onMounted(() => {
               class="py-2 px-3 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center justify-center gap-2"
               :class="bgType === 'gradient' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-xs' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'"
             >
-              <i class="fa-solid fa-[#1E1B4B] fa-circle-half-stroke text-sm"></i>
+              <i class="fa-solid fa-circle-half-stroke text-sm"></i>
               Gradiente
             </button>
           </div>
@@ -241,83 +238,136 @@ onMounted(() => {
         </button>
       </div>
 
-      <!-- Live Preview Smartphone Mockup (5 Colunas) -->
+      <!-- Live Preview Smartphone Mockup Realista (5 Colunas) -->
       <div class="lg:col-span-5 bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col items-center justify-center">
         <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-          <i class="fa-solid fa-eye text-indigo-600"></i>
-          Pré-visualização Interativa em Tempo Real
+          <i class="fa-solid fa-mobile-screen-button text-indigo-600"></i>
+          Pré-visualização do Celular (Tempo Real)
         </h3>
 
-        <!-- Mockup do Celular -->
-        <div class="w-full max-w-[280px] rounded-[32px] p-4 shadow-2xl border-4 border-gray-800 relative transition-all duration-300 overflow-hidden"
-             :style="{
-               background: computedBackground,
-               color: textColor
-             }">
-          <!-- Notch -->
-          <div class="w-24 h-4 bg-gray-800 rounded-b-xl mx-auto mb-4 opacity-80"></div>
+        <!-- Moldura Realista do Celular (iPhone Style Chassis) -->
+        <div class="relative w-[300px] h-[580px] bg-slate-900 rounded-[48px] p-3 shadow-2xl border-[4px] border-slate-800 ring-1 ring-slate-700/50 flex flex-col">
+          <!-- Botões Laterais do Aparelho -->
+          <div class="absolute -left-[10px] top-24 w-[3px] h-10 bg-slate-700 rounded-l"></div>
+          <div class="absolute -left-[10px] top-38 w-[3px] h-12 bg-slate-700 rounded-l"></div>
+          <div class="absolute -right-[10px] top-32 w-[3px] h-14 bg-slate-700 rounded-r"></div>
 
-          <!-- Conteúdo da Vitrine de Exemplo -->
-          <div class="space-y-4 text-center">
-            <!-- Header Store -->
-            <div>
-              <div class="w-14 h-14 rounded-full mx-auto shadow-md border-2 border-white flex items-center justify-center font-bold text-lg"
-                   :style="{ background: primaryColor, color: '#fff' }">
-                V
-              </div>
-              <h4 class="font-bold text-base mt-2" :style="{ color: textColor }">
-                {{ newThemeLabel || 'Sua Vitrine Digital' }}
-              </h4>
-              <p class="text-[11px] opacity-80" :style="{ color: textColor }">@minhavitrine</p>
-            </div>
-
-            <!-- Botões de Links de Exemplo -->
-            <div class="space-y-2 text-xs">
-              <div class="p-2.5 rounded-xl shadow-xs flex items-center justify-between border transition-all"
-                   :style="{
-                     background: fgColor,
-                     borderColor: primaryColor,
-                     color: textColor,
-                     backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
-                   }">
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid fa-globe" :style="{ color: accentColor }"></i>
-                  <span class="font-semibold">Nosso Site Oficial</span>
-                </div>
-                <i class="fa-solid fa-arrow-right text-[10px]" :style="{ color: accentColor }"></i>
+          <!-- Tela Interna do Celular -->
+          <div class="w-full h-full rounded-[38px] overflow-hidden flex flex-col relative transition-all duration-300 select-none shadow-inner"
+               :style="{
+                 background: computedBackground,
+                 color: textColor
+               }">
+            
+            <!-- Barra de Status (Clock & Icons) -->
+            <div class="pt-2 px-6 flex items-center justify-between text-[10px] font-semibold opacity-90 z-20" :style="{ color: textColor }">
+              <span>9:41</span>
+              
+              <!-- Dynamic Island / Notch -->
+              <div class="w-24 h-4 bg-black rounded-full flex items-center justify-end px-2 gap-1 shadow-xs">
+                <div class="w-2 h-2 rounded-full bg-slate-800 border border-slate-700"></div>
               </div>
 
-              <div class="p-2.5 rounded-xl shadow-xs flex items-center justify-between border transition-all"
-                   :style="{
-                     background: fgColor,
-                     borderColor: primaryColor,
-                     color: textColor,
-                     backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
-                   }">
-                <div class="flex items-center gap-2">
-                  <i class="fa-brands fa-instagram" :style="{ color: accentColor }"></i>
-                  <span class="font-semibold">Instagram Store</span>
-                </div>
-                <i class="fa-solid fa-arrow-right text-[10px]" :style="{ color: accentColor }"></i>
+              <div class="flex items-center gap-1">
+                <i class="fa-solid fa-signal text-[9px]"></i>
+                <i class="fa-solid fa-wifi text-[9px]"></i>
+                <i class="fa-solid fa-battery-full text-[10px]"></i>
               </div>
             </div>
 
-            <!-- Cartão de Contato -->
-            <div class="p-2.5 rounded-xl border flex items-center gap-2.5 text-left"
-                 :style="{
-                   background: fgColor,
-                   borderColor: accentColor,
-                   color: textColor,
-                   backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
-                 }">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                   :style="{ background: primaryColor }">
-                <i class="fa-brands fa-whatsapp"></i>
+            <!-- Conteúdo Interno da Vitrine -->
+            <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4 flex flex-col justify-between text-center">
+              
+              <!-- Profile Header -->
+              <div class="space-y-2 pt-2">
+                <div class="relative w-16 h-16 rounded-full mx-auto shadow-md border-2 border-white/80 flex items-center justify-center font-bold text-xl transition-all"
+                     :style="{ background: primaryColor, color: '#ffffff' }">
+                  V
+                  <span class="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-[9px] shadow-xs">
+                    <i class="fa-solid fa-check"></i>
+                  </span>
+                </div>
+
+                <div>
+                  <h4 class="font-bold text-sm tracking-tight transition-all" :style="{ color: textColor }">
+                    {{ newThemeLabel || 'Sua Vitrine Digital' }}
+                  </h4>
+                  <p class="text-[11px] font-mono opacity-80 mt-0.5" :style="{ color: textColor }">
+                    vitrine.app/{{ generatedId }}
+                  </p>
+                  <p class="text-[10px] opacity-70 mt-1 max-w-[200px] mx-auto leading-tight">
+                    Links oficiais, catálogo de produtos e atendimento direto via WhatsApp.
+                  </p>
+                </div>
               </div>
-              <div class="text-[11px]">
-                <p class="font-bold leading-none">Atendimento Comercial</p>
-                <p class="text-[10px] opacity-75 mt-0.5">(96) 98140-3089</p>
+
+              <!-- Lista de Links de Exemplo -->
+              <div class="space-y-2 text-xs">
+                <div class="p-2.5 rounded-xl shadow-xs flex items-center justify-between border transition-all"
+                     :style="{
+                       background: fgColor,
+                       borderColor: primaryColor,
+                       color: textColor,
+                       backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                     }">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded-lg flex items-center justify-center bg-black/10" :style="{ color: accentColor }">
+                      <i class="fa-solid fa-globe text-xs"></i>
+                    </div>
+                    <span class="font-semibold text-xs">Nosso Site Oficial</span>
+                  </div>
+                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60" :style="{ color: accentColor }"></i>
+                </div>
+
+                <div class="p-2.5 rounded-xl shadow-xs flex items-center justify-between border transition-all"
+                     :style="{
+                       background: fgColor,
+                       borderColor: primaryColor,
+                       color: textColor,
+                       backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                     }">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded-lg flex items-center justify-center bg-black/10" :style="{ color: accentColor }">
+                      <i class="fa-brands fa-instagram text-xs"></i>
+                    </div>
+                    <span class="font-semibold text-xs">Siga no Instagram</span>
+                  </div>
+                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60" :style="{ color: accentColor }"></i>
+                </div>
+
+                <!-- Cartão de Contato WhatsApp -->
+                <div class="p-2.5 rounded-xl border flex items-center justify-between transition-all"
+                     :style="{
+                       background: fgColor,
+                       borderColor: accentColor,
+                       color: textColor,
+                       backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                     }">
+                  <div class="flex items-center gap-2.5 text-left">
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-xs"
+                         :style="{ background: primaryColor }">
+                      <i class="fa-brands fa-whatsapp"></i>
+                    </div>
+                    <div>
+                      <p class="font-bold text-xs leading-none">Atendimento Comercial</p>
+                      <p class="text-[10px] opacity-75 mt-0.5">(96) 98140-3089</p>
+                    </div>
+                  </div>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full text-white" :style="{ background: accentColor }">
+                    WhatsApp
+                  </span>
+                </div>
               </div>
+
+              <!-- Rodapé da Tela do Celular -->
+              <div class="pb-1 text-[9px] opacity-50 font-mono tracking-wider">
+                Vitrines © Digital Platform
+              </div>
+            </div>
+
+            <!-- Home Bar Indicator -->
+            <div class="pb-2 flex justify-center">
+              <div class="w-28 h-1 rounded-full opacity-60" :style="{ background: textColor }"></div>
             </div>
           </div>
         </div>
