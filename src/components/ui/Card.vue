@@ -25,12 +25,22 @@ const currentCardStyle = computed(() => {
   if (props.cardStyle) return props.cardStyle
   return themeStore.currentThemeObject?.cardStyle || 'flat'
 })
+
+const btnShapeClass = computed(() => {
+  const shape = themeStore.currentThemeObject?.btnShape || 'pill'
+  return `btn-shape-${shape}`
+})
+
+const btnShadowClass = computed(() => {
+  const shadow = themeStore.currentThemeObject?.btnShadow || 'soft'
+  return `btn-shadow-${shadow}`
+})
 </script>
 
 <template>
   <component :is="internal ? 'RouterLink' : 'a'"
     v-bind="internal ? { to: link } : { href: link, target: '_blank', rel: 'noopener noreferrer' }" 
-    :class="['card', `card-style-${currentCardStyle}`]">
+    :class="['card', `card-style-${currentCardStyle}`, btnShapeClass, btnShadowClass]">
     <div class="icon-wrapper">
       <img v-if="photo" :src="photo" alt="Foto" class="photo" />
       <i v-else-if="icon" :class="icon" class="icon" />
@@ -53,10 +63,10 @@ const currentCardStyle = computed(() => {
   gap: 0.85rem;
   background: var(--color-foreground);
   text-align: left;
-  padding: 0.6rem 0.85rem;
+  padding: 0.65rem 1rem;
   border: 1px solid var(--color-accent);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
+  border-radius: 9999px;
   margin-bottom: 0.85rem;
   text-decoration: none;
   color: inherit;
@@ -64,6 +74,53 @@ const currentCardStyle = computed(() => {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+}
+
+/* Button Shapes */
+.card.btn-shape-pill {
+  border-radius: 9999px !important;
+}
+
+.card.btn-shape-rounded {
+  border-radius: 1rem !important;
+}
+
+.card.btn-shape-square {
+  border-radius: 0px !important;
+}
+
+.card.btn-shape-wavy {
+  border-radius: 1.25rem !important;
+  clip-path: polygon(
+    0% 4px, 4% 0px, 8% 4px, 12% 0px, 16% 4px, 20% 0px, 24% 4px, 28% 0px, 32% 4px, 36% 0px, 40% 4px, 44% 0px, 48% 4px, 52% 0px, 56% 4px, 60% 0px, 64% 4px, 68% 0px, 72% 4px, 76% 0px, 80% 4px, 84% 0px, 88% 4px, 92% 0px, 96% 4px, 100% 0px,
+    100% calc(100% - 4px), 96% 100%, 92% calc(100% - 4px), 88% 100%, 84% calc(100% - 4px), 80% 100%, 76% calc(100% - 4px), 72% 100%, 68% calc(100% - 4px), 64% 100%, 60% calc(100% - 4px), 56% 100%, 52% calc(100% - 4px), 48% 100%, 44% calc(100% - 4px), 40% 100%, 36% calc(100% - 4px), 32% 100%, 28% calc(100% - 4px), 24% 100%, 20% calc(100% - 4px), 16% 100%, 12% calc(100% - 4px), 8% 100%, 4% calc(100% - 4px), 0% 100%
+  ) !important;
+}
+
+.card.btn-shape-outline {
+  background: transparent !important;
+  border: 2px solid var(--color-primary) !important;
+}
+
+/* Button Shadows */
+.card.btn-shadow-none {
+  box-shadow: none !important;
+}
+
+.card.btn-shadow-soft {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+}
+
+.card.btn-shadow-medium {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.card.btn-shadow-hard {
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.9) !important;
+}
+
+.card.btn-shadow-glow {
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.45) !important;
 }
 
 /* Card Style Variations */

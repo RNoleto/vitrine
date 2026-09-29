@@ -15,11 +15,11 @@
                   v-if="loja.logo_url"
                   :src="loja.logo_url" 
                   alt="Logo da vitrine" 
-                  class="w-36 h-36 rounded-2xl object-cover shadow-2xl ring-4 ring-[var(--color-accent)] transform hover:scale-105 transition-all duration-300" 
+                  :class="['w-36 h-36 object-cover shadow-2xl ring-4 ring-[var(--color-accent)] transform hover:scale-105 transition-all duration-300', avatarShapeClass]" 
                 />
                 <div 
                   v-else 
-                  class="w-36 h-36 rounded-2xl bg-[var(--color-foreground)] border-2 border-[var(--color-accent)] flex items-center justify-center shadow-2xl ring-4 ring-[var(--color-accent)]/30 text-[var(--color-accent)] transform hover:scale-105 transition-all duration-300"
+                  :class="['w-36 h-36 bg-[var(--color-foreground)] border-2 border-[var(--color-accent)] flex items-center justify-center shadow-2xl ring-4 ring-[var(--color-accent)]/30 text-[var(--color-accent)] transform hover:scale-105 transition-all duration-300', avatarShapeClass]"
                 >
                   <i class="fa-solid fa-store text-5xl"></i>
                 </div>
@@ -31,8 +31,8 @@
               <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 text-[var(--color-text)]">
                 {{ loja.name }}
               </h1>
-              <p v-if="loja.description" class="text-sm font-medium opacity-90 max-w-md mx-auto leading-relaxed text-[var(--color-text)]">
-                {{ loja.description }}
+              <p v-if="themeSubtitle" class="text-sm font-medium opacity-90 max-w-md mx-auto leading-relaxed text-[var(--color-text)]">
+                {{ themeSubtitle }}
               </p>
             </div>
           </div>
@@ -128,8 +128,13 @@
             </div>
           </div>
 
+          <!-- Banner / Imagem de Destaque do Tema -->
+          <div v-if="themeBannerImage" class="rounded-2xl overflow-hidden shadow-lg border border-[var(--color-accent)] my-4">
+            <img :src="themeBannerImage" alt="Imagem em destaque" class="w-full h-48 sm:h-60 object-cover hover:scale-105 transition-transform duration-500" />
+          </div>
+
           <!-- Bottom Call to Action Footer -->
-          <div v-if="socialLinks.length" class="text-center py-6 space-y-4">
+          <div v-if="socialLinks.length && socialFooterVisible" class="text-center py-6 space-y-4">
             <h4 class="text-base sm:text-lg font-bold text-[var(--color-text)]">
               Acompanhe nas redes sociais
             </h4>
@@ -256,6 +261,26 @@ const socialLinks = computed(() => {
 })
 
 const currentTheme = computed(() => themeStore.currentThemeObject)
+
+const avatarShapeClass = computed(() => {
+  const shape = currentTheme.value?.avatarShape || currentTheme.value?.avatar_shape || 'circle'
+  if (shape === 'square') return 'rounded-none'
+  if (shape === 'rounded-square') return 'rounded-3xl'
+  return 'rounded-full'
+})
+
+const socialFooterVisible = computed(() => {
+  if (!currentTheme.value) return true
+  return currentTheme.value.showSocialFooter !== false && currentTheme.value.show_social_footer !== false
+})
+
+const themeBannerImage = computed(() => {
+  return currentTheme.value?.elements?.banner_image || null
+})
+
+const themeSubtitle = computed(() => {
+  return loja.value?.description || currentTheme.value?.elements?.subtitle || null
+})
 
 const isPremiumLayout = computed(() => {
   if (!currentTheme.value) return false

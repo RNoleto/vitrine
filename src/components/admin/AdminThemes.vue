@@ -30,6 +30,15 @@ const iconFamily = ref('fontawesome-6')
 const layoutStyle = ref('portrait-hero')
 const cardStyle = ref('gold-bordered')
 
+// Linktree Style Controls
+const btnShape = ref('pill') // 'pill' | 'rounded' | 'square' | 'wavy' | 'outline'
+const btnShadow = ref('soft') // 'none' | 'soft' | 'medium' | 'hard' | 'glow'
+const avatarShape = ref('circle') // 'circle' | 'rounded-square' | 'square'
+const showSocialFooter = ref(true)
+const socialStyle = ref('minimal') // 'minimal' | 'circle-filled' | 'outline' | 'pills'
+const themeSubtitle = ref('')
+const themeBannerImage = ref('')
+
 // Fundo: solid | gradient | image | animation
 const bgType = ref('solid')
 const bgColorSolid = ref('#F5EFEB')
@@ -245,6 +254,15 @@ async function saveTheme() {
     iconFamily: iconFamily.value,
     layoutStyle: layoutStyle.value,
     cardStyle: cardStyle.value,
+    btnShape: btnShape.value,
+    btnShadow: btnShadow.value,
+    avatarShape: avatarShape.value,
+    showSocialFooter: showSocialFooter.value,
+    socialStyle: socialStyle.value,
+    elements: {
+      subtitle: themeSubtitle.value.trim() || undefined,
+      banner_image: themeBannerImage.value.trim() || undefined,
+    },
     bgType: bgType.value,
     bgImageUrl: bgImageUrl.value,
     bgAttachment: bgAttachment.value,
@@ -293,6 +311,14 @@ function editCustomTheme(theme) {
   iconFamily.value = theme.iconFamily || theme.icon_family || 'fontawesome-6'
   layoutStyle.value = theme.layoutStyle || 'portrait-hero'
   cardStyle.value = theme.cardStyle || 'gold-bordered'
+
+  btnShape.value = theme.btnShape || theme.btn_shape || 'pill'
+  btnShadow.value = theme.btnShadow || theme.btn_shadow || 'soft'
+  avatarShape.value = theme.avatarShape || theme.avatar_shape || 'circle'
+  showSocialFooter.value = theme.showSocialFooter !== undefined ? theme.showSocialFooter : true
+  socialStyle.value = theme.socialStyle || theme.social_style || 'minimal'
+  themeSubtitle.value = theme.elements?.subtitle || ''
+  themeBannerImage.value = theme.elements?.banner_image || ''
 
   bgType.value = theme.bgType || (theme.colors?.background?.includes('gradient') ? 'gradient' : 'solid')
   bgImageUrl.value = theme.bgImageUrl || ''
@@ -377,6 +403,14 @@ function cancelEditing() {
   iconFamily.value = 'fontawesome-6'
   layoutStyle.value = 'portrait-hero'
   cardStyle.value = 'gold-bordered'
+
+  btnShape.value = 'pill'
+  btnShadow.value = 'soft'
+  avatarShape.value = 'circle'
+  showSocialFooter.value = true
+  socialStyle.value = 'minimal'
+  themeSubtitle.value = ''
+  themeBannerImage.value = ''
 
   bgType.value = 'solid'
   bgColorSolid.value = '#F5EFEB'
@@ -539,6 +573,92 @@ onMounted(async () => {
               <option value="glass">Vidro Efeito Glassmorphism</option>
               <option value="flat">Plano Minimalista</option>
             </select>
+          </div>
+        </div>
+
+        <!-- ESTILOS DE BOTÕES E PERFIL (ESTILO LINKTREE) -->
+        <div class="space-y-3 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+          <label class="block text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i>
+            Personalização de Estilo Linktree (Botões, Avatar & Redes)
+          </label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- Formato dos Botões -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Formato dos Botões</label>
+              <select v-model="btnShape" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
+                <option value="pill">💊 Pílula (Rounded Full)</option>
+                <option value="rounded">🟩 Cantos Arredondados (Rounded)</option>
+                <option value="square">⏹️ Retângulo Reto (Square)</option>
+                <option value="wavy">〰️ Ondulado (Wavy Edge)</option>
+                <option value="outline">🔲 Contorno Transparente (Outline)</option>
+              </select>
+            </div>
+
+            <!-- Sombra dos Botões -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Sombra dos Botões</label>
+              <select v-model="btnShadow" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
+                <option value="none">Sem Sombra (Flat)</option>
+                <option value="soft">Sombra Suave</option>
+                <option value="medium">Sombra Marcada</option>
+                <option value="hard">Sombra Rígida (Retro 3D)</option>
+                <option value="glow">Brilho Neon (Glow)</option>
+              </select>
+            </div>
+
+            <!-- Formato do Avatar -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Formato do Avatar</label>
+              <select v-model="avatarShape" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
+                <option value="circle">⚪ Círculo Perfeito</option>
+                <option value="rounded-square">▢ Quadrado Arredondado</option>
+                <option value="square">⏹️ Quadrado Reto</option>
+              </select>
+            </div>
+
+            <!-- Rodapé de Redes Sociais -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Estilo de Redes</label>
+              <select v-model="socialStyle" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
+                <option value="minimal">Minimalista White/Black</option>
+                <option value="circle-filled">Círculos Preenchidos</option>
+                <option value="outline">Anéis com Borda</option>
+                <option value="pills">Em Pílulas Badges</option>
+              </select>
+            </div>
+
+            <!-- Exibir Rodapé Checkbox -->
+            <div class="flex items-center sm:pt-5">
+              <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-800">
+                <input type="checkbox" v-model="showSocialFooter" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" />
+                Exibir Ícones de Redes
+              </label>
+            </div>
+          </div>
+
+          <!-- Bio / Banner do Tema -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-indigo-100/60">
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-700 mb-1">Subtítulo / Descrição Padrão do Tema</label>
+              <input
+                v-model="themeSubtitle"
+                type="text"
+                placeholder="Ex: Your daily dose of vitamin C | Makeup & Beauty"
+                class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 outline-none"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-700 mb-1">Banner de Imagem Destaque (URL de Imagem / Produto)</label>
+              <input
+                v-model="themeBannerImage"
+                type="text"
+                placeholder="Ex: https://images.unsplash.com/... (opcional)"
+                class="w-full text-xs font-mono bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 outline-none"
+              />
+            </div>
           </div>
         </div>
 
