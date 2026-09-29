@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import api from '../services/api'
 import { useFontStore } from './fontStore'
+import { useIconStore } from './iconStore'
 
 export function getContrastColor(hexColor) {
   if (!hexColor || typeof hexColor !== 'string') return '#FFFFFF';
@@ -150,6 +151,7 @@ export const useThemeStore = defineStore('theme', {
             isPremium: Boolean(t.is_premium),
             category: t.category || 'standard',
             fontFamily: t.font_family || 'sans',
+            iconFamily: t.icon_family || 'fontawesome-6',
             layoutStyle: t.layout_style || 'standard',
             cardStyle: t.card_style || 'flat',
             bgType: t.bg_type || 'solid',
@@ -164,7 +166,9 @@ export const useThemeStore = defineStore('theme', {
           }))
         }
         const fontStore = useFontStore()
+        const iconStore = useIconStore()
         await fontStore.carregarFontes()
+        await iconStore.carregarFamilias()
         this.initDynamicCss()
       } catch (err) {
         console.error('Erro ao carregar temas do banco de dados:', err)
@@ -308,6 +312,7 @@ export const useThemeStore = defineStore('theme', {
           is_premium: themeObj.isPremium !== undefined ? themeObj.isPremium : true,
           category: themeObj.category || 'premium',
           font_family: themeObj.fontFamily || 'serif',
+          icon_family: themeObj.iconFamily || themeObj.icon_family || 'fontawesome-6',
           layout_style: themeObj.layoutStyle || 'portrait-hero',
           card_style: themeObj.cardStyle || 'gold-bordered',
           bg_type: themeObj.bgType || 'solid',

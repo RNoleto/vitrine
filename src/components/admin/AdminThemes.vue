@@ -3,13 +3,16 @@ import { ref, computed, onMounted } from 'vue'
 import { useThemeStore } from '@/stores/themeStore'
 import { useFeedbackStore } from '@/stores/feedbackStore'
 import { useFontStore } from '@/stores/fontStore'
+import { useIconStore } from '@/stores/iconStore'
 
 const themeStore = useThemeStore()
 const feedbackStore = useFeedbackStore()
 const fontStore = useFontStore()
+const iconStore = useIconStore()
 
 onMounted(async () => {
   await fontStore.carregarFontes()
+  await iconStore.carregarFamilias()
 })
 
 const editorFormRef = ref(null)
@@ -23,6 +26,7 @@ const newThemeLabel = ref('')
 const isPremium = ref(true)
 const category = ref('premium')
 const fontFamily = ref('serif')
+const iconFamily = ref('fontawesome-6')
 const layoutStyle = ref('portrait-hero')
 const cardStyle = ref('gold-bordered')
 
@@ -238,6 +242,7 @@ async function saveTheme() {
     isPremium: isPremium.value,
     category: category.value,
     fontFamily: fontFamily.value,
+    iconFamily: iconFamily.value,
     layoutStyle: layoutStyle.value,
     cardStyle: cardStyle.value,
     bgType: bgType.value,
@@ -285,6 +290,7 @@ function editCustomTheme(theme) {
   isPremium.value = theme.isPremium !== undefined ? theme.isPremium : true
   category.value = theme.category || 'premium'
   fontFamily.value = theme.fontFamily || 'serif'
+  iconFamily.value = theme.iconFamily || theme.icon_family || 'fontawesome-6'
   layoutStyle.value = theme.layoutStyle || 'portrait-hero'
   cardStyle.value = theme.cardStyle || 'gold-bordered'
 
@@ -368,6 +374,7 @@ function cancelEditing() {
   isPremium.value = true
   category.value = 'premium'
   fontFamily.value = 'serif'
+  iconFamily.value = 'fontawesome-6'
   layoutStyle.value = 'portrait-hero'
   cardStyle.value = 'gold-bordered'
 
@@ -489,8 +496,8 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Tipografia & Estilo de Layout -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
+        <!-- Tipografia, Ícones & Estilo de Layout -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Tipografia (Fonte)</label>
             <select v-model="fontFamily" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
@@ -504,6 +511,15 @@ onMounted(async () => {
                 <option value="serif">Serifada Elegante (Playfair)</option>
                 <option value="cinzel">Nobre / Jurídica (Cinzel)</option>
               </optgroup>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Família de Ícones</label>
+            <select v-model="iconFamily" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
+              <option v-for="ic in iconStore.iconFamilies" :key="ic.id" :value="ic.id">
+                {{ ic.display_name || ic.family_name }}
+              </option>
             </select>
           </div>
 
