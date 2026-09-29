@@ -213,7 +213,7 @@
                 Nenhuma pergunta cadastrada.
               </div>
 
-              <div v-else class="space-y-2 max-h-60 overflow-y-auto pr-1">
+              <div v-else class="space-y-2.5">
                 <div v-for="(faq, fIdx) in formFaqs" :key="fIdx" class="p-3 bg-gray-50 border border-gray-200 rounded-xl space-y-1.5 relative">
                   <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold text-indigo-600">Pergunta #{{ fIdx + 1 }}</span>
