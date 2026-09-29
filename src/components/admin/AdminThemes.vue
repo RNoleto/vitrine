@@ -8,20 +8,29 @@ const feedbackStore = useFeedbackStore()
 
 const editorFormRef = ref(null)
 
+// Filtro da Galeria por Categoria
+const selectedGalleryTab = ref('all') // 'all' | 'premium' | 'standard' | 'gradient'
+
 // State do Formulário do Criador/Editor de Tema
-const editingThemeId = ref(null) // null = criando novo, string = editando existente
+const editingThemeId = ref(null)
 const newThemeLabel = ref('')
-const bgType = ref('solid') // 'solid' | 'gradient'
-const bgColorSolid = ref('#1E1B4B')
+const isPremium = ref(true)
+const category = ref('premium')
+const fontFamily = ref('serif')
+const layoutStyle = ref('portrait-hero')
+const cardStyle = ref('gold-bordered')
+
+const bgType = ref('solid')
+const bgColorSolid = ref('#F5EFEB')
 const bgGradientColor1 = ref('#4F46E5')
 const bgGradientColor2 = ref('#7C3AED')
 const bgGradientAngle = ref('135deg')
 
-const fgColor = ref('#2E2A72')
-const primaryColor = ref('#818CF8')
-const accentColor = ref('#F43F5E')
-const textColor = ref('#F8FAFC')
-const backdropBlur = ref(0) // 0px a 20px
+const fgColor = ref('#E6DCD5')
+const primaryColor = ref('#6E4D3B')
+const accentColor = ref('#A6826D')
+const textColor = ref('#3D2A20')
+const backdropBlur = ref(0)
 
 const computedBackground = computed(() => {
   if (bgType.value === 'solid') {
@@ -32,12 +41,26 @@ const computedBackground = computed(() => {
 
 const generatedId = computed(() => {
   if (editingThemeId.value) return editingThemeId.value
-  if (!newThemeLabel.value.trim()) return 'custom-theme'
-  return newThemeLabel.value
+  if (!newThemeLabel.value.trim()) return 'custom-premium-theme'
+  return (isPremium.value ? 'premium-' : '') + newThemeLabel.value
     .toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
+})
+
+const filteredGalleryThemes = computed(() => {
+  const all = themeStore.allThemes
+  if (selectedGalleryTab.value === 'premium') {
+    return all.filter(t => t.isPremium)
+  }
+  if (selectedGalleryTab.value === 'standard') {
+    return all.filter(t => !t.isPremium && t.category !== 'gradient')
+  }
+  if (selectedGalleryTab.value === 'gradient') {
+    return all.filter(t => t.category === 'gradient' || t.colors.background.includes('gradient'))
+  }
+  return all
 })
 
 function saveTheme() {
@@ -51,6 +74,11 @@ function saveTheme() {
   const themeObj = {
     id: generatedId.value,
     label: newThemeLabel.value.trim(),
+    isPremium: isPremium.value,
+    category: category.value,
+    fontFamily: fontFamily.value,
+    layoutStyle: layoutStyle.value,
+    cardStyle: cardStyle.value,
     colors: {
       background: computedBackground.value,
       foreground: fgColor.value,
@@ -75,6 +103,12 @@ function saveTheme() {
 function editCustomTheme(theme) {
   editingThemeId.value = theme.id
   newThemeLabel.value = theme.label
+  isPremium.value = theme.isPremium !== undefined ? theme.isPremium : true
+  category.value = theme.category || 'premium'
+  fontFamily.value = theme.fontFamily || 'serif'
+  layoutStyle.value = theme.layoutStyle || 'portrait-hero'
+  cardStyle.value = theme.cardStyle || 'gold-bordered'
+
   fgColor.value = theme.colors.foreground.startsWith('rgba') ? '#ffffff' : theme.colors.foreground
   primaryColor.value = theme.colors.primary
   accentColor.value = theme.colors.accent
@@ -83,7 +117,6 @@ function editCustomTheme(theme) {
 
   if (theme.colors.background && theme.colors.background.includes('gradient')) {
     bgType.value = 'gradient'
-    // Tenta extrair cores do gradiente se estiver no formato linear-gradient(deg, col1, col2)
     const matches = theme.colors.background.match(/#([a-fA-F0-9]{3,8})/g)
     if (matches && matches.length >= 2) {
       bgGradientColor1.value = matches[0]
@@ -91,7 +124,7 @@ function editCustomTheme(theme) {
     }
   } else {
     bgType.value = 'solid'
-    bgColorSolid.value = theme.colors.background || '#1E1B4B'
+    bgColorSolid.value = theme.colors.background || '#F5EFEB'
   }
 
   if (editorFormRef.value) {
@@ -102,15 +135,21 @@ function editCustomTheme(theme) {
 function cancelEditing() {
   editingThemeId.value = null
   newThemeLabel.value = ''
+  isPremium.value = true
+  category.value = 'premium'
+  fontFamily.value = 'serif'
+  layoutStyle.value = 'portrait-hero'
+  cardStyle.value = 'gold-bordered'
+
   bgType.value = 'solid'
-  bgColorSolid.value = '#1E1B4B'
+  bgColorSolid.value = '#F5EFEB'
   bgGradientColor1.value = '#4F46E5'
   bgGradientColor2.value = '#7C3AED'
   bgGradientAngle.value = '135deg'
-  fgColor.value = '#2E2A72'
-  primaryColor.value = '#818CF8'
-  accentColor.value = '#F43F5E'
-  textColor.value = '#F8FAFC'
+  fgColor.value = '#E6DCD5'
+  primaryColor.value = '#6E4D3B'
+  accentColor.value = '#A6826D'
+  textColor.value = '#3D2A20'
   backdropBlur.value = 0
 }
 
@@ -127,6 +166,12 @@ function deleteCustomTheme(theme) {
 function applyPresetToEditor(theme) {
   editingThemeId.value = null
   newThemeLabel.value = `${theme.label} (Cópia)`
+  isPremium.value = theme.isPremium || false
+  category.value = theme.category || 'standard'
+  fontFamily.value = theme.fontFamily || 'serif'
+  layoutStyle.value = theme.layoutStyle || 'standard'
+  cardStyle.value = theme.cardStyle || 'flat'
+
   fgColor.value = theme.colors.foreground.startsWith('rgba') ? '#ffffff' : theme.colors.foreground
   primaryColor.value = theme.colors.primary
   accentColor.value = theme.colors.accent
@@ -157,7 +202,7 @@ onMounted(() => {
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Gerenciador & Criador de Temas</h1>
         <p class="text-sm text-gray-600 mt-1">
-          Crie e edite temas de visualização personalizados. Todos os temas criados ficam disponíveis para as vitrines dos usuários.
+          Crie temas padrão e <span class="font-bold text-amber-600">Temas Premium VIP estilo Landing Page</span> com fotos de perfil, fontes serifadas e prova social.
         </p>
       </div>
     </div>
@@ -168,7 +213,8 @@ onMounted(() => {
       <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-5">
         <div class="flex items-center justify-between border-b border-gray-100 pb-3">
           <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <i class="fa-solid fa-palette" :class="editingThemeId ? 'text-purple-600' : 'text-indigo-600'"></i>
+            <i class="fa-solid fa-crown text-amber-500" v-if="isPremium"></i>
+            <i class="fa-solid fa-palette text-indigo-600" v-else></i>
             {{ editingThemeId ? 'Editar Tema Visual' : 'Criar Novo Tema Visual' }}
           </h2>
 
@@ -181,16 +227,61 @@ onMounted(() => {
           </span>
         </div>
 
-        <!-- Nome do Tema -->
-        <div>
-          <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Nome do Tema</label>
-          <input 
-            v-model="newThemeLabel" 
-            type="text" 
-            placeholder="Ex: Neon Wave, Golden Sunset, Minimal Mint..."
-            class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all"
-          />
-          <p class="text-[11px] text-gray-400 mt-1 font-mono">ID do tema: theme-{{ generatedId }}</p>
+        <!-- Nome do Tema e Tipo Plano -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Nome do Tema</label>
+            <input 
+              v-model="newThemeLabel" 
+              type="text" 
+              placeholder="Ex: Dra. Marina Royal, Editorial Gold, Executive..."
+              class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all"
+            />
+            <p class="text-[11px] text-gray-400 mt-1 font-mono">ID: theme-{{ generatedId }}</p>
+          </div>
+
+          <!-- Seletor Gratuito / Premium VIP -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Categoria de Acesso</label>
+            <select 
+              v-model="isPremium"
+              class="w-full px-3 py-2 text-xs font-bold rounded-lg border outline-none cursor-pointer transition-all"
+              :class="isPremium ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-gray-50 border-gray-300 text-gray-700'"
+            >
+              <option :value="false">⚡ Padrão / Gratuito</option>
+              <option :value="true">👑 Premium VIP</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tipografia & Estilo de Layout -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Tipografia (Fonte)</label>
+            <select v-model="fontFamily" class="w-full text-xs bg-white border border-gray-300 rounded px-2.5 py-1.5 font-medium">
+              <option value="serif">Serifada Elegante (Playfair)</option>
+              <option value="cinzel">Nobre / Jurídica (Cinzel)</option>
+              <option value="sans">Moderna Clean (Inter)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Estilo de Layout</label>
+            <select v-model="layoutStyle" class="w-full text-xs bg-white border border-gray-300 rounded px-2.5 py-1.5 font-medium">
+              <option value="portrait-hero">Hero Retrato Profissional</option>
+              <option value="landing-page">Landing Page Completa (FAQ + Prova Social)</option>
+              <option value="standard">Padrão Empilhado</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Estilo dos Cartões</label>
+            <select v-model="cardStyle" class="w-full text-xs bg-white border border-gray-300 rounded px-2.5 py-1.5 font-medium">
+              <option value="gold-bordered">Moldura Nobre Dourada</option>
+              <option value="glass">Vidro Efeito Glassmorphism</option>
+              <option value="flat">Plano Minimalista</option>
+            </select>
+          </div>
         </div>
 
         <!-- Tipo de Fundo -->
@@ -304,10 +395,12 @@ onMounted(() => {
           <button 
             type="button" 
             @click="saveTheme"
-            class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+            class="flex-1 py-3 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+            :class="isPremium ? 'bg-amber-600 hover:bg-amber-700' : 'bg-indigo-600 hover:bg-indigo-700'"
           >
-            <i class="fa-solid fa-floppy-disk text-sm"></i>
-            {{ editingThemeId ? 'Salvar Alterações do Tema' : 'Salvar e Criar Tema' }}
+            <i class="fa-solid fa-crown text-sm" v-if="isPremium"></i>
+            <i class="fa-solid fa-floppy-disk text-sm" v-else></i>
+            {{ editingThemeId ? 'Salvar Alterações do Tema' : (isPremium ? 'Salvar Tema Premium VIP' : 'Salvar e Criar Tema') }}
           </button>
 
           <button 
@@ -322,7 +415,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Live Preview Smartphone Mockup Realista (5 Colunas) -->
+      <!-- Live Preview Smartphone Mockup Realista Estilo Landing Page VIP (5 Colunas) -->
       <div class="lg:col-span-5 bg-white p-6 rounded-xl border border-gray-200 shadow-xs flex flex-col items-center justify-center">
         <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
           <i class="fa-solid fa-mobile-screen-button text-indigo-600"></i>
@@ -330,17 +423,18 @@ onMounted(() => {
         </h3>
 
         <!-- Moldura Realista do Celular (iPhone Style Chassis) -->
-        <div class="relative w-[300px] h-[580px] bg-slate-900 rounded-[48px] p-3 shadow-2xl border-[4px] border-slate-800 ring-1 ring-slate-700/50 flex flex-col">
+        <div class="relative w-[300px] h-[600px] bg-slate-900 rounded-[48px] p-3 shadow-2xl border-[4px] border-slate-800 ring-1 ring-slate-700/50 flex flex-col">
           <!-- Botões Laterais do Aparelho -->
           <div class="absolute -left-[10px] top-24 w-[3px] h-10 bg-slate-700 rounded-l"></div>
           <div class="absolute -left-[10px] top-38 w-[3px] h-12 bg-slate-700 rounded-l"></div>
           <div class="absolute -right-[10px] top-32 w-[3px] h-14 bg-slate-700 rounded-r"></div>
 
-          <!-- Tela Interna do Celular -->
+          <!-- Tela Interna do Celular com a fonte configurada -->
           <div class="w-full h-full rounded-[38px] overflow-hidden flex flex-col relative transition-all duration-300 select-none shadow-inner"
                :style="{
                  background: computedBackground,
-                 color: textColor
+                 color: textColor,
+                 fontFamily: fontFamily === 'serif' ? '\'Playfair Display\', serif' : fontFamily === 'cinzel' ? '\'Cinzel\', serif' : '\'Inter\', sans-serif'
                }">
             
             <!-- Barra de Status (Clock & Icons) -->
@@ -359,19 +453,37 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Conteúdo Interno da Vitrine -->
-            <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4 flex flex-col justify-between text-center">
+            <!-- Conteúdo Interno da Vitrine (Scrollable) -->
+            <div class="flex-1 overflow-y-auto px-4 py-3 space-y-4 text-center scrollbar-none">
               
-              <!-- Profile Header -->
-              <div class="space-y-2 pt-2">
+              <!-- Layout HERO PROFISSIONAL (Estilo Dra. Marina Almeida / Marina Costa) -->
+              <div v-if="layoutStyle === 'portrait-hero' || layoutStyle === 'landing-page'" class="space-y-3 pt-1">
+                <div class="relative w-full h-44 rounded-2xl overflow-hidden shadow-md border border-white/20">
+                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover" alt="Hero Portrait" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3 text-left">
+                    <div>
+                      <span v-if="isPremium" class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-400 text-amber-950 inline-block mb-1">
+                        👑 VIP Pro
+                      </span>
+                      <h4 class="font-bold text-sm text-white tracking-tight leading-none">
+                        Dra. Marina Almeida
+                      </h4>
+                      <p class="text-[10px] text-amber-200 mt-0.5 font-medium">Advocacia Estratégica & Consultoria</p>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="text-[10px] leading-tight opacity-80 italic">
+                  "Soluções jurídicas preventivas e atendimento estratégico personalizado."
+                </p>
+              </div>
+
+              <!-- Layout PADRÃO -->
+              <div v-else class="space-y-2 pt-2">
                 <div class="relative w-16 h-16 rounded-full mx-auto shadow-md border-2 border-white/80 flex items-center justify-center font-bold text-xl transition-all"
                      :style="{ background: primaryColor, color: '#ffffff' }">
                   V
-                  <span class="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-[9px] shadow-xs">
-                    <i class="fa-solid fa-check"></i>
-                  </span>
                 </div>
-
                 <div>
                   <h4 class="font-bold text-sm tracking-tight transition-all" :style="{ color: textColor }">
                     {{ newThemeLabel || 'Sua Vitrine Digital' }}
@@ -379,26 +491,23 @@ onMounted(() => {
                   <p class="text-[11px] font-mono opacity-80 mt-0.5" :style="{ color: textColor }">
                     vitrine.app/{{ generatedId }}
                   </p>
-                  <p class="text-[10px] opacity-70 mt-1 max-w-[200px] mx-auto leading-tight">
-                    Links oficiais, catálogo de produtos e atendimento direto via WhatsApp.
-                  </p>
                 </div>
               </div>
 
-              <!-- Lista de Links de Exemplo -->
+              <!-- Lista de Links Elegantes -->
               <div class="space-y-2 text-xs">
                 <div class="p-2.5 rounded-xl shadow-xs flex items-center justify-between border transition-all"
                      :style="{
                        background: fgColor,
-                       borderColor: primaryColor,
+                       borderColor: cardStyle === 'gold-bordered' ? accentColor : primaryColor,
                        color: textColor,
                        backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
                      }">
                   <div class="flex items-center gap-2.5">
                     <div class="w-6 h-6 rounded-lg flex items-center justify-center bg-black/10" :style="{ color: accentColor }">
-                      <i class="fa-solid fa-globe text-xs"></i>
+                      <i class="fa-solid fa-calendar-check text-xs"></i>
                     </div>
-                    <span class="font-semibold text-xs">Nosso Site Oficial</span>
+                    <span class="font-semibold text-xs">Agende sua Consulta</span>
                   </div>
                   <i class="fa-solid fa-chevron-right text-[10px] opacity-60" :style="{ color: accentColor }"></i>
                 </div>
@@ -406,15 +515,15 @@ onMounted(() => {
                 <div class="p-2.5 rounded-xl shadow-xs flex items-center justify-between border transition-all"
                      :style="{
                        background: fgColor,
-                       borderColor: primaryColor,
+                       borderColor: cardStyle === 'gold-bordered' ? accentColor : primaryColor,
                        color: textColor,
                        backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
                      }">
                   <div class="flex items-center gap-2.5">
                     <div class="w-6 h-6 rounded-lg flex items-center justify-center bg-black/10" :style="{ color: accentColor }">
-                      <i class="fa-brands fa-instagram text-xs"></i>
+                      <i class="fa-solid fa-scale-balanced text-xs"></i>
                     </div>
-                    <span class="font-semibold text-xs">Siga no Instagram</span>
+                    <span class="font-semibold text-xs">Áreas de Atuação</span>
                   </div>
                   <i class="fa-solid fa-chevron-right text-[10px] opacity-60" :style="{ color: accentColor }"></i>
                 </div>
@@ -433,7 +542,7 @@ onMounted(() => {
                       <i class="fa-brands fa-whatsapp"></i>
                     </div>
                     <div>
-                      <p class="font-bold text-xs leading-none">Atendimento Comercial</p>
+                      <p class="font-bold text-xs leading-none">Fale Conosco</p>
                       <p class="text-[10px] opacity-75 mt-0.5">(96) 98140-3089</p>
                     </div>
                   </div>
@@ -443,9 +552,42 @@ onMounted(() => {
                 </div>
               </div>
 
+              <!-- Bloco Especial de PROVA SOCIAL / ESTATÍSTICAS (Estilo Landing Page Marina) -->
+              <div v-if="layoutStyle === 'landing-page'" class="p-2.5 rounded-xl border grid grid-cols-3 gap-1 text-center transition-all"
+                   :style="{
+                     background: fgColor,
+                     borderColor: primaryColor,
+                     color: textColor
+                   }">
+                <div>
+                  <p class="font-bold text-xs" :style="{ color: accentColor }">+1000</p>
+                  <p class="text-[8px] uppercase tracking-tighter opacity-80">Alunas</p>
+                </div>
+                <div>
+                  <p class="font-bold text-xs" :style="{ color: accentColor }">Desde 2021</p>
+                  <p class="text-[8px] uppercase tracking-tighter opacity-80">Mercado</p>
+                </div>
+                <div>
+                  <p class="font-bold text-xs" :style="{ color: accentColor }">96%</p>
+                  <p class="text-[8px] uppercase tracking-tighter opacity-80">Aprovação</p>
+                </div>
+              </div>
+
+              <!-- Bloco FAQ / Dúvidas Frequentes -->
+              <div v-if="layoutStyle === 'landing-page'" class="p-2 rounded-xl border text-left space-y-1 transition-all"
+                   :style="{ background: fgColor, borderColor: primaryColor }">
+                <p class="text-[10px] font-bold mb-1 flex items-center justify-between" :style="{ color: textColor }">
+                  <span>Dúvidas frequentes</span>
+                  <i class="fa-solid fa-chevron-down text-[8px]" :style="{ color: accentColor }"></i>
+                </p>
+                <div class="text-[9px] opacity-75 border-t border-black/10 pt-1">
+                  Como funciona a consultoria personalizada?
+                </div>
+              </div>
+
               <!-- Rodapé da Tela do Celular -->
-              <div class="pb-1 text-[9px] opacity-50 font-mono tracking-wider">
-                Vitrines © Digital Platform
+              <div class="pb-1 text-[9px] opacity-60 font-mono tracking-wider">
+                Vitrines VIP Platform
               </div>
             </div>
 
@@ -458,22 +600,59 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Galeria de Temas Existentes (Presets + Criados no Admin) -->
+    <!-- Galeria de Temas Existentes com Abas de Categorização -->
     <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-4">
-      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100 pb-3 gap-3">
         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
           <i class="fa-solid fa-swatchbook text-indigo-600"></i>
           Galeria de Temas Disponíveis ({{ themeStore.allThemes.length }})
         </h2>
+
+        <!-- Abas de Categoria -->
+        <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg">
+          <button 
+            type="button" 
+            @click="selectedGalleryTab = 'all'"
+            class="px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer"
+            :class="selectedGalleryTab === 'all' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-600 hover:text-gray-900'"
+          >
+            Todos
+          </button>
+          <button 
+            type="button" 
+            @click="selectedGalleryTab = 'premium'"
+            class="px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer flex items-center gap-1 text-amber-800"
+            :class="selectedGalleryTab === 'premium' ? 'bg-amber-400 text-amber-950 shadow-xs' : 'hover:bg-amber-100/50'"
+          >
+            <i class="fa-solid fa-crown text-[10px]"></i>
+            Premium VIP
+          </button>
+          <button 
+            type="button" 
+            @click="selectedGalleryTab = 'gradient'"
+            class="px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer"
+            :class="selectedGalleryTab === 'gradient' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-600 hover:text-gray-900'"
+          >
+            Gradientes
+          </button>
+          <button 
+            type="button" 
+            @click="selectedGalleryTab = 'standard'"
+            class="px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer"
+            :class="selectedGalleryTab === 'standard' ? 'bg-white text-gray-900 shadow-xs' : 'text-gray-600 hover:text-gray-900'"
+          >
+            Padrão
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div 
-          v-for="theme in themeStore.allThemes" 
+          v-for="theme in filteredGalleryThemes" 
           :key="theme.id"
           class="border rounded-xl p-3.5 space-y-3 relative group hover:shadow-md transition-all bg-gray-50"
           :class="[
-            theme.isCustom ? 'border-purple-300' : 'border-gray-200',
+            theme.isPremium ? 'border-amber-300 ring-1 ring-amber-200' : (theme.isCustom ? 'border-purple-300' : 'border-gray-200'),
             editingThemeId === theme.id ? 'ring-2 ring-purple-500 bg-purple-50/30' : ''
           ]"
         >
@@ -481,7 +660,17 @@ onMounted(() => {
           <div class="h-20 rounded-lg p-2.5 flex flex-col justify-between shadow-inner border border-black/10"
                :style="{ background: theme.colors.background, color: theme.colors.text }">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black/20 backdrop-blur-xs">
+              <!-- Badge Premium ou Admin Custom -->
+              <span 
+                v-if="theme.isPremium" 
+                class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 flex items-center gap-1 shadow-xs"
+              >
+                <i class="fa-solid fa-crown text-[8px]"></i> PREMIUM VIP
+              </span>
+              <span 
+                v-else 
+                class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black/20 backdrop-blur-xs"
+              >
                 {{ theme.isCustom ? 'Admin Custom' : 'Sistema' }}
               </span>
               <div class="w-3.5 h-3.5 rounded-full border border-white" :style="{ background: theme.colors.primary }"></div>
