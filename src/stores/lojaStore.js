@@ -243,6 +243,31 @@ export const useLojaStore = defineStore('loja', {
       }
     },
 
+    async atualizarConteudoCustomizado(id, { bio, metrics, faqs }) {
+      this.carregando = true;
+      try {
+        const { data } = await api.patch(`/stores/${id}/custom-content`, { 
+          bio, 
+          metrics, 
+          faqs 
+        });
+
+        const index = this.lojas.findIndex(l => l.id === id);
+        if (index !== -1) {
+          this.lojas[index].bio = data.bio;
+          this.lojas[index].metrics = data.metrics;
+          this.lojas[index].faqs = data.faqs;
+        }
+
+        return data;
+      } catch (error) {
+        this.erro = error.response?.data?.error || 'Erro ao atualizar conteúdo personalizado';
+        throw error;
+      } finally {
+        this.carregando = false;
+      }
+    },
+
     async registrarVisita(slug){
       try {
         await api.post(`/public/stores/${slug}/visit`);

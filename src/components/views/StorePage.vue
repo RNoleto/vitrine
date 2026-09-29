@@ -72,8 +72,8 @@
               <i class="fa-solid fa-user-check text-base text-[var(--color-accent)]"></i>
               Sobre mim
             </h3>
-            <p class="text-sm leading-relaxed opacity-85 text-[var(--color-text)]">
-              Especialista dedicada a oferecer soluções sob medida para cada cliente. Com foco em segurança, estratégia e atenção aos detalhes, ajudo você a alcançar seus objetivos com agilidade e clareza.
+            <p class="text-sm leading-relaxed opacity-85 text-[var(--color-text)] whitespace-pre-line">
+              {{ displayBio }}
             </p>
             <div class="pt-2">
               <button @click="irParaContatos" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--color-primary)] text-[var(--color-background)] font-medium text-xs tracking-wider uppercase shadow-md hover:opacity-90 transition-all">
@@ -83,23 +83,19 @@
           </div>
 
           <!-- Social Proof Counter Cards -->
-          <div class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-md text-center">
-            <div class="space-y-1">
-              <div class="text-xl sm:text-2xl font-black text-[var(--color-primary)]">+500</div>
-              <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider opacity-75 text-[var(--color-text)]">Clientes</div>
-            </div>
-            <div class="space-y-1 border-x border-[var(--color-accent)]/30 px-2">
-              <div class="text-xl sm:text-2xl font-black text-[var(--color-primary)]">8 ANOS</div>
-              <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider opacity-75 text-[var(--color-text)]">Experiência</div>
-            </div>
-            <div class="space-y-1">
-              <div class="text-xl sm:text-2xl font-black text-[var(--color-primary)]">95%</div>
-              <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider opacity-75 text-[var(--color-text)]">Satisfação</div>
+          <div v-if="displayMetrics.length" class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-md text-center">
+            <div 
+              v-for="(metric, mIdx) in displayMetrics.slice(0, 3)" 
+              :key="mIdx"
+              :class="['space-y-1', mIdx === 1 ? 'border-x border-[var(--color-accent)]/30 px-2' : '']"
+            >
+              <div class="text-xl sm:text-2xl font-black text-[var(--color-primary)]">{{ metric.value }}</div>
+              <div class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider opacity-75 text-[var(--color-text)]">{{ metric.label }}</div>
             </div>
           </div>
 
           <!-- FAQ Accordion Block -->
-          <div class="premium-faq-card p-6 sm:p-8 rounded-2xl border border-[var(--color-accent)] bg-[var(--color-foreground)] shadow-lg space-y-4">
+          <div v-if="activeFaqs.length" class="premium-faq-card p-6 sm:p-8 rounded-2xl border border-[var(--color-accent)] bg-[var(--color-foreground)] shadow-lg space-y-4">
             <h3 class="text-xl font-bold text-[var(--color-text)] flex items-center gap-2 mb-2">
               <i class="fa-solid fa-circle-question text-base text-[var(--color-accent)]"></i>
               Dúvidas frequentes
@@ -107,7 +103,7 @@
 
             <div class="space-y-3">
               <div 
-                v-for="(faq, fIdx) in faqs" 
+                v-for="(faq, fIdx) in activeFaqs" 
                 :key="fIdx"
                 class="border-b border-[var(--color-accent)]/20 pb-3"
               >
@@ -118,7 +114,7 @@
                   <span>{{ faq.question }}</span>
                   <i :class="['fa-solid transition-transform duration-200 text-xs text-[var(--color-accent)]', faq.open ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
                 </button>
-                <p v-if="faq.open" class="text-xs opacity-80 mt-2 leading-relaxed text-[var(--color-text)] pl-1">
+                <p v-if="faq.open" class="text-xs opacity-80 mt-2 leading-relaxed text-[var(--color-text)] pl-1 whitespace-pre-line">
                   {{ faq.answer }}
                 </p>
               </div>
@@ -204,13 +200,29 @@ const lojaStore = useLojaStore()
 
 const loja = ref(null)
 const contatos = ref([])
+const activeFaqs = ref([])
 
-// Dynamic FAQs para a Landing Page
-const faqs = ref([
+// Dynamic FAQs para a Landing Page (fallback)
+const defaultFaqs = [
   { question: 'Como funciona o atendimento presencial ou online?', answer: 'Realizamos consultorias personalizadas tanto de forma 100% remota com flexibilidade de horários quanto presencialmente com agendamento prévio.', open: false },
   { question: 'Quais são as etapas do acompanhamento?', answer: 'Iniciamos com um diagnóstico inicial detalhado, mapeamento de necessidades e estruturação de um plano estratégico contínuo.', open: false },
   { question: 'Como faço para tirar dúvidas antes de contratar?', answer: 'Basta clicar no botão de atendimento pelo WhatsApp ou selecionar um dos nossos consultores para falar diretamente conosco.', open: false }
-])
+]
+
+const displayBio = computed(() => {
+  return loja.value?.bio || 'Especialista dedicada a oferecer soluções sob medida para cada cliente. Com foco em segurança, estratégia e atenção aos detalhes, ajudo você a alcançar seus objetivos com agilidade e clareza.'
+})
+
+const displayMetrics = computed(() => {
+  if (loja.value?.metrics && Array.isArray(loja.value.metrics) && loja.value.metrics.length > 0) {
+    return loja.value.metrics
+  }
+  return [
+    { value: '+500', label: 'Clientes' },
+    { value: '8 ANOS', label: 'Experiência' },
+    { value: '95%', label: 'Satisfação' }
+  ]
+})
 
 const currentTheme = computed(() => themeStore.currentThemeObject)
 
@@ -234,6 +246,12 @@ onMounted(async () => {
     if (loja.value) {
       themeStore.applyTheme(loja.value.theme || 'default', loja.value.id)
       contatos.value = loja.value.contacts || []
+
+      if (loja.value.faqs && Array.isArray(loja.value.faqs) && loja.value.faqs.length > 0) {
+        activeFaqs.value = loja.value.faqs.map(f => ({ ...f, open: false }))
+      } else {
+        activeFaqs.value = defaultFaqs.map(f => ({ ...f }))
+      }
 
       await lojaStore.registrarVisita(slug)
     }
