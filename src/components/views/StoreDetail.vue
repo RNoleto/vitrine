@@ -7,19 +7,19 @@
       <div class="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-4 text-center sm:text-left">
           <img 
-            :src="loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
+            :src="formLogoPreview || loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
             alt="Logo" 
             class="w-14 h-14 rounded-xl object-cover shadow-sm ring-2 ring-indigo-50" 
           />
           <div>
             <div class="flex items-center justify-center sm:justify-start gap-2">
-              <h1 class="text-xl font-bold text-gray-900 leading-tight">{{ loja.name }}</h1>
+              <h1 class="text-xl font-bold text-gray-900 leading-tight">{{ formName || loja.name }}</h1>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Ativa</span>
               <span v-if="activeThemeObj?.isPremium" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
                 <i class="fa-solid fa-crown text-[9px]"></i> Premium
               </span>
             </div>
-            <p class="text-xs text-gray-500 truncate max-w-sm mt-0.5">{{ loja.description || 'Vitrine Digital com Links & Contatos' }}</p>
+            <p class="text-xs text-gray-500 truncate max-w-sm mt-0.5">{{ formDescription || loja.description || 'Vitrine Digital com Links & Contatos' }}</p>
           </div>
         </div>
 
@@ -135,16 +135,51 @@
             </div>
           </div>
 
-          <!-- TAB 2: CONTEÚDO PERSONALIZADO (PREMIUM) -->
+          <!-- TAB 2: DADOS & CONTEÚDO PERSONALIZADO (PREMIUM) -->
           <div v-show="activeMainTab === 'content'" class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5 animate-fade-in">
             <div class="border-b pb-3">
               <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
-                <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Conteúdo Personalizado (Premium)
+                <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Dados & Conteúdo da Vitrine
               </h3>
-              <p class="text-xs text-gray-500">Edite a biografia, as métricas e as perguntas frequentes exibidas nos temas VIP</p>
+              <p class="text-xs text-gray-500">Edite o nome, a logo, o subtítulo, a biografia e as informações da sua vitrine</p>
             </div>
 
-            <!-- 0. Subtítulo / Slogan da Vitrine -->
+            <!-- 0. Dados Principais (Nome & Logo) -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 pb-4 border-b border-gray-100">
+              <div class="sm:col-span-7 space-y-1.5">
+                <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                  <i class="fa-solid fa-store text-indigo-500"></i> Nome da Vitrine:
+                </label>
+                <input 
+                  v-model="formName" 
+                  placeholder="Ex: Minha Empresa / Meu Nome" 
+                  class="w-full p-2.5 border border-gray-300 rounded-xl text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-gray-800"
+                />
+              </div>
+
+              <div class="sm:col-span-5 space-y-1.5">
+                <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                  <i class="fa-solid fa-image text-indigo-500"></i> Logo da Vitrine:
+                </label>
+                <div class="flex items-center gap-2">
+                  <img 
+                    v-if="formLogoPreview" 
+                    :src="formLogoPreview" 
+                    alt="Preview Logo" 
+                    class="w-9 h-9 rounded-lg object-cover border border-gray-200 shadow-xs shrink-0" 
+                  />
+                  <div v-else class="w-9 h-9 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 shrink-0">
+                    <i class="fa-solid fa-store text-sm"></i>
+                  </div>
+                  <label class="flex-1 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl transition-all cursor-pointer text-center truncate shadow-xs">
+                    <i class="fa-solid fa-upload mr-1"></i> Alterar Logo
+                    <input type="file" accept="image/*" class="hidden" @change="handleLogoChange" />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subtítulo / Slogan da Vitrine -->
             <div class="space-y-1.5">
               <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
                 <i class="fa-solid fa-quote-left text-indigo-500"></i> Subtítulo / Descrição Curta da Vitrine:
@@ -245,7 +280,7 @@
               >
                 <i v-if="salvandoConteudo" class="fa-solid fa-circle-notch fa-spin"></i>
                 <i v-else class="fa-solid fa-floppy-disk"></i>
-                <span>{{ salvandoConteudo ? 'Salvando...' : 'Salvar Conteúdo Personalizado' }}</span>
+                <span>{{ salvandoConteudo ? 'Salvando...' : 'Salvar Dados & Conteúdo' }}</span>
               </button>
             </div>
           </div>
@@ -357,22 +392,22 @@
               }"
             ></div>
 
-            <!-- Screen Area with Active Theme Class & iPhone Aspect Ratio -->
+            <!-- Screen Area with Active Theme Class & iPhone Aspect Ratio (pointer-events-none + overflow-hidden prevents scroll hijack) -->
             <div 
               :class="['theme-' + (previewTheme || selectedTheme)]" 
-              class="w-full h-[640px] overflow-y-auto rounded-[36px] p-4 pt-9 text-center transition-all duration-300 relative select-none shadow-inner z-0"
+              class="w-full h-[640px] overflow-hidden rounded-[36px] p-4 pt-9 text-center transition-all duration-300 relative select-none pointer-events-none shadow-inner z-0"
               :style="themeStore.getThemePreviewStyle(activeThemeObj)"
             >
               <!-- Hero Header Mockup -->
               <div class="flex flex-col items-center mb-5">
                 <img 
-                  :src="loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
+                  :src="formLogoPreview || loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
                   alt="Logo" 
                   class="w-18 h-18 rounded-2xl object-cover shadow-lg ring-2 ring-[var(--color-accent)] mb-2" 
                 />
-                <h3 class="text-lg font-bold leading-tight" style="color: var(--color-text);">{{ loja.name }}</h3>
+                <h3 class="text-lg font-bold leading-tight" style="color: var(--color-text);">{{ formName || loja.name }}</h3>
                 <p class="text-xs opacity-80 max-w-[220px] mt-1 leading-snug" style="color: var(--color-text);">
-                  {{ loja.description || 'Sua vitrine digital com links e atendimento personalizado.' }}
+                  {{ formDescription || loja.description || 'Sua vitrine digital com links e atendimento personalizado.' }}
                 </p>
               </div>
 
@@ -457,7 +492,7 @@ const selectedCategoryTab = ref('all') // 'all' | 'premium' | 'gradient' | 'stan
 
 const mainNavigationTabs = [
   { id: 'theme', label: 'Temas & Visual', icon: 'fa-solid fa-palette' },
-  { id: 'content', label: 'Conteúdo Premium', icon: 'fa-solid fa-pen-to-square' },
+  { id: 'content', label: 'Conteúdo & Dados', icon: 'fa-solid fa-pen-to-square' },
   { id: 'links', label: 'Links & Contatos', icon: 'fa-solid fa-link' },
   { id: 'share', label: 'Compartilhar', icon: 'fa-solid fa-share-nodes' }
 ]
@@ -529,6 +564,9 @@ function cancelarPreview() {
   themeStore.applyTheme(savedTheme, loja.value?.id)
 }
 
+const formName = ref('')
+const formLogoBase64 = ref(null)
+const formLogoPreview = ref('')
 const formDescription = ref('')
 const formBio = ref('')
 const formMetrics = ref([
@@ -538,6 +576,21 @@ const formMetrics = ref([
 ])
 const formFaqs = ref([])
 const salvandoConteudo = ref(false)
+
+function handleLogoChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  if (!file.type.startsWith('image/')) {
+    feedbackStore.showError('Por favor, selecione um arquivo de imagem válido.')
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = (event) => {
+    formLogoBase64.value = event.target.result
+    formLogoPreview.value = event.target.result
+  }
+  reader.readAsDataURL(file)
+}
 
 function adicionarFaq() {
   formFaqs.value.push({
@@ -554,6 +607,22 @@ async function salvarConteudoCustomizado() {
   if (!loja.value?.id) return
   salvandoConteudo.value = true
   try {
+    // Atualiza nome e logo se alterados
+    if ((formName.value && formName.value !== loja.value.name) || formLogoBase64.value) {
+      await lojaStore.editarLoja(loja.value.id, {
+        name: formName.value || loja.value.name,
+        logoBase64: formLogoBase64.value,
+        links: loja.value.links || [],
+        ativo: loja.value.ativo ?? 1
+      })
+      const updatedStore = lojaStore.lojas.find(l => l.id === loja.value.id)
+      if (updatedStore) {
+        loja.value = updatedStore
+        formLogoPreview.value = updatedStore.logo_url
+        formLogoBase64.value = null
+      }
+    }
+
     const validMetrics = formMetrics.value.filter(m => m.value && m.value.trim() && m.label && m.label.trim())
     const validFaqs = formFaqs.value.filter(f => f.question && f.question.trim() && f.answer && f.answer.trim())
 
@@ -569,7 +638,7 @@ async function salvarConteudoCustomizado() {
     loja.value.metrics = validMetrics
     loja.value.faqs = validFaqs
 
-    feedbackStore.showSuccess('Conteúdo personalizado salvo com sucesso!')
+    feedbackStore.showSuccess('Dados e conteúdo da vitrine salvos com sucesso!')
   } catch (error) {
     console.error('Erro ao salvar conteúdo personalizado:', error)
     const msg = error.response?.data?.error || error.message || 'Falha ao salvar conteúdo.'
@@ -595,6 +664,8 @@ onMounted(async () => {
     previewTheme.value = selectedTheme.value
     themeStore.applyTheme(selectedTheme.value, loja.value.id)
 
+    formName.value = loja.value.name || ''
+    formLogoPreview.value = loja.value.logo_url || ''
     formDescription.value = loja.value.description || ''
     formBio.value = loja.value.bio || ''
     if (loja.value.metrics && Array.isArray(loja.value.metrics) && loja.value.metrics.length > 0) {
@@ -602,12 +673,6 @@ onMounted(async () => {
     }
     if (loja.value.faqs && Array.isArray(loja.value.faqs) && loja.value.faqs.length > 0) {
       formFaqs.value = JSON.parse(JSON.stringify(loja.value.faqs))
-    } else {
-      formFaqs.value = [
-        { question: 'Como funciona o atendimento presencial ou online?', answer: 'Realizamos consultorias personalizadas tanto de forma 100% remota com flexibilidade de horários quanto presencialmente com agendamento prévio.' },
-        { question: 'Quais são as etapas do acompanhamento?', answer: 'Iniciamos com um diagnóstico inicial detalhado, mapeamento de necessidades e estruturação de um plano estratégico contínuo.' },
-        { question: 'Como faço para tirar dúvidas antes de contratar?', answer: 'Basta clicar no botão de atendimento pelo WhatsApp ou selecionar um dos nossos consultores para falar diretamente conosco.' }
-      ]
     }
   }
 
