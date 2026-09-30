@@ -387,11 +387,11 @@ const socialFooterVisible = computed(() => {
 })
 
 const themeBannerImage = computed(() => {
-  return currentTheme.value?.elements?.banner_image || null
+  return loja.value?.banner_image || currentTheme.value?.bannerImage || currentTheme.value?.banner_image || currentTheme.value?.elements?.banner_image || null
 })
 
 const themeSubtitle = computed(() => {
-  return loja.value?.description && loja.value.description.trim() ? loja.value.description : null
+  return loja.value?.subtitle || loja.value?.description || currentTheme.value?.subtitle || currentTheme.value?.elements?.subtitle || null
 })
 
 const isPremiumLayout = computed(() => {

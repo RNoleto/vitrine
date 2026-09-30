@@ -179,10 +179,10 @@
               </div>
             </div>
 
-            <!-- Subtítulo / Slogan da Vitrine -->
+            <!-- Descrição Curta da Vitrine -->
             <div class="space-y-1.5">
               <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
-                <i class="fa-solid fa-quote-left text-indigo-500"></i> Subtítulo / Descrição Curta da Vitrine:
+                <i class="fa-solid fa-quote-left text-indigo-500"></i> Descrição Curta / Tagline da Vitrine:
               </label>
               <input 
                 v-model="formDescription" 
@@ -190,6 +190,32 @@
                 class="w-full p-2.5 border border-gray-300 rounded-xl text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
               />
               <span class="text-[10px] text-gray-400">Exibido no cabeçalho da vitrine abaixo do nome.</span>
+            </div>
+
+            <!-- Subtítulo / Slogan Personalizado -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                <i class="fa-solid fa-heading text-indigo-500"></i> Subtítulo / Slogan Personalizado do Tema:
+              </label>
+              <input 
+                v-model="formSubtitle" 
+                placeholder="Ex: Soluções jurídicas preventivas e atendimento estratégico personalizado" 
+                class="w-full p-2.5 border border-gray-300 rounded-xl text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
+              />
+              <span class="text-[10px] text-gray-400">Sobrescreve o subtítulo modelo do tema. Deixe em branco para usar o padrão do tema.</span>
+            </div>
+
+            <!-- Banner de Imagem Destaque -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                <i class="fa-solid fa-panorama text-indigo-500"></i> Banner de Imagem Destaque (URL de Imagem / Produto):
+              </label>
+              <input 
+                v-model="formBannerImage" 
+                placeholder="Ex: https://images.unsplash.com/... (URL de imagem em destaque)" 
+                class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all"
+              />
+              <span class="text-[10px] text-gray-400">URL da imagem de capa/destaque da sua vitrine. Sobrescreve a imagem modelo do tema.</span>
             </div>
 
             <!-- 1. Biografia / Sobre mim -->
@@ -513,7 +539,7 @@
                 />
                 <h3 class="text-lg font-bold leading-tight" style="color: var(--color-text);">{{ formName || loja.name }}</h3>
                 <p class="text-xs opacity-80 max-w-[220px] mt-1 leading-snug" style="color: var(--color-text);">
-                  {{ formDescription || loja.description || 'Sua vitrine digital com links e atendimento personalizado.' }}
+                  {{ formSubtitle || loja.subtitle || formDescription || loja.description || activeThemeObj?.subtitle || 'Sua vitrine digital com links e atendimento personalizado.' }}
                 </p>
               </div>
 
@@ -558,6 +584,15 @@
                     <div class="text-[8px] uppercase opacity-70 truncate">{{ metric.label || '-' }}</div>
                   </div>
                 </div>
+              </div>
+
+              <!-- Banner Destaque no Mockup em Tempo Real -->
+              <div v-if="formBannerImage || loja.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" class="rounded-xl overflow-hidden shadow-xs border border-white/20 my-2.5">
+                <img 
+                  :src="formBannerImage || loja.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" 
+                  alt="Banner Destaque" 
+                  class="w-full h-24 object-cover" 
+                />
               </div>
 
               <!-- Rodapé de Redes Sociais no Mockup em Tempo Real -->
@@ -738,6 +773,8 @@ const formName = ref('')
 const formLogoBase64 = ref(null)
 const formLogoPreview = ref('')
 const formDescription = ref('')
+const formSubtitle = ref('')
+const formBannerImage = ref('')
 const formBio = ref('')
 const formMetrics = ref([
   { value: '+500', label: 'Clientes' },
@@ -850,6 +887,8 @@ async function salvarConteudoCustomizado() {
 
     await lojaStore.atualizarConteudoCustomizado(loja.value.id, {
       description: formDescription.value,
+      subtitle: formSubtitle.value,
+      banner_image: formBannerImage.value,
       bio: formBio.value,
       metrics: validMetrics,
       faqs: validFaqs,
@@ -858,6 +897,8 @@ async function salvarConteudoCustomizado() {
     })
 
     loja.value.description = formDescription.value
+    loja.value.subtitle = formSubtitle.value
+    loja.value.banner_image = formBannerImage.value
     loja.value.bio = formBio.value
     loja.value.metrics = validMetrics
     loja.value.faqs = validFaqs
@@ -893,6 +934,8 @@ onMounted(async () => {
     formName.value = loja.value.name || ''
     formLogoPreview.value = loja.value.logo_url || ''
     formDescription.value = loja.value.description || ''
+    formSubtitle.value = loja.value.subtitle || ''
+    formBannerImage.value = loja.value.banner_image || ''
     formBio.value = loja.value.bio || ''
     formLinks.value = JSON.parse(JSON.stringify(loja.value.links || []))
     formShowSocialFooter.value = loja.value.show_social_footer !== 0 && loja.value.show_social_footer !== false

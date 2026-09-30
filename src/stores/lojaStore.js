@@ -243,11 +243,13 @@ export const useLojaStore = defineStore('loja', {
       }
     },
 
-    async atualizarConteudoCustomizado(id, { description, bio, metrics, faqs, social_networks, show_social_footer }) {
+    async atualizarConteudoCustomizado(id, { description, subtitle, banner_image, bio, metrics, faqs, social_networks, show_social_footer }) {
       this.carregando = true;
       try {
         const { data } = await api.patch(`/stores/${id}/custom-content`, { 
           description,
+          subtitle,
+          banner_image,
           bio, 
           metrics, 
           faqs,
@@ -258,6 +260,8 @@ export const useLojaStore = defineStore('loja', {
         const index = this.lojas.findIndex(l => l.id === id);
         if (index !== -1) {
           this.lojas[index].description = data.description;
+          this.lojas[index].subtitle = data.subtitle;
+          this.lojas[index].banner_image = data.banner_image;
           this.lojas[index].bio = data.bio;
           this.lojas[index].metrics = data.metrics;
           this.lojas[index].faqs = data.faqs;
