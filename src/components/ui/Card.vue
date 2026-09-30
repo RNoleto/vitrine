@@ -127,11 +127,10 @@ const iconWrapperStyleObj = computed(() => {
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  background: var(--color-foreground);
   text-align: left;
   padding: 0.65rem 1rem;
-  border: 1px solid var(--color-accent);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-width: 1.5px;
+  border-style: solid;
   border-radius: 9999px;
   margin-bottom: 0.85rem;
   text-decoration: none;
