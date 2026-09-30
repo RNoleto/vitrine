@@ -120,29 +120,16 @@ const iconWrapperStyleObj = computed(() => {
   }
 })
 
-const componentTag = computed(() => {
-  if (props.link) {
-    return props.internal ? 'RouterLink' : 'a'
-  }
-  return 'button'
-})
-
-const tagProps = computed(() => {
-  if (props.link) {
-    return props.internal ? { to: props.link } : { href: props.link, target: '_blank', rel: 'noopener noreferrer' }
-  }
-  return { type: 'button' }
-})
-
 function handleClick(e) {
   emit('click', e)
 }
 </script>
 
 <template>
-  <component
-    :is="componentTag"
-    v-bind="tagProps"
+  <!-- Link Interno (RouterLink) -->
+  <RouterLink
+    v-if="link && internal"
+    :to="link"
     :class="['vitrine-button', `card-style-${resolvedCardStyle}`, btnShapeClass, btnShadowClass]"
     :style="buttonStyleObj"
     @click="handleClick"
@@ -161,7 +148,59 @@ function handleClick(e) {
     <div v-if="showArrow" class="arrow-wrapper">
       <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);" />
     </div>
-  </component>
+  </RouterLink>
+
+  <!-- Link Externo (a) -->
+  <a
+    v-else-if="link && !internal"
+    :href="link"
+    target="_blank"
+    rel="noopener noreferrer"
+    :class="['vitrine-button', `card-style-${resolvedCardStyle}`, btnShapeClass, btnShadowClass]"
+    :style="buttonStyleObj"
+    @click="handleClick"
+  >
+    <div class="icon-wrapper" :style="iconWrapperStyleObj">
+      <img v-if="photo" :src="photo" alt="Foto" class="photo" />
+      <i v-else-if="icon" :class="icon" class="icon" style="color: var(--color-accent);" />
+      <i v-else class="fa-solid fa-link icon opacity-50" style="color: var(--color-accent);" />
+    </div>
+
+    <div class="button-content flex-1 min-w-0">
+      <p class="button-title" style="color: var(--color-text);">{{ text }}</p>
+      <span v-if="subtitle" class="button-subtitle" style="color: var(--color-text);">{{ subtitle }}</span>
+    </div>
+
+    <div v-if="showArrow" class="arrow-wrapper">
+      <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);" />
+    </div>
+  </a>
+
+  <!-- Botão Interativo / Div (Click Handler) -->
+  <div
+    v-else
+    role="button"
+    tabindex="0"
+    :class="['vitrine-button', `card-style-${resolvedCardStyle}`, btnShapeClass, btnShadowClass]"
+    :style="buttonStyleObj"
+    @click="handleClick"
+    @keydown.enter="handleClick"
+  >
+    <div class="icon-wrapper" :style="iconWrapperStyleObj">
+      <img v-if="photo" :src="photo" alt="Foto" class="photo" />
+      <i v-else-if="icon" :class="icon" class="icon" style="color: var(--color-accent);" />
+      <i v-else class="fa-solid fa-link icon opacity-50" style="color: var(--color-accent);" />
+    </div>
+
+    <div class="button-content flex-1 min-w-0">
+      <p class="button-title" style="color: var(--color-text);">{{ text }}</p>
+      <span v-if="subtitle" class="button-subtitle" style="color: var(--color-text);">{{ subtitle }}</span>
+    </div>
+
+    <div v-if="showArrow" class="arrow-wrapper">
+      <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);" />
+    </div>
+  </div>
 </template>
 
 <style scoped>
