@@ -1265,8 +1265,8 @@ onMounted(async () => {
                   class="p-2.5 flex items-center justify-between border transition-all"
                   :class="[computedBtnShapeClass, computedBtnShadowClass]"
                   :style="{
-                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.2)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
-                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.35)' : primaryColor),
+                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 45%, transparent)` : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
+                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? `color-mix(in srgb, ${accentColor} 80%, transparent)` : primaryColor),
                     color: textColor,
                     backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
                   }"
@@ -1275,8 +1275,8 @@ onMounted(async () => {
                     <div 
                       class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all" 
                       :style="{
-                        background: cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.08)',
-                        border: cardStyle === 'glass' ? '1px solid rgba(255, 255, 255, 0.4)' : 'none',
+                        background: cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 65%, transparent)` : 'rgba(0, 0, 0, 0.08)',
+                        border: cardStyle === 'glass' ? `1px solid ${accentColor}` : 'none',
                         color: accentColor
                       }"
                     >
@@ -1291,8 +1291,8 @@ onMounted(async () => {
                   class="p-2.5 flex items-center justify-between border transition-all"
                   :class="[computedBtnShapeClass, computedBtnShadowClass]"
                   :style="{
-                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.2)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
-                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.35)' : primaryColor),
+                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 45%, transparent)` : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
+                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? `color-mix(in srgb, ${accentColor} 80%, transparent)` : primaryColor),
                     color: textColor,
                     backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
                   }"
@@ -1301,8 +1301,8 @@ onMounted(async () => {
                     <div 
                       class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all" 
                       :style="{
-                        background: cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.08)',
-                        border: cardStyle === 'glass' ? '1px solid rgba(255, 255, 255, 0.4)' : 'none',
+                        background: cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 65%, transparent)` : 'rgba(0, 0, 0, 0.08)',
+                        border: cardStyle === 'glass' ? `1px solid ${accentColor}` : 'none',
                         color: accentColor
                       }"
                     >
@@ -1318,7 +1318,7 @@ onMounted(async () => {
                   class="p-2.5 border flex items-center justify-between transition-all"
                   :class="[computedBtnShapeClass, computedBtnShadowClass]"
                   :style="{
-                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
+                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 45%, transparent)` : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
                     borderColor: accentColor,
                     color: textColor,
                     backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')

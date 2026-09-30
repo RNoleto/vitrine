@@ -150,17 +150,17 @@ const btnShadowClass = computed(() => {
 
 /* 3. Vidro Translúcido (Glassmorphism) */
 .card.card-style-glass {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: color-mix(in srgb, var(--color-foreground) 45%, transparent) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border: 1.5px solid color-mix(in srgb, var(--color-accent) 80%, transparent) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 }
 
 /* Harmonização dos Ícones conforme o efeito do cartão */
 .card.card-style-glass .icon-wrapper {
-  background: rgba(255, 255, 255, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: color-mix(in srgb, var(--color-foreground) 65%, transparent) !important;
+  border: 1px solid var(--color-accent) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
 }
