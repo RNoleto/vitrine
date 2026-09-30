@@ -648,49 +648,14 @@
 
               <!-- Links Mockup Cards (Real-Time Reactive to formLinks) -->
               <div class="space-y-2 mb-4">
-                <div 
+                <VitrineButton 
                   v-for="(link, lIdx) in (formLinks && formLinks.length ? formLinks : (loja?.links && loja?.links.length ? loja.links : [{ texto: 'Nosso Site Oficial', icone: 'fa-solid fa-globe' }, { texto: 'Atendimento WhatsApp', icone: 'fa-brands fa-whatsapp' }]))" 
                   :key="lIdx"
-                  class="flex items-center gap-2.5 p-2.5 border text-left text-xs font-semibold transition-all"
-                  :class="[btnShapeClass, btnShadowClass]"
-                  :style="{
-                    background: (activeThemeObj?.btnShape || activeThemeObj?.btn_shape) === 'outline' 
-                      ? 'transparent' 
-                      : (((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
-                        ? 'color-mix(in srgb, var(--color-foreground) 45%, transparent)' 
-                        : ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'gold-bordered' 
-                          ? 'linear-gradient(135deg, var(--color-foreground), var(--color-background))' 
-                          : 'var(--color-foreground)')),
-                    borderColor: 'var(--color-accent)',
-                    color: 'var(--color-text)',
-                    backdropFilter: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
-                      ? `blur(${activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 12}px)` 
-                      : 'none',
-                    WebkitBackdropFilter: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
-                      ? `blur(${activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 12}px)` 
-                      : 'none'
-                  }"
-                >
-                  <div 
-                    class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all" 
-                    :style="{
-                      background: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
-                        ? 'color-mix(in srgb, var(--color-foreground) 65%, transparent)' 
-                        : 'var(--color-background-solid, var(--color-background))',
-                      border: '1px solid var(--color-accent)',
-                      backdropFilter: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
-                        ? 'blur(8px)' 
-                        : 'none',
-                      WebkitBackdropFilter: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
-                        ? 'blur(8px)' 
-                        : 'none'
-                    }"
-                  >
-                    <i :class="link.icone || 'fa-solid fa-link'" class="text-xs" style="color: var(--color-accent);"></i>
-                  </div>
-                  <span class="flex-1 truncate">{{ link.texto }}</span>
-                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60" style="color: var(--color-accent);"></i>
-                </div>
+                  :text="link.texto"
+                  :icon="link.icone"
+                  :show-arrow="true"
+                  :theme="activeThemeObj"
+                />
               </div>
 
               <!-- Features & Content Preview (Real-Time Reactive to formBio & formMetrics) -->
@@ -773,6 +738,7 @@ import { useContactStore } from '../../stores/contactStore'
 import { useThemeStore } from '../../stores/themeStore'
 import { useFeedbackStore } from '../../stores/feedbackStore'
 import Loading from '../ui/Loading.vue'
+import VitrineButton from '../ui/VitrineButton.vue'
 
 const route = useRoute()
 const router = useRouter()

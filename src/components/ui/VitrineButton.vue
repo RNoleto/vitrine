@@ -16,41 +16,59 @@ const props = defineProps({
   cardStyle: {
     type: String,
     default: null
+  },
+  theme: {
+    type: Object,
+    default: null
   }
-});
+})
+
+const emit = defineEmits(['click'])
 
 const themeStore = useThemeStore()
 
-const currentCardStyle = computed(() => {
+// Resolve o tema ativo (prop customizada ou themeStore)
+const activeTheme = computed(() => {
+  return props.theme || themeStore.currentThemeObject || {}
+})
+
+// Estilo do Card (flat, gradient, glass, etc)
+const resolvedCardStyle = computed(() => {
   if (props.cardStyle) return props.cardStyle
-  const theme = themeStore.currentThemeObject
+  const theme = activeTheme.value
   const blur = theme?.backdropBlur !== undefined ? Number(theme.backdropBlur) : (theme?.backdrop_blur !== undefined ? Number(theme.backdrop_blur) : 0)
   const style = theme?.cardStyle || theme?.card_style || 'flat'
   if (style === 'glass' || blur > 0) return 'glass'
   return style
 })
 
-const currentBlur = computed(() => {
-  const theme = themeStore.currentThemeObject
+// Blur de backdrop
+const resolvedBlur = computed(() => {
+  const theme = activeTheme.value
   const blur = theme?.backdropBlur !== undefined ? Number(theme.backdropBlur) : (theme?.backdrop_blur !== undefined ? Number(theme.backdrop_blur) : 0)
   return blur > 0 ? blur : 12
 })
 
-const btnShapeClass = computed(() => {
-  const shape = themeStore.currentThemeObject?.btnShape || themeStore.currentThemeObject?.btn_shape || 'pill'
-  return `btn-shape-${shape}`
+// Formato do botão (pill, rounded, square, wavy, outline)
+const btnShape = computed(() => {
+  const theme = activeTheme.value
+  return theme?.btnShape || theme?.btn_shape || 'pill'
 })
 
+const btnShapeClass = computed(() => `btn-shape-${btnShape.value}`)
+
+// Sombra do botão (none, soft, medium, hard, glow)
 const btnShadowClass = computed(() => {
-  const shadow = themeStore.currentThemeObject?.btnShadow || themeStore.currentThemeObject?.btn_shadow || 'soft'
+  const theme = activeTheme.value
+  const shadow = theme?.btnShadow || theme?.btn_shadow || 'soft'
   return `btn-shadow-${shadow}`
 })
 
-const cardStyleObj = computed(() => {
-  const shape = themeStore.currentThemeObject?.btnShape || themeStore.currentThemeObject?.btn_shape || 'pill'
-  const isOutline = shape === 'outline'
-  const isGlass = currentCardStyle.value === 'glass'
-  const isGradient = currentCardStyle.value === 'gold-bordered' || currentCardStyle.value === 'gradient'
+// Objeto de estilos dinâmicos para o botão container
+const buttonStyleObj = computed(() => {
+  const isOutline = btnShape.value === 'outline'
+  const isGlass = resolvedCardStyle.value === 'glass'
+  const isGradient = resolvedCardStyle.value === 'gold-bordered' || resolvedCardStyle.value === 'gradient'
 
   let bg = 'var(--color-foreground)'
   if (isOutline) {
@@ -68,7 +86,7 @@ const cardStyleObj = computed(() => {
 
   let filter = 'none'
   if (isGlass) {
-    filter = `blur(${currentBlur.value}px)`
+    filter = `blur(${resolvedBlur.value}px)`
   }
 
   return {
@@ -80,8 +98,9 @@ const cardStyleObj = computed(() => {
   }
 })
 
+// Objeto de estilos dinâmicos para a bolinha do ícone
 const iconWrapperStyleObj = computed(() => {
-  const isGlass = currentCardStyle.value === 'glass'
+  const isGlass = resolvedCardStyle.value === 'glass'
 
   let bg = 'var(--color-background-solid, var(--color-background))'
   if (isGlass) {
@@ -100,140 +119,132 @@ const iconWrapperStyleObj = computed(() => {
     WebkitBackdropFilter: filter
   }
 })
+
+const componentTag = computed(() => {
+  if (props.link) {
+    return props.internal ? 'RouterLink' : 'a'
+  }
+  return 'button'
+})
+
+const tagProps = computed(() => {
+  if (props.link) {
+    return props.internal ? { to: props.link } : { href: props.link, target: '_blank', rel: 'noopener noreferrer' }
+  }
+  return { type: 'button' }
+})
+
+function handleClick(e) {
+  emit('click', e)
+}
 </script>
 
 <template>
-  <component :is="internal ? 'RouterLink' : 'a'"
-    v-bind="internal ? { to: link } : { href: link, target: '_blank', rel: 'noopener noreferrer' }" 
-    :class="['card', `card-style-${currentCardStyle}`, btnShapeClass, btnShadowClass]"
-    :style="cardStyleObj">
+  <component
+    :is="componentTag"
+    v-bind="tagProps"
+    :class="['vitrine-button', `card-style-${resolvedCardStyle}`, btnShapeClass, btnShadowClass]"
+    :style="buttonStyleObj"
+    @click="handleClick"
+  >
     <div class="icon-wrapper" :style="iconWrapperStyleObj">
       <img v-if="photo" :src="photo" alt="Foto" class="photo" />
       <i v-else-if="icon" :class="icon" class="icon" style="color: var(--color-accent);" />
       <i v-else class="fa-solid fa-link icon opacity-50" style="color: var(--color-accent);" />
     </div>
-    <div class="card-content flex-1 min-w-0">
-      <p class="card-title" style="color: var(--color-text);">{{ text }}</p>
-      <span v-if="subtitle" class="card-subtitle" style="color: var(--color-text);">{{ subtitle }}</span>
+
+    <div class="button-content flex-1 min-w-0">
+      <p class="button-title" style="color: var(--color-text);">{{ text }}</p>
+      <span v-if="subtitle" class="button-subtitle" style="color: var(--color-text);">{{ subtitle }}</span>
     </div>
+
     <div v-if="showArrow" class="arrow-wrapper">
-      <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);"></i>
+      <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);" />
     </div>
   </component>
 </template>
 
 <style scoped>
-.card {
+.vitrine-button {
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  background: var(--color-foreground);
+  width: 100%;
   text-align: left;
   padding: 0.65rem 1rem;
-  border: 1px solid var(--color-accent);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-radius: 9999px;
+  border-width: 1.5px;
+  border-style: solid;
   margin-bottom: 0.85rem;
   text-decoration: none;
-  color: inherit;
   transition: all 0.25s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Button Shapes */
-.card.btn-shape-pill {
-  border-radius: 9999px !important;
+.btn-shape-pill {
+  border-radius: 9999px;
 }
 
-.card.btn-shape-rounded {
-  border-radius: 1rem !important;
+.btn-shape-rounded {
+  border-radius: 1rem;
 }
 
-.card.btn-shape-square {
-  border-radius: 0px !important;
+.btn-shape-square {
+  border-radius: 0px;
 }
 
-.card.btn-shape-wavy {
-  border-radius: 1.25rem !important;
+.btn-shape-wavy {
+  border-radius: 1.25rem;
   clip-path: polygon(
     0% 4px, 4% 0px, 8% 4px, 12% 0px, 16% 4px, 20% 0px, 24% 4px, 28% 0px, 32% 4px, 36% 0px, 40% 4px, 44% 0px, 48% 4px, 52% 0px, 56% 4px, 60% 0px, 64% 4px, 68% 0px, 72% 4px, 76% 0px, 80% 4px, 84% 0px, 88% 4px, 92% 0px, 96% 4px, 100% 0px,
     100% calc(100% - 4px), 96% 100%, 92% calc(100% - 4px), 88% 100%, 84% calc(100% - 4px), 80% 100%, 76% calc(100% - 4px), 72% 100%, 68% calc(100% - 4px), 64% 100%, 60% calc(100% - 4px), 56% 100%, 52% calc(100% - 4px), 48% 100%, 44% calc(100% - 4px), 40% 100%, 36% calc(100% - 4px), 32% 100%, 28% calc(100% - 4px), 24% 100%, 20% calc(100% - 4px), 16% 100%, 12% calc(100% - 4px), 8% 100%, 4% calc(100% - 4px), 0% 100%
-  ) !important;
+  );
 }
 
-.card.btn-shape-outline {
+.btn-shape-outline {
   background: transparent !important;
-  border: 2px solid var(--color-primary) !important;
 }
 
 /* Button Shadows */
-.card.btn-shadow-none {
-  box-shadow: none !important;
+.btn-shadow-none {
+  box-shadow: none;
 }
 
-.card.btn-shadow-soft {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+.btn-shadow-soft {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-.card.btn-shadow-medium {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+.btn-shadow-medium {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.card.btn-shadow-hard {
-  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.9) !important;
+.btn-shadow-hard {
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.9);
 }
 
-.card.btn-shadow-glow {
-  box-shadow: 0 0 18px rgba(99, 102, 241, 0.45) !important;
+.btn-shadow-glow {
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.45);
 }
 
-/* Card Style Variations */
-/* 1. Cor Sólida (Flat / Solid) */
-.card.card-style-flat, .card.card-style-solid {
-  background: var(--color-foreground) !important;
-  border: 1.5px solid var(--color-accent) !important;
+/* Efeitos Especiais de Camada */
+.card-style-gold-bordered,
+.card-style-gradient {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
-/* 2. Gradiente Nobre (Gold Bordered / Gradient) */
-.card.card-style-gold-bordered, .card.card-style-gradient {
-  border: 1.5px solid var(--color-accent) !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
-  background: linear-gradient(135deg, var(--color-foreground), var(--color-background)) !important;
+.card-style-glass {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-/* 3. Vidro Translúcido (Glassmorphism) */
-.card.card-style-glass {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
-}
-
-.card.card-style-gold-bordered .icon-wrapper,
-.card.card-style-gradient .icon-wrapper,
-.card.card-style-flat .icon-wrapper,
-.card.card-style-solid .icon-wrapper {
-  background: var(--color-background-solid, var(--color-background)) !important;
-  border: 1px solid var(--color-accent) !important;
-}
-
-.card:hover {
+.vitrine-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border-color: var(--color-primary);
 }
 
-.card:hover .icon-wrapper {
-  background: var(--color-accent);
-  color: var(--color-accent-text);
-  transition: background 0.3s ease;
-}
-
-.card:hover .icon {
-  color: var(--color-accent-text);
-}
-
-.card:hover .arrow-icon {
-  color: var(--color-accent);
+.vitrine-button:hover .arrow-icon {
   transform: translateX(3px);
 }
 
@@ -241,7 +252,6 @@ const iconWrapperStyleObj = computed(() => {
   width: 42px;
   height: 42px;
   min-width: 42px;
-  background: var(--color-background-solid, var(--color-background));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -252,7 +262,6 @@ const iconWrapperStyleObj = computed(() => {
 
 .icon-wrapper .icon {
   font-size: 18px;
-  color: var(--color-accent);
 }
 
 .photo {
@@ -262,20 +271,18 @@ const iconWrapperStyleObj = computed(() => {
   border-radius: 50%;
 }
 
-.card-content {
+.button-content {
   display: flex;
   flex-direction: column;
 }
 
-.card-title {
-  color: var(--color-text);
+.button-title {
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1.3;
 }
 
-.card-subtitle {
-  color: var(--color-text);
+.button-subtitle {
   opacity: 0.75;
   font-size: 0.75rem;
   margin-top: 1px;
@@ -289,9 +296,7 @@ const iconWrapperStyleObj = computed(() => {
 
 .arrow-icon {
   font-size: 16px;
-  color: var(--color-accent);
   opacity: 0.8;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 </style>
-

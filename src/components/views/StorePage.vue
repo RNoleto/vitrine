@@ -43,7 +43,7 @@
               ✨ Links em Destaque
             </h2>
             <div v-for="(link, index) in loja.links" :key="index">
-              <Card 
+              <VitrineButton 
                 :text="link.texto" 
                 :icon="link.icone" 
                 :show-arrow="true"
@@ -55,7 +55,7 @@
 
           <!-- Contacts Cards -->
           <div v-if="contatos.length === 1" class="pt-1">
-            <Card 
+            <VitrineButton 
               :text="contatos[0].name" 
               :photo="contatos[0].photo" 
               subtitle="Atendimento direto via WhatsApp"
@@ -64,7 +64,7 @@
             />
           </div>
           <div v-else-if="contatos.length > 1" class="pt-1">
-            <Card 
+            <VitrineButton 
               text="Fale com a nossa equipe de especialistas" 
               icon="fa-solid fa-headset" 
               subtitle="Equipe disponível para atendimento"
@@ -228,7 +228,7 @@
           <!-- Links da vitrine -->
           <div v-if="loja.links && loja.links.length" class="space-y-3">
             <div v-for="(link, index) in loja.links" :key="index">
-              <Card 
+              <VitrineButton 
                 :text="link.texto" 
                 :icon="link.icone" 
                 :show-arrow="true"
@@ -240,7 +240,7 @@
 
           <!-- Contatos -->
           <div v-if="contatos.length === 1" class="pt-1">
-            <Card 
+            <VitrineButton 
               :text="contatos[0].name" 
               :photo="contatos[0].photo" 
               subtitle="Atendimento direto via WhatsApp"
@@ -249,7 +249,7 @@
             />
           </div>
           <div v-else-if="contatos.length > 1" class="pt-1">
-            <Card 
+            <VitrineButton 
               text="Fale com a nossa equipe de especialistas" 
               icon="fa-solid fa-headset" 
               subtitle="Equipe disponível para atendimento"
@@ -393,7 +393,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useThemeStore } from '../../stores/themeStore'
 import Loading from '../ui/Loading.vue'
-import Card from '../ui/Card.vue'
+import VitrineButton from '../ui/VitrineButton.vue'
 import Footer from '../Footer.vue'
 
 const themeStore = useThemeStore()

@@ -6,7 +6,7 @@ import { useContactStore } from '../../stores/contactStore'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useThemeStore } from '../../stores/themeStore'
 import Loading from '../ui/Loading.vue'
-import Card from '../ui/Card.vue'
+import VitrineButton from '../ui/VitrineButton.vue'
 import Footer from '../Footer.vue'
 
 const route = useRoute()
@@ -80,7 +80,7 @@ onMounted(async () => {
             <Loading v-if="contactStore.carregando" text="" />
             <div v-if="contatos.length" class="space-y-3 mt-6">
               <div v-for="(c, i) in contatos" :key="i">
-                <Card 
+                <VitrineButton 
                   :photo="c.photo" 
                   :text="c.name" 
                   subtitle="Atendimento direto via WhatsApp"
