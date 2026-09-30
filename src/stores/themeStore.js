@@ -37,6 +37,18 @@ export function getContrastColor(hexColor) {
   return yiq >= 128 ? '#1F2937' : '#FFFFFF';
 }
 
+export function hexToRgbaStr(hex, alpha = 0.45) {
+  if (!hex || typeof hex !== 'string') return `rgba(255, 255, 255, ${alpha})`
+  if (hex.startsWith('rgba') || hex.startsWith('rgb')) return hex
+  let c = hex.replace('#', '')
+  if (c.length === 3) c = c.split('').map(x => x + x).join('')
+  if (c.length !== 6) return `rgba(255, 255, 255, ${alpha})`
+  const r = parseInt(c.substring(0, 2), 16)
+  const g = parseInt(c.substring(2, 4), 16)
+  const b = parseInt(c.substring(4, 6), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 export const PRESET_THEMES = []
 
 export const useThemeStore = defineStore('theme', {
@@ -203,12 +215,15 @@ export const useThemeStore = defineStore('theme', {
           --color-background: ${theme.colors?.background || '#FAFAFA'};
           --color-background-solid: ${solidBg};
           --color-foreground: ${fg};
+          --color-foreground-glass: ${hexToRgbaStr(fg, 0.45)};
+          --color-icon-glass: ${hexToRgbaStr(fg, 0.65)};
           --color-primary: ${primary};
           --color-primary-text: ${primaryText};
           --color-accent: ${accent};
           --color-accent-text: ${accentText};
           --color-text: ${text};
           --backdrop-blur: ${blur};
+          --card-backdrop-blur: ${(theme.backdropBlur || (theme.cardStyle === 'glass' ? 12 : 0)) + 'px'};
           font-family: ${fontCss};
         }
 
