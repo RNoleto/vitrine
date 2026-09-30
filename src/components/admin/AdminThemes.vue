@@ -1270,8 +1270,7 @@ onMounted(async () => {
                 >
                   <div class="flex items-center gap-2.5">
                     <div 
-                      class="w-6 h-6 flex items-center justify-center bg-black/10" 
-                      :class="computedAvatarShapeClass"
+                      class="w-6 h-6 rounded-full flex items-center justify-center bg-black/10" 
                       :style="{ color: accentColor }"
                     >
                       <i class="fa-solid fa-calendar-check text-xs"></i>
@@ -1293,8 +1292,7 @@ onMounted(async () => {
                 >
                   <div class="flex items-center gap-2.5">
                     <div 
-                      class="w-6 h-6 flex items-center justify-center bg-black/10" 
-                      :class="computedAvatarShapeClass"
+                      class="w-6 h-6 rounded-full flex items-center justify-center bg-black/10" 
                       :style="{ color: accentColor }"
                     >
                       <i class="fa-solid fa-scale-balanced text-xs"></i>
@@ -1317,8 +1315,7 @@ onMounted(async () => {
                 >
                   <div class="flex items-center gap-2.5 text-left">
                     <div 
-                      class="w-7 h-7 flex items-center justify-center text-white text-xs font-bold shadow-xs"
-                      :class="computedAvatarShapeClass"
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-xs"
                       :style="{ background: primaryColor }"
                     >
                       <i class="fa-brands fa-whatsapp"></i>
