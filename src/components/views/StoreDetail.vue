@@ -206,10 +206,10 @@
             </div>
 
             <!-- Banner de Imagem Destaque -->
-            <div class="space-y-1.5 p-3 bg-gray-50 border border-gray-200 rounded-xl">
+            <div class="space-y-3 p-4 bg-gray-50 border border-gray-200 rounded-2xl">
               <div class="flex items-center justify-between">
-                <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
-                  <i class="fa-solid fa-panorama text-indigo-500"></i> Banner de Imagem Destaque (URL de Imagem / Produto):
+                <label class="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                  <i class="fa-solid fa-panorama text-indigo-600"></i> Banner de Imagem Destaque
                 </label>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" v-model="formShowBanner" class="sr-only peer">
@@ -219,13 +219,96 @@
                   </span>
                 </label>
               </div>
-              <div v-if="formShowBanner" class="pt-1.5 space-y-1">
-                <input 
-                  v-model="formBannerImage" 
-                  placeholder="Ex: https://images.unsplash.com/... (URL de imagem em destaque)" 
-                  class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono bg-white focus:ring-2 focus:ring-indigo-500 transition-all"
-                />
-                <span class="text-[10px] text-gray-400">URL da imagem de capa/destaque da sua vitrine. Sobrescreve a imagem modelo do tema.</span>
+
+              <div v-if="formShowBanner" class="pt-2 space-y-3 border-t border-gray-200/80">
+                <!-- Abas de seleção: Upload de Arquivo vs URL Externa -->
+                <div class="flex items-center gap-2">
+                  <button 
+                    type="button"
+                    @click="bannerInputMode = 'file'" 
+                    :class="[
+                      'px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5',
+                      bannerInputMode === 'file' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                    ]"
+                  >
+                    <i class="fa-solid fa-upload text-[11px]"></i> Enviar Arquivo
+                  </button>
+                  <button 
+                    type="button"
+                    @click="bannerInputMode = 'url'" 
+                    :class="[
+                      'px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5',
+                      bannerInputMode === 'url' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                    ]"
+                  >
+                    <i class="fa-solid fa-link text-[11px]"></i> URL da Imagem
+                  </button>
+                </div>
+
+                <!-- Campo 1: Enviar Arquivo -->
+                <div v-if="bannerInputMode === 'file'" class="space-y-2">
+                  <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <label class="flex-1 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl transition-all cursor-pointer text-center border border-indigo-200 shadow-xs flex items-center justify-center gap-2 truncate">
+                      <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                      <span class="truncate">{{ formBannerFileName ? formBannerFileName : 'Escolher Imagem do Computador' }}</span>
+                      <input type="file" accept="image/jpeg,image/png,image/webp,image/jpg" class="hidden" @change="handleBannerFileChange" />
+                    </label>
+
+                    <button 
+                      v-if="formBannerImage || formBannerPreview" 
+                      type="button"
+                      @click="removerBannerPersonalizado" 
+                      class="px-3.5 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl border border-red-200 transition-all flex items-center justify-center gap-1.5 shrink-0"
+                    >
+                      <i class="fa-solid fa-trash-can text-xs"></i> Usar Padrão do Tema
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Campo 2: Inserir URL -->
+                <div v-else-if="bannerInputMode === 'url'" class="space-y-2">
+                  <div class="flex items-center gap-2">
+                    <input 
+                      v-model="formBannerImage" 
+                      @input="formBannerPreview = formBannerImage"
+                      placeholder="Ex: https://images.unsplash.com/... (URL de imagem)" 
+                      class="flex-1 p-2.5 border border-gray-300 rounded-xl text-xs font-mono bg-white focus:ring-2 focus:ring-indigo-500 transition-all"
+                    />
+                    <button 
+                      v-if="formBannerImage" 
+                      type="button"
+                      @click="removerBannerPersonalizado" 
+                      class="px-3 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl border border-red-200 transition-all flex items-center justify-center gap-1 shrink-0"
+                    >
+                      <i class="fa-solid fa-trash-can"></i> Limpar
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Pré-visualização do Banner (Personalizado ou Padrão do Tema) -->
+                <div class="relative rounded-xl overflow-hidden border border-gray-200 shadow-xs bg-gray-100 group">
+                  <img 
+                    :src="bannerImagePreviewUrl" 
+                    alt="Preview Banner" 
+                    class="w-full h-28 object-cover transition-all" 
+                  />
+                  <div class="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900/80 text-white backdrop-blur-xs flex items-center gap-1 shadow-sm">
+                    <i :class="(formBannerPreview || formBannerImage) ? 'fa-solid fa-image text-indigo-400' : 'fa-solid fa-wand-magic-sparkles text-amber-400'"></i>
+                    <span>{{ (formBannerPreview || formBannerImage) ? 'Imagem Personalizada' : 'Modelo Padrão do Tema' }}</span>
+                  </div>
+                </div>
+
+                <!-- Validações & Regras Explicativas -->
+                <div class="p-2.5 bg-indigo-50/70 border border-indigo-100 rounded-xl text-[11px] text-gray-600 space-y-1">
+                  <p class="font-bold text-indigo-900 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-info text-indigo-600"></i> Formatos & Limites:
+                  </p>
+                  <ul class="list-disc list-inside space-y-0.5 text-[10px] text-gray-500">
+                    <li>Formatos aceitos: <strong>JPG, PNG ou WEBP</strong> (Máximo: <strong>5 MB</strong>).</li>
+                    <li>Dimensão recomendada: <strong>1200 x 400px</strong> (proporção 3:1).</li>
+                    <li>Se nenhum arquivo ou URL for fornecido, o sistema exibirá automaticamente a <strong>imagem padrão do tema</strong>.</li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -607,9 +690,9 @@
               </div>
 
               <!-- Banner Destaque no Mockup em Tempo Real -->
-              <div v-if="showBannerComputed && (formBannerImage || loja?.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage)" class="rounded-xl overflow-hidden shadow-xs border border-white/20 my-2.5">
+              <div v-if="showBannerComputed && bannerImagePreviewUrl" class="rounded-xl overflow-hidden shadow-xs border border-white/20 my-2.5">
                 <img 
-                  :src="formBannerImage || loja?.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" 
+                  :src="bannerImagePreviewUrl" 
                   alt="Banner Destaque" 
                   class="w-full h-24 object-cover" 
                 />
@@ -765,6 +848,18 @@ const showBannerComputed = computed(() => {
   return loja.value?.show_banner !== 0 && loja.value?.show_banner !== false
 })
 
+const bannerImagePreviewUrl = computed(() => {
+  return (
+    formBannerPreview.value ||
+    formBannerImage.value ||
+    loja.value?.banner_image ||
+    activeThemeObj.value?.banner_image ||
+    activeThemeObj.value?.bannerImage ||
+    activeThemeObj.value?.elements?.banner_image ||
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1200&q=80'
+  )
+})
+
 const mockupSocialLinks = computed(() => {
   const filled = []
   const networks = formSocialNetworks.value || {}
@@ -833,6 +928,9 @@ const formLogoPreview = ref('')
 const formDescription = ref('')
 const formSubtitle = ref('')
 const formBannerImage = ref('')
+const formBannerPreview = ref('')
+const formBannerFileName = ref('')
+const bannerInputMode = ref('file') // 'file' | 'url'
 const formShowBanner = ref(true)
 const formBio = ref('')
 const formShowMetrics = ref(true)
@@ -871,6 +969,40 @@ function handleLogoChange(e) {
     formLogoPreview.value = event.target.result
   }
   reader.readAsDataURL(file)
+}
+
+function handleBannerFileChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+  if (!allowedTypes.includes(file.type)) {
+    feedbackStore.showError('Formato inválido! Por favor, selecione uma imagem no formato JPG, PNG ou WEBP.')
+    e.target.value = ''
+    return
+  }
+
+  const maxSizeInBytes = 5 * 1024 * 1024 // 5 MB
+  if (file.size > maxSizeInBytes) {
+    feedbackStore.showError('O arquivo ultrapassa o tamanho máximo permitido de 5 MB.')
+    e.target.value = ''
+    return
+  }
+
+  formBannerFileName.value = file.name
+
+  const reader = new FileReader()
+  reader.onload = (event) => {
+    formBannerPreview.value = event.target.result
+    formBannerImage.value = event.target.result
+  }
+  reader.readAsDataURL(file)
+}
+
+function removerBannerPersonalizado() {
+  formBannerImage.value = ''
+  formBannerPreview.value = ''
+  formBannerFileName.value = ''
 }
 
 function adicionarFaq() {
@@ -1000,6 +1132,13 @@ onMounted(async () => {
     formDescription.value = loja.value.description || ''
     formSubtitle.value = loja.value.subtitle || ''
     formBannerImage.value = loja.value.banner_image || ''
+    formBannerPreview.value = loja.value.banner_image || ''
+    if (loja.value.banner_image && loja.value.banner_image.startsWith('http')) {
+      bannerInputMode.value = 'url'
+    } else if (loja.value.banner_image && loja.value.banner_image.startsWith('data:')) {
+      bannerInputMode.value = 'file'
+      formBannerFileName.value = 'Imagem enviada'
+    }
     formShowBanner.value = loja.value.show_banner !== 0 && loja.value.show_banner !== false
     formBio.value = loja.value.bio || ''
     formShowMetrics.value = loja.value.show_metrics !== 0 && loja.value.show_metrics !== false

@@ -478,7 +478,13 @@ const themeBannerImage = computed(() => {
   if (loja.value?.show_banner === 0 || loja.value?.show_banner === false) {
     return null
   }
-  return loja.value?.banner_image || currentTheme.value?.bannerImage || currentTheme.value?.banner_image || currentTheme.value?.elements?.banner_image || null
+  return (
+    loja.value?.banner_image ||
+    currentTheme.value?.bannerImage ||
+    currentTheme.value?.banner_image ||
+    currentTheme.value?.elements?.banner_image ||
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1200&q=80'
+  )
 })
 
 const themeSubtitle = computed(() => {
