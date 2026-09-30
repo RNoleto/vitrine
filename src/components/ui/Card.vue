@@ -45,24 +45,79 @@ const btnShadowClass = computed(() => {
   const shadow = themeStore.currentThemeObject?.btnShadow || themeStore.currentThemeObject?.btn_shadow || 'soft'
   return `btn-shadow-${shadow}`
 })
+
+const cardStyleObj = computed(() => {
+  const shape = themeStore.currentThemeObject?.btnShape || themeStore.currentThemeObject?.btn_shape || 'pill'
+  const isOutline = shape === 'outline'
+  const isGlass = currentCardStyle.value === 'glass'
+  const isGradient = currentCardStyle.value === 'gold-bordered' || currentCardStyle.value === 'gradient'
+
+  let bg = 'var(--color-foreground)'
+  if (isOutline) {
+    bg = 'transparent'
+  } else if (isGlass) {
+    bg = 'color-mix(in srgb, var(--color-foreground) 45%, transparent)'
+  } else if (isGradient) {
+    bg = 'linear-gradient(135deg, var(--color-foreground), var(--color-background))'
+  }
+
+  let border = 'var(--color-accent)'
+  if (isOutline) {
+    border = 'var(--color-primary)'
+  }
+
+  let filter = 'none'
+  if (isGlass) {
+    filter = `blur(${currentBlur.value}px)`
+  }
+
+  return {
+    background: bg,
+    borderColor: border,
+    color: 'var(--color-text)',
+    backdropFilter: filter,
+    WebkitBackdropFilter: filter
+  }
+})
+
+const iconWrapperStyleObj = computed(() => {
+  const isGlass = currentCardStyle.value === 'glass'
+
+  let bg = 'var(--color-background-solid, var(--color-background))'
+  if (isGlass) {
+    bg = 'color-mix(in srgb, var(--color-foreground) 65%, transparent)'
+  }
+
+  let filter = 'none'
+  if (isGlass) {
+    filter = 'blur(8px)'
+  }
+
+  return {
+    background: bg,
+    border: '1px solid var(--color-accent)',
+    backdropFilter: filter,
+    WebkitBackdropFilter: filter
+  }
+})
 </script>
 
 <template>
   <component :is="internal ? 'RouterLink' : 'a'"
     v-bind="internal ? { to: link } : { href: link, target: '_blank', rel: 'noopener noreferrer' }" 
     :class="['card', `card-style-${currentCardStyle}`, btnShapeClass, btnShadowClass]"
-    :style="currentCardStyle === 'glass' ? { backdropFilter: `blur(${currentBlur}px)`, WebkitBackdropFilter: `blur(${currentBlur}px)` } : {}">
-    <div class="icon-wrapper">
+    :style="cardStyleObj">
+    <div class="icon-wrapper" :style="iconWrapperStyleObj">
       <img v-if="photo" :src="photo" alt="Foto" class="photo" />
-      <i v-else-if="icon" :class="icon" class="icon" />
-      <i v-else class="fa-solid fa-link icon opacity-50" />
+      <i v-else-if="icon" :class="icon" class="icon" style="color: var(--color-accent);" />
+      <i v-else class="fa-solid fa-link icon opacity-50" style="color: var(--color-accent);" />
     </div>
     <div class="card-content flex-1 min-w-0">
-      <p class="card-title">{{ text }}</p>
-      <span v-if="subtitle" class="card-subtitle">{{ subtitle }}</span>
+      <p class="card-title" style="color: var(--color-text);">{{ text }}</p>
+      <span v-if="subtitle" class="card-subtitle" style="color: var(--color-text);">{{ subtitle }}</span>
     </div>
     <div v-if="showArrow" class="arrow-wrapper">
-      <i class="fa-solid fa-circle-chevron-right arrow-icon"></i>
+      <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);"></i>
     </div>
   </component>
 </template>
@@ -150,19 +205,7 @@ const btnShadowClass = computed(() => {
 
 /* 3. Vidro Translúcido (Glassmorphism) */
 .card.card-style-glass {
-  background: color-mix(in srgb, var(--color-foreground) 45%, transparent) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1.5px solid color-mix(in srgb, var(--color-accent) 80%, transparent) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
-}
-
-/* Harmonização dos Ícones conforme o efeito do cartão */
-.card.card-style-glass .icon-wrapper {
-  background: color-mix(in srgb, var(--color-foreground) 65%, transparent) !important;
-  border: 1px solid var(--color-accent) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 .card.card-style-gold-bordered .icon-wrapper,
