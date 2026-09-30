@@ -552,10 +552,10 @@
                 </p>
               </div>
 
-              <!-- Links Mockup Cards -->
+              <!-- Links Mockup Cards (Real-Time Reactive to formLinks) -->
               <div class="space-y-2 mb-4">
                 <div 
-                  v-for="(link, lIdx) in (loja.links && loja.links.length ? loja.links : [{ texto: 'Nosso Site Oficial', icone: 'fa-solid fa-globe' }, { texto: 'Atendimento WhatsApp', icone: 'fa-brands fa-whatsapp' }])" 
+                  v-for="(link, lIdx) in (formLinks && formLinks.length ? formLinks : (loja?.links && loja?.links.length ? loja.links : [{ texto: 'Nosso Site Oficial', icone: 'fa-solid fa-globe' }, { texto: 'Atendimento WhatsApp', icone: 'fa-brands fa-whatsapp' }]))" 
                   :key="lIdx"
                   class="flex items-center gap-2.5 p-2.5 border text-left text-xs font-semibold transition-all"
                   :class="[btnShapeClass, btnShadowClass]"
@@ -569,15 +569,15 @@
                 </div>
               </div>
 
-              <!-- Premium Landing Page Features Preview -->
-              <div v-if="['portrait-hero', 'landing-page'].includes(activeThemeObj?.layoutStyle)" class="space-y-3 pt-2 text-left">
+              <!-- Features & Content Preview (Real-Time Reactive to formBio & formMetrics) -->
+              <div class="space-y-3 pt-2 text-left">
                 <!-- Sobre Mim Block -->
-                <div class="p-3 rounded-xl border text-xs space-y-1" style="background: var(--color-foreground); border-color: var(--color-accent);">
+                <div v-if="formBio && formBio.trim()" class="p-3 rounded-xl border text-xs space-y-1" style="background: var(--color-foreground); border-color: var(--color-accent);">
                   <div class="font-bold flex items-center gap-1" style="color: var(--color-text);">
                     <i class="fa-solid fa-user-check text-[10px]" style="color: var(--color-accent);"></i> Sobre mim
                   </div>
                   <p class="opacity-80 text-xs leading-relaxed whitespace-pre-line" style="color: var(--color-text);">
-                    {{ formBio || 'Atendimento estratégico com compromisso e excelência.' }}
+                    {{ formBio }}
                   </p>
                 </div>
 
@@ -596,9 +596,9 @@
               </div>
 
               <!-- Banner Destaque no Mockup em Tempo Real -->
-              <div v-if="formBannerImage || loja.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" class="rounded-xl overflow-hidden shadow-xs border border-white/20 my-2.5">
+              <div v-if="formBannerImage || loja?.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" class="rounded-xl overflow-hidden shadow-xs border border-white/20 my-2.5">
                 <img 
-                  :src="formBannerImage || loja.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" 
+                  :src="formBannerImage || loja?.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" 
                   alt="Banner Destaque" 
                   class="w-full h-24 object-cover" 
                 />
@@ -607,24 +607,24 @@
               <!-- Rodapé de Redes Sociais no Mockup em Tempo Real -->
               <div v-if="showSocialFooterComputed" class="pt-3 border-t border-black/10 flex items-center justify-center gap-2 flex-wrap">
                 <template v-if="socialStyle === 'minimal'">
-                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="p-1.5 opacity-80 hover:opacity-100 transition-opacity" style="color: var(--color-text);">
-                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-xs"></i>
+                  <span v-for="sItem in mockupSocialLinks" :key="sItem.key" class="p-1.5 opacity-80 hover:opacity-100 transition-opacity" style="color: var(--color-text);">
+                    <i :class="sItem.icon" class="text-xs"></i>
                   </span>
                 </template>
                 <template v-else-if="socialStyle === 'circle-filled'">
-                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-xs" style="background: var(--color-primary); color: #FFFFFF;">
-                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-[10px]"></i>
+                  <span v-for="sItem in mockupSocialLinks" :key="sItem.key" class="w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-xs" style="background: var(--color-primary); color: #FFFFFF;">
+                    <i :class="sItem.icon" class="text-[10px]"></i>
                   </span>
                 </template>
                 <template v-else-if="socialStyle === 'outline'">
-                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="w-6 h-6 rounded-full border flex items-center justify-center text-xs" style="border-color: var(--color-accent); color: var(--color-text);">
-                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-[10px]"></i>
+                  <span v-for="sItem in mockupSocialLinks" :key="sItem.key" class="w-6 h-6 rounded-full border flex items-center justify-center text-xs" style="border-color: var(--color-accent); color: var(--color-text);">
+                    <i :class="sItem.icon" class="text-[10px]"></i>
                   </span>
                 </template>
                 <template v-else-if="socialStyle === 'pills'">
-                  <span v-for="ic in ['instagram', 'whatsapp', 'linkedin']" :key="ic" class="px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1 border" style="background: var(--color-foreground); border-color: var(--color-accent); color: var(--color-text);">
-                    <i :class="['fa-brands', `fa-${ic}`]" class="text-[9px]"></i>
-                    <span class="capitalize">{{ ic }}</span>
+                  <span v-for="sItem in mockupSocialLinks" :key="sItem.key" class="px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1 border" style="background: var(--color-foreground); border-color: var(--color-accent); color: var(--color-text);">
+                    <i :class="sItem.icon" class="text-[9px]"></i>
+                    <span class="capitalize">{{ sItem.key }}</span>
                   </span>
                 </template>
               </div>
@@ -745,6 +745,30 @@ const showMetricsComputed = computed(() => {
     return formShowMetrics.value
   }
   return loja.value?.show_metrics !== 0 && loja.value?.show_metrics !== false
+})
+
+const mockupSocialLinks = computed(() => {
+  const filled = []
+  const networks = formSocialNetworks.value || {}
+  
+  if (networks.instagram) filled.push({ key: 'instagram', icon: 'fa-brands fa-instagram' })
+  if (networks.whatsapp) filled.push({ key: 'whatsapp', icon: 'fa-brands fa-whatsapp' })
+  if (networks.facebook) filled.push({ key: 'facebook', icon: 'fa-brands fa-facebook-f' })
+  if (networks.youtube) filled.push({ key: 'youtube', icon: 'fa-brands fa-youtube' })
+  if (networks.tiktok) filled.push({ key: 'tiktok', icon: 'fa-brands fa-tiktok' })
+  if (networks.linkedin) filled.push({ key: 'linkedin', icon: 'fa-brands fa-linkedin-in' })
+  if (networks.twitter) filled.push({ key: 'twitter', icon: 'fa-brands fa-x-twitter' })
+  if (networks.website) filled.push({ key: 'website', icon: 'fa-solid fa-globe' })
+
+  if (filled.length > 0) return filled
+
+  return [
+    { key: 'instagram', icon: 'fa-brands fa-instagram' },
+    { key: 'whatsapp', icon: 'fa-brands fa-whatsapp' },
+    { key: 'facebook', icon: 'fa-brands fa-facebook-f' },
+    { key: 'linkedin', icon: 'fa-brands fa-linkedin-in' },
+    { key: 'website', icon: 'fa-solid fa-globe' }
+  ]
 })
 
 function handleThemeChange() {
