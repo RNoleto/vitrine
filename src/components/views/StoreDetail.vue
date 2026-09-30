@@ -403,7 +403,7 @@
                 <img 
                   :src="formLogoPreview || loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
                   alt="Logo" 
-                  class="w-18 h-18 rounded-2xl object-cover shadow-lg ring-2 ring-[var(--color-accent)] mb-2" 
+                  :class="['w-18 h-18 object-cover shadow-lg ring-2 ring-[var(--color-accent)] mb-2', avatarShapeClass]" 
                 />
                 <h3 class="text-lg font-bold leading-tight" style="color: var(--color-text);">{{ formName || loja.name }}</h3>
                 <p class="text-xs opacity-80 max-w-[220px] mt-1 leading-snug" style="color: var(--color-text);">
@@ -524,6 +524,13 @@ const filteredThemes = computed(() => {
 const activeThemeObj = computed(() => {
   const targetId = previewTheme.value || selectedTheme.value
   return themeStore.allThemes.find(t => t.id === targetId) || themeStore.allThemes[0]
+})
+
+const avatarShapeClass = computed(() => {
+  const shape = activeThemeObj.value?.avatarShape || activeThemeObj.value?.avatar_shape || 'circle'
+  if (shape === 'square') return 'rounded-none'
+  if (shape === 'rounded-square' || shape === 'rounded') return 'rounded-2xl'
+  return 'rounded-full'
 })
 
 function handleThemeChange() {
