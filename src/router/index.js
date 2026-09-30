@@ -81,7 +81,7 @@ const routes = [
     
       try {
         const loja = await lojaStore.obterLojaPublica(slug);
-        themeStore.applyTheme(loja.theme || 'default', loja.id);
+        themeStore.applyTheme(loja.theme || loja.ref_cod_theme || 'default', loja.id);
         next();
       } catch (error) {
         console.error('Erro detalhado:', error);
@@ -99,7 +99,7 @@ const routes = [
 
       try {
         const loja = await lojaStore.obterLojaPublica(to.params.slug);
-        themeStore.applyTheme(loja.theme || 'default', loja.id);
+        themeStore.applyTheme(loja.theme || loja.ref_cod_theme || 'default', loja.id);
         next();
       } catch (error) {
         next({ name: 'Login' });
