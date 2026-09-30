@@ -271,6 +271,73 @@
               </div>
             </div>
 
+            <!-- 4. Configuração do Rodapé de Redes Sociais -->
+            <div class="space-y-3 p-4 bg-indigo-50/60 border border-indigo-100 rounded-2xl">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-gray-800 flex items-center gap-2">
+                  <i class="fa-solid fa-share-nodes text-indigo-600"></i> Rodapé de Redes Sociais na Vitrine
+                </label>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="formShowSocialFooter" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <span class="ml-2 text-xs font-semibold" :class="formShowSocialFooter ? 'text-indigo-700' : 'text-gray-400'">
+                    {{ formShowSocialFooter ? 'Exibir no Rodapé' : 'Ocultar Rodapé' }}
+                  </span>
+                </label>
+              </div>
+
+              <div v-if="formShowSocialFooter" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-brands fa-instagram text-pink-600"></i> Instagram
+                  </label>
+                  <input v-model="formSocialNetworks.instagram" placeholder="https://instagram.com/seu-perfil" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-brands fa-whatsapp text-emerald-600"></i> WhatsApp
+                  </label>
+                  <input v-model="formSocialNetworks.whatsapp" placeholder="https://wa.me/5511999999999" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-brands fa-youtube text-red-600"></i> YouTube
+                  </label>
+                  <input v-model="formSocialNetworks.youtube" placeholder="https://youtube.com/@seu-canal" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-brands fa-tiktok text-black"></i> TikTok
+                  </label>
+                  <input v-model="formSocialNetworks.tiktok" placeholder="https://tiktok.com/@seu-usuario" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-brands fa-facebook text-blue-600"></i> Facebook
+                  </label>
+                  <input v-model="formSocialNetworks.facebook" placeholder="https://facebook.com/suapagina" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-brands fa-x-twitter text-gray-800"></i> X / Twitter
+                  </label>
+                  <input v-model="formSocialNetworks.twitter" placeholder="https://x.com/seu-perfil" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-brands fa-linkedin text-blue-700"></i> LinkedIn
+                  </label>
+                  <input v-model="formSocialNetworks.linkedin" placeholder="https://linkedin.com/in/seu-perfil" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-globe text-indigo-600"></i> Website / Blog
+                  </label>
+                  <input v-model="formSocialNetworks.website" placeholder="https://seusite.com.br" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white" />
+                </div>
+              </div>
+            </div>
+
             <!-- Botão Salvar Conteúdo -->
             <div class="pt-2">
               <button 
@@ -280,32 +347,71 @@
               >
                 <i v-if="salvandoConteudo" class="fa-solid fa-circle-notch fa-spin"></i>
                 <i v-else class="fa-solid fa-floppy-disk"></i>
-                <span>{{ salvandoConteudo ? 'Salvando...' : 'Salvar Dados & Conteúdo' }}</span>
+                <span>{{ salvandoConteudo ? 'Salvando...' : 'Salvar Conteúdo & Redes Sociais' }}</span>
               </button>
             </div>
           </div>
 
           <!-- TAB 3: LINKS & CONTATOS -->
           <div v-show="activeMainTab === 'links'" class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6 animate-fade-in">
-            <!-- Links Cadastrados -->
-            <div class="space-y-3">
-              <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
-                <i class="fa-solid fa-link text-indigo-600"></i> Links da Vitrine ({{ loja.links ? loja.links.length : 0 }})
-              </h3>
-              <div v-if="loja.links && loja.links.length" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div v-for="(link, i) in loja.links" :key="i" class="flex items-center gap-2.5 p-2.5 bg-gray-50 border border-gray-200 rounded-xl">
-                  <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                    <i :class="link.icone"></i>
+            <!-- Links Cadastrados & Editor de Botões -->
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-link text-indigo-600"></i> Botões & Links da Vitrine ({{ formLinks.length }})
+                  </h3>
+                  <p class="text-xs text-gray-500 mt-0.5">Edite os textos dos botões, ícones e URLs como desejar</p>
+                </div>
+                <button 
+                  @click="adicionarLink" 
+                  class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5"
+                >
+                  <i class="fa-solid fa-plus text-xs"></i> Adicionar Botão
+                </button>
+              </div>
+
+              <div v-if="formLinks.length === 0" class="p-4 border border-dashed border-gray-200 rounded-2xl text-center text-xs text-gray-400">
+                Nenhum botão cadastrado. Clique em "Adicionar Botão" para criar o primeiro link.
+              </div>
+
+              <div v-else class="space-y-3">
+                <div v-for="(link, lIdx) in formLinks" :key="lIdx" class="p-3.5 bg-gray-50 border border-gray-200 rounded-2xl space-y-2 relative shadow-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-indigo-700">Botão #{{ lIdx + 1 }}</span>
+                    <button @click="removerLink(lIdx)" class="text-red-500 hover:text-red-700 text-xs font-semibold flex items-center gap-1">
+                      <i class="fa-solid fa-trash-can text-xs"></i> Remover
+                    </button>
                   </div>
-                  <div class="min-w-0 flex-1">
-                    <p class="text-xs font-bold text-gray-800 truncate">{{ link.texto }}</p>
-                    <a :href="link.url" target="_blank" class="text-[10px] text-indigo-600 hover:underline truncate block">
-                      {{ link.url }}
-                    </a>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Texto do Botão</label>
+                      <input v-model="link.texto" placeholder="Ex: Nosso Site Oficial" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white font-semibold" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Ícone (FontAwesome)</label>
+                      <input v-model="link.icone" placeholder="Ex: fa-solid fa-globe" class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white font-mono" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Link / URL de Destino</label>
+                      <input v-model="link.url" placeholder="https://..." class="w-full p-2 border border-gray-300 rounded-xl text-xs bg-white font-mono" />
+                    </div>
                   </div>
                 </div>
               </div>
-              <p v-else class="text-xs text-gray-400 italic">Nenhum link cadastrado.</p>
+
+              <div class="pt-2">
+                <button 
+                  @click="salvarLinksEBotoes" 
+                  :disabled="salvandoLinks"
+                  class="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <i v-if="salvandoLinks" class="fa-solid fa-circle-notch fa-spin"></i>
+                  <i v-else class="fa-solid fa-floppy-disk"></i>
+                  <span>{{ salvandoLinks ? 'Salvando Botões...' : 'Salvar Texto dos Botões & Links' }}</span>
+                </button>
+              </div>
             </div>
 
             <!-- Contatos Vinculados -->
@@ -582,7 +688,21 @@ const formMetrics = ref([
   { value: '95%', label: 'Satisfação' }
 ])
 const formFaqs = ref([])
+const formLinks = ref([])
 const salvandoConteudo = ref(false)
+const salvandoLinks = ref(false)
+
+const formShowSocialFooter = ref(true)
+const formSocialNetworks = ref({
+  instagram: '',
+  whatsapp: '',
+  youtube: '',
+  tiktok: '',
+  facebook: '',
+  twitter: '',
+  linkedin: '',
+  website: ''
+})
 
 function handleLogoChange(e) {
   const file = e.target.files[0]
@@ -608,6 +728,44 @@ function adicionarFaq() {
 
 function removerFaq(index) {
   formFaqs.value.splice(index, 1)
+}
+
+function adicionarLink() {
+  formLinks.value.push({
+    icone: 'fa-solid fa-globe',
+    texto: 'Novo Botão de Link',
+    url: 'https://'
+  })
+}
+
+function removerLink(index) {
+  formLinks.value.splice(index, 1)
+}
+
+async function salvarLinksEBotoes() {
+  if (!loja.value?.id) return
+  salvandoLinks.value = true
+  try {
+    const validLinks = formLinks.value.filter(l => l.texto && l.texto.trim() && l.url && l.url.trim())
+    await lojaStore.editarLoja(loja.value.id, {
+      name: formName.value || loja.value.name,
+      logoBase64: formLogoBase64.value,
+      links: validLinks,
+      ativo: loja.value.ativo ?? 1
+    })
+    const updatedStore = lojaStore.lojas.find(l => l.id === loja.value.id)
+    if (updatedStore) {
+      loja.value = updatedStore
+      formLinks.value = JSON.parse(JSON.stringify(updatedStore.links || []))
+    }
+    feedbackStore.showSuccess('Links e textos dos botões salvos com sucesso!')
+  } catch (error) {
+    console.error('Erro ao salvar links:', error)
+    const msg = error.response?.data?.error || error.message || 'Falha ao salvar links.'
+    feedbackStore.showError('Erro ao salvar links: ' + msg)
+  } finally {
+    salvandoLinks.value = false
+  }
 }
 
 async function salvarConteudoCustomizado() {
@@ -637,15 +795,19 @@ async function salvarConteudoCustomizado() {
       description: formDescription.value,
       bio: formBio.value,
       metrics: validMetrics,
-      faqs: validFaqs
+      faqs: validFaqs,
+      social_networks: formSocialNetworks.value,
+      show_social_footer: formShowSocialFooter.value ? 1 : 0
     })
 
     loja.value.description = formDescription.value
     loja.value.bio = formBio.value
     loja.value.metrics = validMetrics
     loja.value.faqs = validFaqs
+    loja.value.social_networks = JSON.parse(JSON.stringify(formSocialNetworks.value))
+    loja.value.show_social_footer = formShowSocialFooter.value ? 1 : 0
 
-    feedbackStore.showSuccess('Dados e conteúdo da vitrine salvos com sucesso!')
+    feedbackStore.showSuccess('Dados, conteúdo e redes sociais da vitrine salvos com sucesso!')
   } catch (error) {
     console.error('Erro ao salvar conteúdo personalizado:', error)
     const msg = error.response?.data?.error || error.message || 'Falha ao salvar conteúdo.'
@@ -675,6 +837,22 @@ onMounted(async () => {
     formLogoPreview.value = loja.value.logo_url || ''
     formDescription.value = loja.value.description || ''
     formBio.value = loja.value.bio || ''
+    formLinks.value = JSON.parse(JSON.stringify(loja.value.links || []))
+    formShowSocialFooter.value = loja.value.show_social_footer !== 0 && loja.value.show_social_footer !== false
+
+    if (loja.value.social_networks && typeof loja.value.social_networks === 'object') {
+      formSocialNetworks.value = {
+        instagram: loja.value.social_networks.instagram || '',
+        whatsapp: loja.value.social_networks.whatsapp || '',
+        youtube: loja.value.social_networks.youtube || '',
+        tiktok: loja.value.social_networks.tiktok || '',
+        facebook: loja.value.social_networks.facebook || '',
+        twitter: loja.value.social_networks.twitter || '',
+        linkedin: loja.value.social_networks.linkedin || '',
+        website: loja.value.social_networks.website || ''
+      }
+    }
+
     if (loja.value.metrics && Array.isArray(loja.value.metrics) && loja.value.metrics.length > 0) {
       formMetrics.value = JSON.parse(JSON.stringify(loja.value.metrics))
     }

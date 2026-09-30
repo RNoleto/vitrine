@@ -391,7 +391,7 @@ const themeBannerImage = computed(() => {
 })
 
 const themeSubtitle = computed(() => {
-  return loja.value?.description || currentTheme.value?.elements?.subtitle || null
+  return loja.value?.description && loja.value.description.trim() ? loja.value.description : null
 })
 
 const isPremiumLayout = computed(() => {
