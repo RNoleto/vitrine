@@ -236,9 +236,18 @@
 
             <!-- 2. Métricas / Prova Social -->
             <div class="space-y-2">
-              <label class="block text-xs font-bold text-gray-700">
-                <i class="fa-solid fa-chart-line text-indigo-500 mr-1"></i> 3 Destaques Numéricos (Métricas):
-              </label>
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                  <i class="fa-solid fa-chart-line text-indigo-500"></i> 3 Destaques Numéricos (Métricas):
+                </label>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="formShowMetrics" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <span class="ml-2 text-xs font-semibold" :class="formShowMetrics ? 'text-indigo-700' : 'text-gray-400'">
+                    {{ formShowMetrics ? 'Exibir na Vitrine' : 'Ocultar da Vitrine' }}
+                  </span>
+                </label>
+              </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div v-for="(metric, mIdx) in formMetrics" :key="mIdx" class="p-2.5 bg-gray-50 border border-gray-200 rounded-xl space-y-1.5">
                   <span class="text-[10px] font-bold text-indigo-600 block">Destaque #{{ mIdx + 1 }}</span>
@@ -573,7 +582,7 @@
                 </div>
 
                 <!-- Stats Counter Row -->
-                <div v-if="formMetrics && formMetrics.length" class="grid grid-cols-3 gap-1 p-2 rounded-xl text-center border" style="background: var(--color-foreground); border-color: var(--color-accent);">
+                <div v-if="showMetricsComputed && formMetrics && formMetrics.length" class="grid grid-cols-3 gap-1 p-2 rounded-xl text-center border" style="background: var(--color-foreground); border-color: var(--color-accent);">
                   <div 
                     v-for="(metric, mIdx) in formMetrics.slice(0, 3)" 
                     :key="mIdx"
@@ -731,6 +740,13 @@ const showSocialFooterComputed = computed(() => {
   return activeThemeObj.value?.showSocialFooter !== false && activeThemeObj.value?.show_social_footer !== false
 })
 
+const showMetricsComputed = computed(() => {
+  if (typeof formShowMetrics.value !== 'undefined' && formShowMetrics.value !== null) {
+    return formShowMetrics.value
+  }
+  return loja.value?.show_metrics !== 0 && loja.value?.show_metrics !== false
+})
+
 function handleThemeChange() {
   if (!selectedTheme.value) return
   previewTheme.value = selectedTheme.value
@@ -776,6 +792,7 @@ const formDescription = ref('')
 const formSubtitle = ref('')
 const formBannerImage = ref('')
 const formBio = ref('')
+const formShowMetrics = ref(true)
 const formMetrics = ref([
   { value: '+500', label: 'Clientes' },
   { value: '8 ANOS', label: 'Experiência' },
@@ -891,6 +908,7 @@ async function salvarConteudoCustomizado() {
       banner_image: formBannerImage.value,
       bio: formBio.value,
       metrics: validMetrics,
+      show_metrics: formShowMetrics.value ? 1 : 0,
       faqs: validFaqs,
       social_networks: formSocialNetworks.value,
       show_social_footer: formShowSocialFooter.value ? 1 : 0
@@ -901,6 +919,7 @@ async function salvarConteudoCustomizado() {
     loja.value.banner_image = formBannerImage.value
     loja.value.bio = formBio.value
     loja.value.metrics = validMetrics
+    loja.value.show_metrics = formShowMetrics.value ? 1 : 0
     loja.value.faqs = validFaqs
     loja.value.social_networks = JSON.parse(JSON.stringify(formSocialNetworks.value))
     loja.value.show_social_footer = formShowSocialFooter.value ? 1 : 0
@@ -937,6 +956,7 @@ onMounted(async () => {
     formSubtitle.value = loja.value.subtitle || ''
     formBannerImage.value = loja.value.banner_image || ''
     formBio.value = loja.value.bio || ''
+    formShowMetrics.value = loja.value.show_metrics !== 0 && loja.value.show_metrics !== false
     formLinks.value = JSON.parse(JSON.stringify(loja.value.links || []))
     formShowSocialFooter.value = loja.value.show_social_footer !== 0 && loja.value.show_social_footer !== false
 

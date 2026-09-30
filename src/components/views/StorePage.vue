@@ -90,7 +90,7 @@
           </div>
 
           <!-- Social Proof Counter Cards -->
-          <div v-if="loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-md text-center">
+          <div v-if="loja.show_metrics !== 0 && loja.show_metrics !== false && loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-md text-center">
             <div 
               v-for="(metric, mIdx) in loja.metrics.slice(0, 3)" 
               :key="mIdx"
