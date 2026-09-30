@@ -23,16 +23,17 @@ const themeStore = useThemeStore()
 
 const currentCardStyle = computed(() => {
   if (props.cardStyle) return props.cardStyle
-  return themeStore.currentThemeObject?.cardStyle || 'flat'
+  const theme = themeStore.currentThemeObject
+  return theme?.cardStyle || theme?.card_style || 'flat'
 })
 
 const btnShapeClass = computed(() => {
-  const shape = themeStore.currentThemeObject?.btnShape || 'pill'
+  const shape = themeStore.currentThemeObject?.btnShape || themeStore.currentThemeObject?.btn_shape || 'pill'
   return `btn-shape-${shape}`
 })
 
 const btnShadowClass = computed(() => {
-  const shadow = themeStore.currentThemeObject?.btnShadow || 'soft'
+  const shadow = themeStore.currentThemeObject?.btnShadow || themeStore.currentThemeObject?.btn_shadow || 'soft'
   return `btn-shadow-${shadow}`
 })
 </script>
@@ -124,22 +125,41 @@ const btnShadowClass = computed(() => {
 }
 
 /* Card Style Variations */
-.card.card-style-gold-bordered {
-  border: 1.5px solid var(--color-accent);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-  background: linear-gradient(135deg, var(--color-foreground), var(--color-background));
+/* 1. Cor Sólida (Flat / Solid) */
+.card.card-style-flat, .card.card-style-solid {
+  background: var(--color-foreground) !important;
+  border: 1.5px solid var(--color-accent) !important;
 }
 
+/* 2. Gradiente Nobre (Gold Bordered / Gradient) */
+.card.card-style-gold-bordered, .card.card-style-gradient {
+  border: 1.5px solid var(--color-accent) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  background: linear-gradient(135deg, var(--color-foreground), var(--color-background)) !important;
+}
+
+/* 3. Vidro Translúcido (Glassmorphism) */
 .card.card-style-glass {
-  background: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 }
 
-.card.card-style-flat {
-  background: var(--color-foreground) !important;
+/* Harmonização dos Ícones conforme o efeito do cartão */
+.card.card-style-glass .icon-wrapper {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.card.card-style-gold-bordered .icon-wrapper,
+.card.card-style-gradient .icon-wrapper,
+.card.card-style-flat .icon-wrapper,
+.card.card-style-solid .icon-wrapper {
+  background: var(--color-background-solid, var(--color-background)) !important;
   border: 1px solid var(--color-accent) !important;
 }
 

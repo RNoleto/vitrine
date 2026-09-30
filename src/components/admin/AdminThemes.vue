@@ -591,11 +591,11 @@ onMounted(async () => {
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Estilo dos Cartões</label>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Estilo dos Cartões / Botões</label>
             <select v-model="cardStyle" class="w-full text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
-              <option value="gold-bordered">Moldura Nobre Dourada</option>
-              <option value="glass">Vidro Efeito Glassmorphism</option>
-              <option value="flat">Plano Minimalista</option>
+              <option value="flat">🎨 Cor Sólida (Foreground)</option>
+              <option value="gold-bordered">🌈 Gradiente Nobre (Foreground → Background)</option>
+              <option value="glass">🧊 Vidro Translúcido (Glassmorphism)</option>
             </select>
           </div>
         </div>
@@ -1262,16 +1262,20 @@ onMounted(async () => {
                   class="p-2.5 flex items-center justify-between border transition-all"
                   :class="[computedBtnShapeClass, computedBtnShadowClass]"
                   :style="{
-                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
-                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.4)' : primaryColor),
+                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.2)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
+                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.35)' : primaryColor),
                     color: textColor,
                     backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
                   }"
                 >
                   <div class="flex items-center gap-2.5">
                     <div 
-                      class="w-6 h-6 rounded-full flex items-center justify-center bg-black/10" 
-                      :style="{ color: accentColor }"
+                      class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all" 
+                      :style="{
+                        background: cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.08)',
+                        border: cardStyle === 'glass' ? '1px solid rgba(255, 255, 255, 0.4)' : 'none',
+                        color: accentColor
+                      }"
                     >
                       <i class="fa-solid fa-calendar-check text-xs"></i>
                     </div>
@@ -1284,16 +1288,20 @@ onMounted(async () => {
                   class="p-2.5 flex items-center justify-between border transition-all"
                   :class="[computedBtnShapeClass, computedBtnShadowClass]"
                   :style="{
-                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
-                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.4)' : primaryColor),
+                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.2)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
+                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.35)' : primaryColor),
                     color: textColor,
                     backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
                   }"
                 >
                   <div class="flex items-center gap-2.5">
                     <div 
-                      class="w-6 h-6 rounded-full flex items-center justify-center bg-black/10" 
-                      :style="{ color: accentColor }"
+                      class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all" 
+                      :style="{
+                        background: cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.08)',
+                        border: cardStyle === 'glass' ? '1px solid rgba(255, 255, 255, 0.4)' : 'none',
+                        color: accentColor
+                      }"
                     >
                       <i class="fa-solid fa-scale-balanced text-xs"></i>
                     </div>
