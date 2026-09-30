@@ -522,7 +522,8 @@
                 <div 
                   v-for="(link, lIdx) in (loja.links && loja.links.length ? loja.links : [{ texto: 'Nosso Site Oficial', icone: 'fa-solid fa-globe' }, { texto: 'Atendimento WhatsApp', icone: 'fa-brands fa-whatsapp' }])" 
                   :key="lIdx"
-                  class="flex items-center gap-2.5 p-2.5 rounded-xl border text-left text-xs font-semibold shadow-sm transition-all"
+                  class="flex items-center gap-2.5 p-2.5 border text-left text-xs font-semibold transition-all"
+                  :class="[btnShapeClass, btnShadowClass]"
                   style="background: var(--color-foreground); border-color: var(--color-accent); color: var(--color-text);"
                 >
                   <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-background-solid, var(--color-background));">
@@ -557,6 +558,31 @@
                     <div class="text-[8px] uppercase opacity-70 truncate">{{ metric.label || '-' }}</div>
                   </div>
                 </div>
+              </div>
+
+              <!-- Rodapé de Redes Sociais no Mockup em Tempo Real -->
+              <div v-if="showSocialFooterComputed" class="pt-3 border-t border-black/10 flex items-center justify-center gap-2 flex-wrap">
+                <template v-if="socialStyle === 'minimal'">
+                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="p-1.5 opacity-80 hover:opacity-100 transition-opacity" style="color: var(--color-text);">
+                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-xs"></i>
+                  </span>
+                </template>
+                <template v-else-if="socialStyle === 'circle-filled'">
+                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-xs" style="background: var(--color-primary); color: #FFFFFF;">
+                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-[10px]"></i>
+                  </span>
+                </template>
+                <template v-else-if="socialStyle === 'outline'">
+                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="w-6 h-6 rounded-full border flex items-center justify-center text-xs" style="border-color: var(--color-accent); color: var(--color-text);">
+                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-[10px]"></i>
+                  </span>
+                </template>
+                <template v-else-if="socialStyle === 'pills'">
+                  <span v-for="ic in ['instagram', 'whatsapp', 'linkedin']" :key="ic" class="px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1 border" style="background: var(--color-foreground); border-color: var(--color-accent); color: var(--color-text);">
+                    <i :class="['fa-brands', `fa-${ic}`]" class="text-[9px]"></i>
+                    <span class="capitalize">{{ ic }}</span>
+                  </span>
+                </template>
               </div>
 
             </div>
@@ -637,6 +663,37 @@ const avatarShapeClass = computed(() => {
   if (shape === 'square') return 'rounded-none'
   if (shape === 'rounded-square' || shape === 'rounded') return 'rounded-2xl'
   return 'rounded-full'
+})
+
+const btnShapeClass = computed(() => {
+  const shape = activeThemeObj.value?.btnShape || activeThemeObj.value?.btn_shape || 'pill'
+  if (shape === 'pill') return 'rounded-full'
+  if (shape === 'rounded') return 'rounded-xl'
+  if (shape === 'square') return 'rounded-none'
+  if (shape === 'wavy') return 'rounded-3xl border-dashed'
+  if (shape === 'outline') return 'rounded-xl !bg-transparent border-2'
+  return 'rounded-full'
+})
+
+const btnShadowClass = computed(() => {
+  const shadow = activeThemeObj.value?.btnShadow || activeThemeObj.value?.btn_shadow || 'soft'
+  if (shadow === 'none') return 'shadow-none'
+  if (shadow === 'soft') return 'shadow-sm'
+  if (shadow === 'medium') return 'shadow-md'
+  if (shadow === 'glow') return 'shadow-lg shadow-indigo-500/30'
+  if (shadow === 'hard') return 'shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)]'
+  return 'shadow-sm'
+})
+
+const socialStyle = computed(() => {
+  return activeThemeObj.value?.socialStyle || activeThemeObj.value?.social_style || 'minimal'
+})
+
+const showSocialFooterComputed = computed(() => {
+  if (typeof formShowSocialFooter.value !== 'undefined' && formShowSocialFooter.value !== null) {
+    return formShowSocialFooter.value
+  }
+  return activeThemeObj.value?.showSocialFooter !== false && activeThemeObj.value?.show_social_footer !== false
 })
 
 function handleThemeChange() {

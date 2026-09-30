@@ -194,6 +194,30 @@ const mockupContainerStyle = computed(() => {
   return style
 })
 
+const computedAvatarShapeClass = computed(() => {
+  if (avatarShape.value === 'square') return 'rounded-none'
+  if (avatarShape.value === 'rounded-square' || avatarShape.value === 'rounded') return 'rounded-2xl'
+  return 'rounded-full'
+})
+
+const computedBtnShapeClass = computed(() => {
+  if (btnShape.value === 'pill') return 'rounded-full'
+  if (btnShape.value === 'rounded') return 'rounded-xl'
+  if (btnShape.value === 'square') return 'rounded-none'
+  if (btnShape.value === 'wavy') return 'rounded-3xl border-dashed'
+  if (btnShape.value === 'outline') return 'rounded-xl !bg-transparent border-2'
+  return 'rounded-xl'
+})
+
+const computedBtnShadowClass = computed(() => {
+  if (btnShadow.value === 'none') return 'shadow-none'
+  if (btnShadow.value === 'soft') return 'shadow-sm'
+  if (btnShadow.value === 'medium') return 'shadow-md'
+  if (btnShadow.value === 'hard') return 'shadow-[4px_4px_0px_0px_rgba(0,0,0,0.85)]'
+  if (btnShadow.value === 'glow') return 'shadow-[0_0_15px_rgba(99,102,241,0.6)]'
+  return 'shadow-sm'
+})
+
 const generatedId = computed(() => {
   if (editingThemeId.value) return editingThemeId.value
   if (!newThemeLabel.value.trim()) return 'custom-premium-theme'
@@ -1194,7 +1218,7 @@ onMounted(async () => {
               <!-- Layout HERO PROFISSIONAL -->
               <div v-if="layoutStyle === 'portrait-hero' || layoutStyle === 'landing-page'" class="space-y-3 pt-1">
                 <div class="relative w-full h-44 rounded-2xl overflow-hidden shadow-md border border-white/20">
-                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover" alt="Hero Portrait" />
+                  <img :src="themeBannerImage || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop'" class="w-full h-full object-cover" alt="Hero Portrait" />
                   <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3 text-left">
                     <div>
                       <span v-if="isPremium" class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-400 text-amber-950 inline-block mb-1">
@@ -1208,15 +1232,18 @@ onMounted(async () => {
                   </div>
                 </div>
 
-                <p class="text-[10px] leading-tight opacity-80 italic">
-                  "Soluções jurídicas preventivas e atendimento estratégico personalizado."
+                <p class="text-[10px] leading-tight opacity-80 italic" :style="{ color: textColor }">
+                  "{{ themeSubtitle || 'Soluções jurídicas preventivas e atendimento estratégico personalizado.' }}"
                 </p>
               </div>
 
               <!-- Layout PADRÃO -->
               <div v-else class="space-y-2 pt-2">
-                <div class="relative w-16 h-16 rounded-full mx-auto shadow-md border-2 border-white/80 flex items-center justify-center font-bold text-xl transition-all"
-                     :style="{ background: primaryColor, color: '#ffffff' }">
+                <div 
+                  class="relative w-16 h-16 mx-auto shadow-md border-2 border-white/80 flex items-center justify-center font-bold text-xl transition-all"
+                  :class="computedAvatarShapeClass"
+                  :style="{ background: primaryColor, color: '#ffffff' }"
+                >
                   V
                 </div>
                 <div>
@@ -1231,15 +1258,22 @@ onMounted(async () => {
 
               <!-- Lista de Links Elegantes -->
               <div class="space-y-2 text-xs">
-                <div class="p-2.5 rounded-xl shadow-xs flex items-center justify-between border transition-all"
-                     :style="{
-                       background: fgColor,
-                       borderColor: cardStyle === 'gold-bordered' ? accentColor : primaryColor,
-                       color: textColor,
-                       backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
-                     }">
+                <div 
+                  class="p-2.5 flex items-center justify-between border transition-all"
+                  :class="[computedBtnShapeClass, computedBtnShadowClass]"
+                  :style="{
+                    background: btnShape === 'outline' ? 'transparent' : fgColor,
+                    borderColor: cardStyle === 'gold-bordered' ? accentColor : primaryColor,
+                    color: textColor,
+                    backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                  }"
+                >
                   <div class="flex items-center gap-2.5">
-                    <div class="w-6 h-6 rounded-lg flex items-center justify-center bg-black/10" :style="{ color: accentColor }">
+                    <div 
+                      class="w-6 h-6 flex items-center justify-center bg-black/10" 
+                      :class="computedAvatarShapeClass"
+                      :style="{ color: accentColor }"
+                    >
                       <i class="fa-solid fa-calendar-check text-xs"></i>
                     </div>
                     <span class="font-semibold text-xs">Agende sua Consulta</span>
@@ -1247,15 +1281,22 @@ onMounted(async () => {
                   <i class="fa-solid fa-chevron-right text-[10px] opacity-60" :style="{ color: accentColor }"></i>
                 </div>
 
-                <div class="p-2.5 rounded-xl shadow-xs flex items-center justify-between border transition-all"
-                     :style="{
-                       background: fgColor,
-                       borderColor: cardStyle === 'gold-bordered' ? accentColor : primaryColor,
-                       color: textColor,
-                       backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
-                     }">
+                <div 
+                  class="p-2.5 flex items-center justify-between border transition-all"
+                  :class="[computedBtnShapeClass, computedBtnShadowClass]"
+                  :style="{
+                    background: btnShape === 'outline' ? 'transparent' : fgColor,
+                    borderColor: cardStyle === 'gold-bordered' ? accentColor : primaryColor,
+                    color: textColor,
+                    backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                  }"
+                >
                   <div class="flex items-center gap-2.5">
-                    <div class="w-6 h-6 rounded-lg flex items-center justify-center bg-black/10" :style="{ color: accentColor }">
+                    <div 
+                      class="w-6 h-6 flex items-center justify-center bg-black/10" 
+                      :class="computedAvatarShapeClass"
+                      :style="{ color: accentColor }"
+                    >
                       <i class="fa-solid fa-scale-balanced text-xs"></i>
                     </div>
                     <span class="font-semibold text-xs">Áreas de Atuação</span>
@@ -1264,16 +1305,22 @@ onMounted(async () => {
                 </div>
 
                 <!-- Cartão de Contato WhatsApp -->
-                <div class="p-2.5 rounded-xl border flex items-center justify-between transition-all"
-                     :style="{
-                       background: fgColor,
-                       borderColor: accentColor,
-                       color: textColor,
-                       backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
-                     }">
+                <div 
+                  class="p-2.5 border flex items-center justify-between transition-all"
+                  :class="[computedBtnShapeClass, computedBtnShadowClass]"
+                  :style="{
+                    background: btnShape === 'outline' ? 'transparent' : fgColor,
+                    borderColor: accentColor,
+                    color: textColor,
+                    backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                  }"
+                >
                   <div class="flex items-center gap-2.5 text-left">
-                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-xs"
-                         :style="{ background: primaryColor }">
+                    <div 
+                      class="w-7 h-7 flex items-center justify-center text-white text-xs font-bold shadow-xs"
+                      :class="computedAvatarShapeClass"
+                      :style="{ background: primaryColor }"
+                    >
                       <i class="fa-brands fa-whatsapp"></i>
                     </div>
                     <div>
@@ -1281,14 +1328,42 @@ onMounted(async () => {
                       <p class="text-[10px] opacity-75 mt-0.5">(96) 98140-3089</p>
                     </div>
                   </div>
-                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full text-white" :style="{ background: accentColor }">
+                  <span 
+                    class="text-[9px] font-bold px-2 py-0.5 rounded-full text-white" 
+                    :style="{ background: accentColor }"
+                  >
                     WhatsApp
                   </span>
                 </div>
               </div>
 
+              <!-- Rodapé de Redes Sociais no Mockup em Tempo Real -->
+              <div v-if="showSocialFooter" class="pt-3 border-t border-white/10 flex items-center justify-center gap-2 flex-wrap">
+                <template v-if="socialStyle === 'minimal'">
+                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="p-1.5 opacity-80 hover:opacity-100 transition-opacity" :style="{ color: textColor }">
+                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-xs"></i>
+                  </span>
+                </template>
+                <template v-else-if="socialStyle === 'circle-filled'">
+                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-xs" :style="{ background: primaryColor, color: '#FFFFFF' }">
+                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-[10px]"></i>
+                  </span>
+                </template>
+                <template v-else-if="socialStyle === 'outline'">
+                  <span v-for="ic in ['instagram', 'whatsapp', 'facebook', 'linkedin', 'globe']" :key="ic" class="w-6 h-6 rounded-full border flex items-center justify-center text-xs" :style="{ borderColor: accentColor, color: textColor }">
+                    <i :class="['fa-brands', `fa-${ic}`, ic === 'globe' ? 'fa-solid' : '']" class="text-[10px]"></i>
+                  </span>
+                </template>
+                <template v-else-if="socialStyle === 'pills'">
+                  <span v-for="ic in ['instagram', 'whatsapp', 'linkedin']" :key="ic" class="px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1 border" :style="{ background: fgColor, borderColor: accentColor, color: textColor }">
+                    <i :class="['fa-brands', `fa-${ic}`]" class="text-[9px]"></i>
+                    <span class="capitalize">{{ ic }}</span>
+                  </span>
+                </template>
+              </div>
+
               <!-- Rodapé da Tela do Celular -->
-              <div class="pb-1 text-[9px] opacity-60 font-mono tracking-wider">
+              <div class="pb-1 text-[9px] opacity-60 font-mono tracking-wider" :style="{ color: textColor }">
                 Vitrines VIP Platform
               </div>
             </div>
