@@ -653,7 +653,12 @@
                   :key="lIdx"
                   class="flex items-center gap-2.5 p-2.5 border text-left text-xs font-semibold transition-all"
                   :class="[btnShapeClass, btnShadowClass]"
-                  style="background: var(--color-foreground); border-color: var(--color-accent); color: var(--color-text);"
+                  :style="{
+                    background: (activeThemeObj?.btnShape || activeThemeObj?.btn_shape) === 'outline' ? 'transparent' : ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' ? 'rgba(255, 255, 255, 0.25)' : ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'gold-bordered' ? 'linear-gradient(135deg, var(--color-foreground), var(--color-background))' : 'var(--color-foreground)')),
+                    borderColor: 'var(--color-accent)',
+                    color: 'var(--color-text)',
+                    backdropFilter: (activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' ? 'blur(12px)' : 'none'
+                  }"
                 >
                   <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-background-solid, var(--color-background));">
                     <i :class="link.icone || 'fa-solid fa-link'" class="text-xs" style="color: var(--color-accent);"></i>

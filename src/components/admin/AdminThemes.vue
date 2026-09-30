@@ -1262,10 +1262,10 @@ onMounted(async () => {
                   class="p-2.5 flex items-center justify-between border transition-all"
                   :class="[computedBtnShapeClass, computedBtnShadowClass]"
                   :style="{
-                    background: btnShape === 'outline' ? 'transparent' : fgColor,
-                    borderColor: cardStyle === 'gold-bordered' ? accentColor : primaryColor,
+                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
+                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.4)' : primaryColor),
                     color: textColor,
-                    backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                    backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
                   }"
                 >
                   <div class="flex items-center gap-2.5">
@@ -1284,10 +1284,10 @@ onMounted(async () => {
                   class="p-2.5 flex items-center justify-between border transition-all"
                   :class="[computedBtnShapeClass, computedBtnShadowClass]"
                   :style="{
-                    background: btnShape === 'outline' ? 'transparent' : fgColor,
-                    borderColor: cardStyle === 'gold-bordered' ? accentColor : primaryColor,
+                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
+                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.4)' : primaryColor),
                     color: textColor,
-                    backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                    backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
                   }"
                 >
                   <div class="flex items-center gap-2.5">
@@ -1307,10 +1307,10 @@ onMounted(async () => {
                   class="p-2.5 border flex items-center justify-between transition-all"
                   :class="[computedBtnShapeClass, computedBtnShadowClass]"
                   :style="{
-                    background: btnShape === 'outline' ? 'transparent' : fgColor,
+                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? 'rgba(255, 255, 255, 0.25)' : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
                     borderColor: accentColor,
                     color: textColor,
-                    backdropFilter: backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none'
+                    backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
                   }"
                 >
                   <div class="flex items-center gap-2.5 text-left">

@@ -194,7 +194,7 @@ export const useThemeStore = defineStore('theme', {
         // Injeção de variáveis isoladas
         cssString += `
         .theme-${theme.id}, [data-theme="${theme.id}"] {
-          --color-background: ${bgType === 'solid' ? theme.colors.background : 'transparent'};
+          --color-background: ${theme.colors?.background || '#FAFAFA'};
           --color-background-solid: ${solidBg};
           --color-foreground: ${fg};
           --color-primary: ${primary};
