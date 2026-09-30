@@ -46,6 +46,7 @@ const form = ref({
 
 const availableChannelTypes = [
   { value: 'errors-log', label: '🚨 Logs de Erros & Exceções' },
+  { value: 'migrations-log', label: '🗄️ Logs de Migrações do Banco (Deploy)' },
   { value: 'general', label: '📢 Canal Geral / Notificações' },
   { value: 'leads', label: '📊 Métricas & Acessos de Lojas' },
   { value: 'system', label: '⚙️ Alertas de Sistema' },
@@ -54,6 +55,9 @@ const availableChannelTypes = [
 const availableEvents = [
   { key: 'system.error', label: 'Erros fatais do sistema' },
   { key: 'system.exception', label: 'Exceções HTTP 500' },
+  { key: 'migration.started', label: 'Início da execução de migrations (Deploy)' },
+  { key: 'migration.success', label: 'Sucesso das migrations (Deploy)' },
+  { key: 'migration.failed', label: 'Falha/Erro nas migrations (Deploy)' },
   { key: 'system.test', label: 'Testes de webhook' },
   { key: 'store.created', label: 'Criação de novas vitrines' },
 ]
