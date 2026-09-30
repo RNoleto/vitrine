@@ -894,6 +894,7 @@ async function aplicarTema() {
   salvandoTema.value = true
   try {
     await lojaStore.atualizarTemaLoja(loja.value.id, themeToApply)
+    loja.value.ref_cod_theme = themeToApply
     loja.value.theme = themeToApply
     themeStore.applyTheme(themeToApply, loja.value.id)
     selectedTheme.value = themeToApply
@@ -911,7 +912,7 @@ async function aplicarTema() {
 }
 
 function cancelarPreview() {
-  const savedTheme = loja.value?.theme || 'default'
+  const savedTheme = loja.value?.ref_cod_theme || loja.value?.theme || 'default'
   selectedTheme.value = savedTheme
   previewTheme.value = savedTheme
   isPreview.value = false
@@ -1119,7 +1120,7 @@ onMounted(async () => {
   await buscarLoja()
 
   if (loja.value) {
-    selectedTheme.value = loja.value.theme || 'default'
+    selectedTheme.value = loja.value.ref_cod_theme || loja.value.theme || 'default'
     previewTheme.value = selectedTheme.value
     themeStore.applyTheme(selectedTheme.value, loja.value.id)
 

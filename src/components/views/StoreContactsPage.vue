@@ -43,7 +43,7 @@ onMounted(async () => {
     loja.value = lojaStore.lojaSelecionada
     
     if (loja.value) {
-      themeStore.applyTheme(loja.value.theme || 'default', loja.value.id, true)
+      themeStore.applyTheme(loja.value.ref_cod_theme || loja.value.theme || 'default', loja.value.id, true)
     }
   } catch (error) {
     console.error('Erro ao carregar contatos:', error)

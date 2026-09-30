@@ -506,7 +506,7 @@ onMounted(async () => {
     loja.value = await lojaStore.obterLojaPublica(slug)
     
     if (loja.value) {
-      themeStore.applyTheme(loja.value.theme || 'default', loja.value.id, true)
+      themeStore.applyTheme(loja.value.ref_cod_theme || loja.value.theme || 'default', loja.value.id, true)
       contatos.value = loja.value.contacts || []
 
       if (loja.value.faqs && Array.isArray(loja.value.faqs) && loja.value.faqs.length > 0) {
@@ -596,4 +596,4 @@ section ::v-deep(footer) {
     transform: translateY(0);
   }
 }
-</style>
+</style>
