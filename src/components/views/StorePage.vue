@@ -155,26 +155,138 @@
 
         </div>
 
-        <!-- --- LAYOUT STANDARD MINIMAL --- -->
-        <div v-else-if="loja" class="storePage text-center animate-fade-in">
-          <div class="mt-6">
-            <img :src="loja.logo_url" alt="Logo da loja" class="w-32 h-32 mx-auto object-contain shadow-sm rounded-full" v-if="loja.logo_url" />
-            <h1 class="title text-2xl font-bold mt-4">{{ loja.name }}</h1>
-            <p v-if="loja.description" class="text-sm opacity-80 mt-1 max-w-md mx-auto">{{ loja.description }}</p>
+        <!-- --- LAYOUT STANDARD (PADRÃO EMPILHADO LINKTREE) --- -->
+        <div v-else-if="loja" class="storePage text-center animate-fade-in space-y-6">
+          
+          <!-- Avatar e Título Centrados -->
+          <div class="pt-4 flex flex-col items-center">
+            <div class="relative mb-3">
+              <img 
+                v-if="loja.logo_url"
+                :src="loja.logo_url" 
+                alt="Logo da vitrine" 
+                :class="['w-28 h-28 sm:w-32 sm:h-32 object-cover shadow-xl ring-4 ring-[var(--color-accent)]/40 transform hover:scale-105 transition-all duration-300', avatarShapeClass]" 
+              />
+              <div 
+                v-else 
+                :class="['w-28 h-28 sm:w-32 sm:h-32 bg-[var(--color-foreground)] border-2 border-[var(--color-accent)] flex items-center justify-center shadow-xl text-[var(--color-accent)] transform hover:scale-105 transition-all duration-300', avatarShapeClass]"
+              >
+                <i class="fa-solid fa-store text-4xl"></i>
+              </div>
+            </div>
+            
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text)] mb-1">
+              {{ loja.name }}
+            </h1>
+            <p v-if="themeSubtitle" class="text-xs sm:text-sm font-medium opacity-90 max-w-md mx-auto leading-relaxed text-[var(--color-text)]">
+              {{ themeSubtitle }}
+            </p>
           </div>
-          <div class="mt-8 space-y-3">
-            <!-- Links da loja -->
+
+          <!-- Links da vitrine -->
+          <div v-if="loja.links && loja.links.length" class="space-y-3">
             <div v-for="(link, index) in loja.links" :key="index">
-              <Card :text="link.texto" :icon="link.icone" class="w-full" @click="handleClickLink(link)"/>
-            </div>
-            <!-- Lista de Contatos da Loja -->
-            <div v-if="contatos.length === 1" class="space-y-3 mb-2">
-              <Card :text="contatos[0].name" :photo="contatos[0].photo" @click="handleClickContact(contatos[0])" />
-            </div>
-            <div v-else-if="contatos.length > 1">
-              <Card text="Fale com um de nossos consultores" icon="fa-solid fa-headset" @click="irParaContatos" />
+              <Card 
+                :text="link.texto" 
+                :icon="link.icone" 
+                :show-arrow="true"
+                class="w-full shadow-sm hover:shadow-md transition-all duration-300" 
+                @click="handleClickLink(link)"
+              />
             </div>
           </div>
+
+          <!-- Contatos -->
+          <div v-if="contatos.length === 1" class="pt-1">
+            <Card 
+              :text="contatos[0].name" 
+              :photo="contatos[0].photo" 
+              subtitle="Atendimento direto via WhatsApp"
+              :show-arrow="true"
+              @click="handleClickContact(contatos[0])" 
+            />
+          </div>
+          <div v-else-if="contatos.length > 1" class="pt-1">
+            <Card 
+              text="Fale com a nossa equipe de especialistas" 
+              icon="fa-solid fa-headset" 
+              subtitle="Equipe disponível para atendimento"
+              :show-arrow="true"
+              @click="irParaContatos" 
+            />
+          </div>
+
+          <!-- Banner / Imagem de Destaque -->
+          <div v-if="themeBannerImage" class="rounded-2xl overflow-hidden shadow-lg border border-[var(--color-accent)] my-4">
+            <img :src="themeBannerImage" alt="Imagem em destaque" class="w-full h-44 sm:h-56 object-cover hover:scale-105 transition-transform duration-500" />
+          </div>
+
+          <!-- Bio / Sobre Mim -->
+          <div v-if="loja.bio && loja.bio.trim()" class="p-5 rounded-2xl border border-[var(--color-accent)] bg-[var(--color-foreground)] shadow-md space-y-2 text-left">
+            <h3 class="text-base font-bold text-[var(--color-text)] flex items-center gap-2">
+              <i class="fa-solid fa-user-check text-sm text-[var(--color-accent)]"></i>
+              Sobre mim
+            </h3>
+            <p class="text-xs sm:text-sm leading-relaxed opacity-85 text-[var(--color-text)] whitespace-pre-line">
+              {{ loja.bio }}
+            </p>
+          </div>
+
+          <!-- Métricas / Prova Social -->
+          <div v-if="loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-sm text-center">
+            <div 
+              v-for="(metric, mIdx) in loja.metrics.slice(0, 3)" 
+              :key="mIdx"
+              :class="['space-y-0.5', mIdx === 1 ? 'border-x border-[var(--color-accent)]/30 px-1' : '']"
+            >
+              <div class="text-lg font-black text-[var(--color-primary)]">{{ metric.value }}</div>
+              <div class="text-[10px] font-semibold uppercase tracking-wider opacity-75 text-[var(--color-text)]">{{ metric.label }}</div>
+            </div>
+          </div>
+
+          <!-- FAQ Accordion -->
+          <div v-if="activeFaqs.length" class="p-5 rounded-2xl border border-[var(--color-accent)] bg-[var(--color-foreground)] shadow-md space-y-3 text-left">
+            <h3 class="text-base font-bold text-[var(--color-text)] flex items-center gap-2 mb-1">
+              <i class="fa-solid fa-circle-question text-sm text-[var(--color-accent)]"></i>
+              Dúvidas frequentes
+            </h3>
+            <div class="space-y-2">
+              <div 
+                v-for="(faq, fIdx) in activeFaqs" 
+                :key="fIdx"
+                class="border-b border-[var(--color-accent)]/20 pb-2"
+              >
+                <button 
+                  @click="faq.open = !faq.open"
+                  class="w-full flex items-center justify-between text-left font-semibold text-xs sm:text-sm text-[var(--color-text)] focus:outline-none"
+                >
+                  <span>{{ faq.question }}</span>
+                  <i :class="['fa-solid transition-transform duration-200 text-xs text-[var(--color-accent)]', faq.open ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+                </button>
+                <p v-if="faq.open" class="text-xs opacity-80 mt-1 leading-relaxed text-[var(--color-text)] pl-1 whitespace-pre-line">
+                  {{ faq.answer }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé de Redes Sociais -->
+          <div v-if="socialLinks.length && socialFooterVisible" class="text-center py-4 space-y-3">
+            <div class="flex items-center justify-center flex-wrap gap-3 text-lg">
+              <a 
+                v-for="(sLink, sIdx) in socialLinks" 
+                :key="sIdx"
+                :href="sLink.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                :title="sLink.label"
+                class="w-9 h-9 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-text)] transition-all shadow-xs hover:scale-105"
+              >
+                <i :class="sLink.icon"></i>
+              </a>
+            </div>
+          </div>
+
         </div>
 
         <!-- Loja Não Encontrada -->
@@ -284,7 +396,8 @@ const themeSubtitle = computed(() => {
 
 const isPremiumLayout = computed(() => {
   if (!currentTheme.value) return false
-  return currentTheme.value.isPremium || ['portrait-hero', 'landing-page'].includes(currentTheme.value.layoutStyle)
+  const layout = currentTheme.value.layoutStyle || currentTheme.value.layout_style
+  return ['portrait-hero', 'landing-page'].includes(layout)
 })
 
 onMounted(async () => {

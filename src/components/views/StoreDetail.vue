@@ -428,7 +428,7 @@
               </div>
 
               <!-- Premium Landing Page Features Preview -->
-              <div v-if="activeThemeObj?.isPremium || ['portrait-hero', 'landing-page'].includes(activeThemeObj?.layoutStyle)" class="space-y-3 pt-2 text-left">
+              <div v-if="['portrait-hero', 'landing-page'].includes(activeThemeObj?.layoutStyle)" class="space-y-3 pt-2 text-left">
                 <!-- Sobre Mim Block -->
                 <div class="p-3 rounded-xl border text-xs space-y-1" style="background: var(--color-foreground); border-color: var(--color-accent);">
                   <div class="font-bold flex items-center gap-1" style="color: var(--color-text);">
