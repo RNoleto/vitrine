@@ -138,18 +138,60 @@
             <h4 class="text-base sm:text-lg font-bold text-[var(--color-text)]">
               Acompanhe nas redes sociais
             </h4>
-            <div class="flex items-center justify-center flex-wrap gap-4 text-lg">
-              <a 
-                v-for="(sLink, sIdx) in socialLinks" 
-                :key="sIdx"
-                :href="sLink.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                :title="sLink.label"
-                class="w-10 h-10 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-text)] transition-all shadow-sm hover:scale-105"
-              >
-                <i :class="sLink.icon"></i>
-              </a>
+            <div class="flex items-center justify-center flex-wrap gap-3">
+              <template v-if="socialStyle === 'minimal'">
+                <a 
+                  v-for="(sLink, sIdx) in socialLinks" 
+                  :key="sIdx"
+                  :href="sLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="sLink.label"
+                  class="p-2 opacity-80 hover:opacity-100 transition-opacity text-xl text-[var(--color-text)] hover:scale-110"
+                >
+                  <i :class="sLink.icon"></i>
+                </a>
+              </template>
+              <template v-else-if="socialStyle === 'circle-filled'">
+                <a 
+                  v-for="(sLink, sIdx) in socialLinks" 
+                  :key="sIdx"
+                  :href="sLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="sLink.label"
+                  class="w-10 h-10 rounded-full bg-[var(--color-primary)] text-[var(--color-primary-text)] flex items-center justify-center text-lg shadow-md hover:scale-110 transition-all"
+                >
+                  <i :class="sLink.icon"></i>
+                </a>
+              </template>
+              <template v-else-if="socialStyle === 'outline'">
+                <a 
+                  v-for="(sLink, sIdx) in socialLinks" 
+                  :key="sIdx"
+                  :href="sLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="sLink.label"
+                  class="w-10 h-10 rounded-full border border-[var(--color-accent)] text-[var(--color-text)] flex items-center justify-center text-lg hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-text)] transition-all shadow-sm hover:scale-110"
+                >
+                  <i :class="sLink.icon"></i>
+                </a>
+              </template>
+              <template v-else-if="socialStyle === 'pills'">
+                <a 
+                  v-for="(sLink, sIdx) in socialLinks" 
+                  :key="sIdx"
+                  :href="sLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="sLink.label"
+                  class="px-3.5 py-1.5 rounded-full border border-[var(--color-accent)] bg-[var(--color-foreground)] text-[var(--color-text)] flex items-center gap-1.5 text-xs font-bold shadow-sm hover:scale-105 transition-all"
+                >
+                  <i :class="sLink.icon" class="text-sm"></i>
+                  <span>{{ sLink.label }}</span>
+                </a>
+              </template>
             </div>
           </div>
 
@@ -233,7 +275,7 @@
           </div>
 
           <!-- Métricas / Prova Social -->
-          <div v-if="loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-sm text-center">
+          <div v-if="loja.show_metrics !== 0 && loja.show_metrics !== false && loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-sm text-center">
             <div 
               v-for="(metric, mIdx) in loja.metrics.slice(0, 3)" 
               :key="mIdx"
@@ -272,18 +314,60 @@
 
           <!-- Rodapé de Redes Sociais -->
           <div v-if="socialLinks.length && socialFooterVisible" class="text-center py-4 space-y-3">
-            <div class="flex items-center justify-center flex-wrap gap-3 text-lg">
-              <a 
-                v-for="(sLink, sIdx) in socialLinks" 
-                :key="sIdx"
-                :href="sLink.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                :title="sLink.label"
-                class="w-9 h-9 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-text)] transition-all shadow-xs hover:scale-105"
-              >
-                <i :class="sLink.icon"></i>
-              </a>
+            <div class="flex items-center justify-center flex-wrap gap-3">
+              <template v-if="socialStyle === 'minimal'">
+                <a 
+                  v-for="(sLink, sIdx) in socialLinks" 
+                  :key="sIdx"
+                  :href="sLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="sLink.label"
+                  class="p-1.5 opacity-80 hover:opacity-100 transition-opacity text-lg text-[var(--color-text)] hover:scale-110"
+                >
+                  <i :class="sLink.icon"></i>
+                </a>
+              </template>
+              <template v-else-if="socialStyle === 'circle-filled'">
+                <a 
+                  v-for="(sLink, sIdx) in socialLinks" 
+                  :key="sIdx"
+                  :href="sLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="sLink.label"
+                  class="w-9 h-9 rounded-full bg-[var(--color-primary)] text-[var(--color-primary-text)] flex items-center justify-center text-sm shadow-sm hover:scale-110 transition-all"
+                >
+                  <i :class="sLink.icon"></i>
+                </a>
+              </template>
+              <template v-else-if="socialStyle === 'outline'">
+                <a 
+                  v-for="(sLink, sIdx) in socialLinks" 
+                  :key="sIdx"
+                  :href="sLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="sLink.label"
+                  class="w-9 h-9 rounded-full border border-[var(--color-accent)] text-[var(--color-text)] flex items-center justify-center text-sm hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-text)] transition-all shadow-xs hover:scale-110"
+                >
+                  <i :class="sLink.icon"></i>
+                </a>
+              </template>
+              <template v-else-if="socialStyle === 'pills'">
+                <a 
+                  v-for="(sLink, sIdx) in socialLinks" 
+                  :key="sIdx"
+                  :href="sLink.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="sLink.label"
+                  class="px-3 py-1 rounded-full border border-[var(--color-accent)] bg-[var(--color-foreground)] text-[var(--color-text)] flex items-center gap-1.5 text-xs font-bold shadow-xs hover:scale-105 transition-all"
+                >
+                  <i :class="sLink.icon" class="text-xs"></i>
+                  <span>{{ sLink.label }}</span>
+                </a>
+              </template>
             </div>
           </div>
 
@@ -384,6 +468,10 @@ const avatarShapeClass = computed(() => {
 const socialFooterVisible = computed(() => {
   if (!currentTheme.value) return true
   return currentTheme.value.showSocialFooter !== false && currentTheme.value.show_social_footer !== false
+})
+
+const socialStyle = computed(() => {
+  return currentTheme.value?.socialStyle || currentTheme.value?.social_style || 'minimal'
 })
 
 const themeBannerImage = computed(() => {
