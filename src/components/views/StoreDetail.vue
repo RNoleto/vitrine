@@ -654,13 +654,42 @@
                   class="flex items-center gap-2.5 p-2.5 border text-left text-xs font-semibold transition-all"
                   :class="[btnShapeClass, btnShadowClass]"
                   :style="{
-                    background: (activeThemeObj?.btnShape || activeThemeObj?.btn_shape) === 'outline' ? 'transparent' : ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' ? 'rgba(255, 255, 255, 0.25)' : ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'gold-bordered' ? 'linear-gradient(135deg, var(--color-foreground), var(--color-background))' : 'var(--color-foreground)')),
-                    borderColor: 'var(--color-accent)',
+                    background: (activeThemeObj?.btnShape || activeThemeObj?.btn_shape) === 'outline' 
+                      ? 'transparent' 
+                      : (((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
+                        ? 'rgba(255, 255, 255, 0.25)' 
+                        : ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'gold-bordered' 
+                          ? 'linear-gradient(135deg, var(--color-foreground), var(--color-background))' 
+                          : 'var(--color-foreground)')),
+                    borderColor: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
+                      ? 'rgba(255, 255, 255, 0.35)' 
+                      : 'var(--color-accent)',
                     color: 'var(--color-text)',
-                    backdropFilter: (activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' ? 'blur(12px)' : 'none'
+                    backdropFilter: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
+                      ? `blur(${activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 12}px)` 
+                      : 'none',
+                    WebkitBackdropFilter: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
+                      ? `blur(${activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 12}px)` 
+                      : 'none'
                   }"
                 >
-                  <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-background-solid, var(--color-background));">
+                  <div 
+                    class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all" 
+                    :style="{
+                      background: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
+                        ? 'rgba(255, 255, 255, 0.25)' 
+                        : 'var(--color-background-solid, var(--color-background))',
+                      border: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
+                        ? '1px solid rgba(255, 255, 255, 0.4)' 
+                        : '1px solid var(--color-accent)',
+                      backdropFilter: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
+                        ? 'blur(8px)' 
+                        : 'none',
+                      WebkitBackdropFilter: ((activeThemeObj?.cardStyle || activeThemeObj?.card_style) === 'glass' || (activeThemeObj?.backdropBlur || activeThemeObj?.backdrop_blur || 0) > 0)
+                        ? 'blur(8px)' 
+                        : 'none'
+                    }"
+                  >
                     <i :class="link.icone || 'fa-solid fa-link'" class="text-xs" style="color: var(--color-accent);"></i>
                   </div>
                   <span class="flex-1 truncate">{{ link.texto }}</span>

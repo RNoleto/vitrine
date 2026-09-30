@@ -401,7 +401,10 @@ function editCustomTheme(theme) {
   primaryColor.value = theme.colors.primary
   accentColor.value = theme.colors.accent
   textColor.value = theme.colors.text
-  backdropBlur.value = theme.backdropBlur || 0
+  
+  const themeBlur = theme.backdropBlur !== undefined ? Number(theme.backdropBlur) : (theme.backdrop_blur !== undefined ? Number(theme.backdrop_blur) : 0)
+  cardStyle.value = theme.cardStyle || theme.card_style || (themeBlur > 0 ? 'glass' : 'gold-bordered')
+  backdropBlur.value = themeBlur > 0 ? themeBlur : (cardStyle.value === 'glass' ? 12 : 0)
 
   if (theme.colors.background && theme.colors.background.includes('gradient')) {
     const matches = theme.colors.background.match(/#([a-fA-F0-9]{3,8})/g)

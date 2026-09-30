@@ -24,7 +24,16 @@ const themeStore = useThemeStore()
 const currentCardStyle = computed(() => {
   if (props.cardStyle) return props.cardStyle
   const theme = themeStore.currentThemeObject
-  return theme?.cardStyle || theme?.card_style || 'flat'
+  const blur = theme?.backdropBlur !== undefined ? Number(theme.backdropBlur) : (theme?.backdrop_blur !== undefined ? Number(theme.backdrop_blur) : 0)
+  const style = theme?.cardStyle || theme?.card_style || 'flat'
+  if (style === 'glass' || blur > 0) return 'glass'
+  return style
+})
+
+const currentBlur = computed(() => {
+  const theme = themeStore.currentThemeObject
+  const blur = theme?.backdropBlur !== undefined ? Number(theme.backdropBlur) : (theme?.backdrop_blur !== undefined ? Number(theme.backdrop_blur) : 0)
+  return blur > 0 ? blur : 12
 })
 
 const btnShapeClass = computed(() => {
@@ -41,7 +50,8 @@ const btnShadowClass = computed(() => {
 <template>
   <component :is="internal ? 'RouterLink' : 'a'"
     v-bind="internal ? { to: link } : { href: link, target: '_blank', rel: 'noopener noreferrer' }" 
-    :class="['card', `card-style-${currentCardStyle}`, btnShapeClass, btnShadowClass]">
+    :class="['card', `card-style-${currentCardStyle}`, btnShapeClass, btnShadowClass]"
+    :style="currentCardStyle === 'glass' ? { backdropFilter: `blur(${currentBlur}px)`, WebkitBackdropFilter: `blur(${currentBlur}px)` } : {}">
     <div class="icon-wrapper">
       <img v-if="photo" :src="photo" alt="Foto" class="photo" />
       <i v-else-if="icon" :class="icon" class="icon" />

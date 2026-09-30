@@ -70,32 +70,38 @@ export const useThemeStore = defineStore('theme', {
       try {
         const { data } = await api.get('/themes')
         if (Array.isArray(data) && data.length > 0) {
-          this.dbThemes = data.map(t => ({
-            id: t.id,
-            label: t.label,
-            isCustom: t.is_custom !== undefined ? Boolean(t.is_custom) : false,
-            isPremium: Boolean(t.is_premium),
-            category: t.category || 'standard',
-            fontFamily: t.font_family || 'sans',
-            iconFamily: t.icon_family || 'fontawesome-6',
-            layoutStyle: t.layout_style || 'standard',
-            cardStyle: t.card_style || 'flat',
-            btnShape: t.btn_shape || 'pill',
-            btnShadow: t.btn_shadow || 'soft',
-            avatarShape: t.avatar_shape || 'circle',
-            showSocialFooter: t.show_social_footer !== undefined ? Boolean(t.show_social_footer) : true,
-            socialStyle: t.social_style || 'minimal',
-            elements: t.elements || null,
-            bgType: t.bg_type || 'solid',
-            bgImageUrl: t.bg_image_url || '',
-            bgAttachment: t.bg_attachment || 'scroll',
-            bgSize: t.bg_size || 'cover',
-            bgPosition: t.bg_position || 'center',
-            bgAnimationType: t.bg_animation_type || 'gradient-flow',
-            bgOverlay: t.bg_overlay || { enabled: false, color: '#000000', opacity: 0, blur: 0 },
-            colors: t.colors || { background: '#FFFFFF', foreground: '#F8FAFC', primary: '#6366F1', accent: '#4F46E5', text: '#1E293B' },
-            backdropBlur: t.backdrop_blur || 0
-          }))
+          this.dbThemes = data.map(t => {
+            const blurVal = t.backdrop_blur !== undefined && t.backdrop_blur !== null ? Number(t.backdrop_blur) : 0
+            const cardStyleVal = t.card_style || 'flat'
+            const isGlass = cardStyleVal === 'glass' || blurVal > 0
+
+            return {
+              id: t.id,
+              label: t.label,
+              isCustom: t.is_custom !== undefined ? Boolean(t.is_custom) : false,
+              isPremium: Boolean(t.is_premium),
+              category: t.category || 'standard',
+              fontFamily: t.font_family || 'sans',
+              iconFamily: t.icon_family || 'fontawesome-6',
+              layoutStyle: t.layout_style || 'standard',
+              cardStyle: isGlass ? 'glass' : cardStyleVal,
+              btnShape: t.btn_shape || 'pill',
+              btnShadow: t.btn_shadow || 'soft',
+              avatarShape: t.avatar_shape || 'circle',
+              showSocialFooter: t.show_social_footer !== undefined ? Boolean(t.show_social_footer) : true,
+              socialStyle: t.social_style || 'minimal',
+              elements: t.elements || null,
+              bgType: t.bg_type || 'solid',
+              bgImageUrl: t.bg_image_url || '',
+              bgAttachment: t.bg_attachment || 'scroll',
+              bgSize: t.bg_size || 'cover',
+              bgPosition: t.bg_position || 'center',
+              bgAnimationType: t.bg_animation_type || 'gradient-flow',
+              bgOverlay: t.bg_overlay || { enabled: false, color: '#000000', opacity: 0, blur: 0 },
+              colors: t.colors || { background: '#FFFFFF', foreground: '#F8FAFC', primary: '#6366F1', accent: '#4F46E5', text: '#1E293B' },
+              backdropBlur: blurVal > 0 ? blurVal : (cardStyleVal === 'glass' ? 12 : 0)
+            }
+          })
         }
         const fontStore = useFontStore()
         const iconStore = useIconStore()
@@ -246,7 +252,7 @@ export const useThemeStore = defineStore('theme', {
           font_family: themeObj.fontFamily || 'serif',
           icon_family: themeObj.iconFamily || themeObj.icon_family || 'fontawesome-6',
           layout_style: themeObj.layoutStyle || 'portrait-hero',
-          card_style: themeObj.cardStyle || 'gold-bordered',
+          card_style: (themeObj.cardStyle === 'glass' || (themeObj.backdropBlur || 0) > 0) ? 'glass' : (themeObj.cardStyle || 'gold-bordered'),
           btn_shape: themeObj.btnShape || themeObj.btn_shape || 'pill',
           btn_shadow: themeObj.btnShadow || themeObj.btn_shadow || 'soft',
           avatar_shape: themeObj.avatarShape || themeObj.avatar_shape || 'circle',
@@ -261,7 +267,7 @@ export const useThemeStore = defineStore('theme', {
           bg_animation_type: themeObj.bgAnimationType || null,
           bg_overlay: themeObj.bgOverlay || { enabled: false, color: '#000000', opacity: 0, blur: 0 },
           colors: themeObj.colors,
-          backdrop_blur: themeObj.backdropBlur || 0
+          backdrop_blur: (themeObj.backdropBlur > 0) ? themeObj.backdropBlur : (themeObj.cardStyle === 'glass' ? 12 : 0)
         }
 
         const existingTheme = this.allThemes.find(t => t.id === themeObj.id)
