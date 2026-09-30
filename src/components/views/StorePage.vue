@@ -475,6 +475,9 @@ const socialStyle = computed(() => {
 })
 
 const themeBannerImage = computed(() => {
+  if (loja.value?.show_banner === 0 || loja.value?.show_banner === false) {
+    return null
+  }
   return loja.value?.banner_image || currentTheme.value?.bannerImage || currentTheme.value?.banner_image || currentTheme.value?.elements?.banner_image || null
 })
 

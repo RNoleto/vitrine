@@ -206,16 +206,27 @@
             </div>
 
             <!-- Banner de Imagem Destaque -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
-                <i class="fa-solid fa-panorama text-indigo-500"></i> Banner de Imagem Destaque (URL de Imagem / Produto):
-              </label>
-              <input 
-                v-model="formBannerImage" 
-                placeholder="Ex: https://images.unsplash.com/... (URL de imagem em destaque)" 
-                class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all"
-              />
-              <span class="text-[10px] text-gray-400">URL da imagem de capa/destaque da sua vitrine. Sobrescreve a imagem modelo do tema.</span>
+            <div class="space-y-1.5 p-3 bg-gray-50 border border-gray-200 rounded-xl">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                  <i class="fa-solid fa-panorama text-indigo-500"></i> Banner de Imagem Destaque (URL de Imagem / Produto):
+                </label>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="formShowBanner" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <span class="ml-2 text-xs font-semibold" :class="formShowBanner ? 'text-indigo-700' : 'text-gray-400'">
+                    {{ formShowBanner ? 'Exibir Banner' : 'Ocultar Banner' }}
+                  </span>
+                </label>
+              </div>
+              <div v-if="formShowBanner" class="pt-1.5 space-y-1">
+                <input 
+                  v-model="formBannerImage" 
+                  placeholder="Ex: https://images.unsplash.com/... (URL de imagem em destaque)" 
+                  class="w-full p-2.5 border border-gray-300 rounded-xl text-xs font-mono bg-white focus:ring-2 focus:ring-indigo-500 transition-all"
+                />
+                <span class="text-[10px] text-gray-400">URL da imagem de capa/destaque da sua vitrine. Sobrescreve a imagem modelo do tema.</span>
+              </div>
             </div>
 
             <!-- 1. Biografia / Sobre mim -->
@@ -596,7 +607,7 @@
               </div>
 
               <!-- Banner Destaque no Mockup em Tempo Real -->
-              <div v-if="formBannerImage || loja?.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" class="rounded-xl overflow-hidden shadow-xs border border-white/20 my-2.5">
+              <div v-if="showBannerComputed && (formBannerImage || loja?.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage)" class="rounded-xl overflow-hidden shadow-xs border border-white/20 my-2.5">
                 <img 
                   :src="formBannerImage || loja?.banner_image || activeThemeObj?.banner_image || activeThemeObj?.bannerImage" 
                   alt="Banner Destaque" 
@@ -747,6 +758,13 @@ const showMetricsComputed = computed(() => {
   return loja.value?.show_metrics !== 0 && loja.value?.show_metrics !== false
 })
 
+const showBannerComputed = computed(() => {
+  if (typeof formShowBanner.value !== 'undefined' && formShowBanner.value !== null) {
+    return formShowBanner.value
+  }
+  return loja.value?.show_banner !== 0 && loja.value?.show_banner !== false
+})
+
 const mockupSocialLinks = computed(() => {
   const filled = []
   const networks = formSocialNetworks.value || {}
@@ -815,6 +833,7 @@ const formLogoPreview = ref('')
 const formDescription = ref('')
 const formSubtitle = ref('')
 const formBannerImage = ref('')
+const formShowBanner = ref(true)
 const formBio = ref('')
 const formShowMetrics = ref(true)
 const formMetrics = ref([
@@ -930,6 +949,7 @@ async function salvarConteudoCustomizado() {
       description: formDescription.value,
       subtitle: formSubtitle.value,
       banner_image: formBannerImage.value,
+      show_banner: formShowBanner.value ? 1 : 0,
       bio: formBio.value,
       metrics: validMetrics,
       show_metrics: formShowMetrics.value ? 1 : 0,
@@ -941,6 +961,7 @@ async function salvarConteudoCustomizado() {
     loja.value.description = formDescription.value
     loja.value.subtitle = formSubtitle.value
     loja.value.banner_image = formBannerImage.value
+    loja.value.show_banner = formShowBanner.value ? 1 : 0
     loja.value.bio = formBio.value
     loja.value.metrics = validMetrics
     loja.value.show_metrics = formShowMetrics.value ? 1 : 0
@@ -979,6 +1000,7 @@ onMounted(async () => {
     formDescription.value = loja.value.description || ''
     formSubtitle.value = loja.value.subtitle || ''
     formBannerImage.value = loja.value.banner_image || ''
+    formShowBanner.value = loja.value.show_banner !== 0 && loja.value.show_banner !== false
     formBio.value = loja.value.bio || ''
     formShowMetrics.value = loja.value.show_metrics !== 0 && loja.value.show_metrics !== false
     formLinks.value = JSON.parse(JSON.stringify(loja.value.links || []))
