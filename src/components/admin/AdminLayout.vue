@@ -15,11 +15,12 @@ import {
   faArrowRightFromBracket,
   faPalette,
   faFont,
-  faIcons
+  faIcons,
+  faRobot
 } from '@fortawesome/free-solid-svg-icons'
 import Button from '@/components/ui/Button.vue'
 
-library.add(faChartPie, faUsers, faStore, faAddressBook, faArrowLeft, faShieldHalved, faArrowRightFromBracket, faPalette, faFont, faIcons)
+library.add(faChartPie, faUsers, faStore, faAddressBook, faArrowLeft, faShieldHalved, faArrowRightFromBracket, faPalette, faFont, faIcons, faRobot)
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
@@ -37,6 +38,7 @@ const links = [
   { name: 'Temas Visuais', route: '/admin/themes', icon: 'palette' },
   { name: 'Gerenciador de Fontes', route: '/admin/fonts', icon: 'font' },
   { name: 'Gerenciador de Ícones', route: '/admin/icons', icon: 'icons' },
+  { name: 'Integrações & Discord', route: '/admin/integrations', icon: 'robot' },
 ]
 
 function toggleSidebar() {

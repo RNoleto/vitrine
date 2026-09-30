@@ -22,6 +22,7 @@ import AdminContacts from '../components/admin/AdminContacts.vue'
 import AdminThemes from '@/components/admin/AdminThemes.vue'
 import AdminFonts from '@/components/admin/AdminFonts.vue'
 import AdminIcons from '@/components/admin/AdminIcons.vue'
+import AdminIntegrations from '@/components/admin/AdminIntegrations.vue'
 
 import { useThemeStore } from '../stores/themeStore'
 import { useLojaStore } from '../stores/lojaStore'
@@ -146,6 +147,11 @@ const routes = [
         path: 'icons',
         name: 'AdminIcons',
         component: AdminIcons
+      },
+      {
+        path: 'integrations',
+        name: 'AdminIntegrations',
+        component: AdminIntegrations
       },
       {
         path: 'settings',
