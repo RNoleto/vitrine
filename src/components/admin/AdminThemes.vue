@@ -4,6 +4,7 @@ import { useThemeStore } from '@/stores/themeStore'
 import { useFeedbackStore } from '@/stores/feedbackStore'
 import { useFontStore } from '@/stores/fontStore'
 import { useIconStore } from '@/stores/iconStore'
+import VitrineButton from '@/components/ui/VitrineButton.vue'
 
 const themeStore = useThemeStore()
 const feedbackStore = useFeedbackStore()
@@ -241,6 +242,20 @@ const filteredGalleryThemes = computed(() => {
   }
   return all
 })
+
+const customThemePreviewObj = computed(() => ({
+  cardStyle: cardStyle.value,
+  btnShape: btnShape.value,
+  btnShadow: btnShadow.value,
+  backdropBlur: backdropBlur.value,
+  colors: {
+    background: computedBackground.value,
+    foreground: fgColor.value,
+    primary: primaryColor.value,
+    accent: accentColor.value,
+    text: textColor.value
+  }
+}))
 
 function handleBgImageUpload(event) {
   const file = event.target.files[0]
@@ -1261,88 +1276,27 @@ onMounted(async () => {
 
               <!-- Lista de Links Elegantes -->
               <div class="space-y-2 text-xs">
-                <div 
-                  class="p-2.5 flex items-center justify-between border transition-all"
-                  :class="[computedBtnShapeClass, computedBtnShadowClass]"
-                  :style="{
-                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 45%, transparent)` : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
-                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? `color-mix(in srgb, ${accentColor} 80%, transparent)` : primaryColor),
-                    color: textColor,
-                    backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
-                  }"
-                >
-                  <div class="flex items-center gap-2.5">
-                    <div 
-                      class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all" 
-                      :style="{
-                        background: cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 65%, transparent)` : 'rgba(0, 0, 0, 0.08)',
-                        border: cardStyle === 'glass' ? `1px solid ${accentColor}` : 'none',
-                        color: accentColor
-                      }"
-                    >
-                      <i class="fa-solid fa-calendar-check text-xs"></i>
-                    </div>
-                    <span class="font-semibold text-xs">Agende sua Consulta</span>
-                  </div>
-                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60" :style="{ color: accentColor }"></i>
-                </div>
+                <VitrineButton
+                  text="Agende sua Consulta"
+                  icon="fa-solid fa-calendar-check"
+                  :show-arrow="true"
+                  :theme="customThemePreviewObj"
+                />
 
-                <div 
-                  class="p-2.5 flex items-center justify-between border transition-all"
-                  :class="[computedBtnShapeClass, computedBtnShadowClass]"
-                  :style="{
-                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 45%, transparent)` : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
-                    borderColor: cardStyle === 'gold-bordered' ? accentColor : (cardStyle === 'glass' ? `color-mix(in srgb, ${accentColor} 80%, transparent)` : primaryColor),
-                    color: textColor,
-                    backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
-                  }"
-                >
-                  <div class="flex items-center gap-2.5">
-                    <div 
-                      class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all" 
-                      :style="{
-                        background: cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 65%, transparent)` : 'rgba(0, 0, 0, 0.08)',
-                        border: cardStyle === 'glass' ? `1px solid ${accentColor}` : 'none',
-                        color: accentColor
-                      }"
-                    >
-                      <i class="fa-solid fa-scale-balanced text-xs"></i>
-                    </div>
-                    <span class="font-semibold text-xs">Áreas de Atuação</span>
-                  </div>
-                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60" :style="{ color: accentColor }"></i>
-                </div>
+                <VitrineButton
+                  text="Áreas de Atuação"
+                  icon="fa-solid fa-scale-balanced"
+                  :show-arrow="true"
+                  :theme="customThemePreviewObj"
+                />
 
-                <!-- Cartão de Contato WhatsApp -->
-                <div 
-                  class="p-2.5 border flex items-center justify-between transition-all"
-                  :class="[computedBtnShapeClass, computedBtnShadowClass]"
-                  :style="{
-                    background: btnShape === 'outline' ? 'transparent' : (cardStyle === 'glass' ? `color-mix(in srgb, ${fgColor} 45%, transparent)` : (cardStyle === 'gold-bordered' ? `linear-gradient(135deg, ${fgColor}, ${bgColor})` : fgColor)),
-                    borderColor: accentColor,
-                    color: textColor,
-                    backdropFilter: cardStyle === 'glass' ? 'blur(12px)' : (backdropBlur > 0 ? `blur(${backdropBlur}px)` : 'none')
-                  }"
-                >
-                  <div class="flex items-center gap-2.5 text-left">
-                    <div 
-                      class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-xs"
-                      :style="{ background: primaryColor }"
-                    >
-                      <i class="fa-brands fa-whatsapp"></i>
-                    </div>
-                    <div>
-                      <p class="font-bold text-xs leading-none">Fale Conosco</p>
-                      <p class="text-[10px] opacity-75 mt-0.5">(96) 98140-3089</p>
-                    </div>
-                  </div>
-                  <span 
-                    class="text-[9px] font-bold px-2 py-0.5 rounded-full text-white" 
-                    :style="{ background: accentColor }"
-                  >
-                    WhatsApp
-                  </span>
-                </div>
+                <VitrineButton
+                  text="Fale Conosco"
+                  subtitle="(96) 98140-3089"
+                  icon="fa-brands fa-whatsapp"
+                  :show-arrow="true"
+                  :theme="customThemePreviewObj"
+                />
               </div>
 
               <!-- Rodapé de Redes Sociais no Mockup em Tempo Real -->

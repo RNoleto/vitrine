@@ -66,33 +66,44 @@ const btnShadowClass = computed(() => {
 
 // Objeto de estilos dinâmicos para o botão container
 const buttonStyleObj = computed(() => {
+  const theme = activeTheme.value
   const isOutline = btnShape.value === 'outline'
   const isGlass = resolvedCardStyle.value === 'glass'
   const isGradient = resolvedCardStyle.value === 'gold-bordered' || resolvedCardStyle.value === 'gradient'
 
-  let bg = 'var(--color-foreground)'
+  const fg = theme?.colors?.foreground || 'var(--color-foreground)'
+  const bgCol = theme?.colors?.background || 'var(--color-background)'
+  const accent = theme?.colors?.accent || 'var(--color-accent)'
+  const primary = theme?.colors?.primary || 'var(--color-primary)'
+  const textCol = theme?.colors?.text || 'var(--color-text)'
+
+  let bg = fg
   if (isOutline) {
     bg = 'transparent'
   } else if (isGlass) {
-    bg = 'color-mix(in srgb, var(--color-foreground) 45%, transparent)'
+    bg = `color-mix(in srgb, ${fg} 45%, transparent)`
   } else if (isGradient) {
-    bg = 'linear-gradient(135deg, var(--color-foreground), var(--color-background))'
+    bg = `linear-gradient(135deg, ${fg}, ${bgCol})`
   }
 
-  let border = 'var(--color-accent)'
-  if (isOutline) {
-    border = 'var(--color-primary)'
+  let border = primary
+  if (isGlass) {
+    border = `color-mix(in srgb, ${accent} 80%, transparent)`
+  } else if (isGradient) {
+    border = accent
+  } else if (isOutline) {
+    border = primary
   }
 
   let filter = 'none'
   if (isGlass) {
-    filter = `blur(${resolvedBlur.value}px)`
+    filter = `blur(${resolvedBlur.value > 0 ? resolvedBlur.value : 12}px)`
   }
 
   return {
     background: bg,
     borderColor: border,
-    color: 'var(--color-text)',
+    color: textCol,
     backdropFilter: filter,
     WebkitBackdropFilter: filter
   }
@@ -100,21 +111,25 @@ const buttonStyleObj = computed(() => {
 
 // Objeto de estilos dinâmicos para a bolinha do ícone
 const iconWrapperStyleObj = computed(() => {
+  const theme = activeTheme.value
   const isGlass = resolvedCardStyle.value === 'glass'
+  const fg = theme?.colors?.foreground || 'var(--color-foreground)'
+  const accent = theme?.colors?.accent || 'var(--color-accent)'
 
-  let bg = 'var(--color-background-solid, var(--color-background))'
-  if (isGlass) {
-    bg = 'color-mix(in srgb, var(--color-foreground) 65%, transparent)'
-  }
-
+  let bg = 'rgba(0, 0, 0, 0.08)'
+  let border = 'none'
   let filter = 'none'
+
   if (isGlass) {
+    bg = `color-mix(in srgb, ${fg} 65%, transparent)`
+    border = `1px solid ${accent}`
     filter = 'blur(8px)'
   }
 
   return {
     background: bg,
-    border: '1px solid var(--color-accent)',
+    border: border,
+    color: accent,
     backdropFilter: filter,
     WebkitBackdropFilter: filter
   }
@@ -136,17 +151,17 @@ function handleClick(e) {
   >
     <div class="icon-wrapper" :style="iconWrapperStyleObj">
       <img v-if="photo" :src="photo" alt="Foto" class="photo" />
-      <i v-else-if="icon" :class="icon" class="icon" style="color: var(--color-accent);" />
-      <i v-else class="fa-solid fa-link icon opacity-50" style="color: var(--color-accent);" />
+      <i v-else-if="icon" :class="icon" class="icon" :style="{ color: iconWrapperStyleObj.color }" />
+      <i v-else class="fa-solid fa-link icon opacity-50" :style="{ color: iconWrapperStyleObj.color }" />
     </div>
 
     <div class="button-content flex-1 min-w-0">
-      <p class="button-title" style="color: var(--color-text);">{{ text }}</p>
-      <span v-if="subtitle" class="button-subtitle" style="color: var(--color-text);">{{ subtitle }}</span>
+      <p class="button-title" :style="{ color: buttonStyleObj.color }">{{ text }}</p>
+      <span v-if="subtitle" class="button-subtitle" :style="{ color: buttonStyleObj.color }">{{ subtitle }}</span>
     </div>
 
     <div v-if="showArrow" class="arrow-wrapper">
-      <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);" />
+      <i class="fa-solid fa-chevron-right arrow-icon" :style="{ color: activeTheme?.colors?.accent || 'var(--color-accent)' }" />
     </div>
   </RouterLink>
 
@@ -162,17 +177,17 @@ function handleClick(e) {
   >
     <div class="icon-wrapper" :style="iconWrapperStyleObj">
       <img v-if="photo" :src="photo" alt="Foto" class="photo" />
-      <i v-else-if="icon" :class="icon" class="icon" style="color: var(--color-accent);" />
-      <i v-else class="fa-solid fa-link icon opacity-50" style="color: var(--color-accent);" />
+      <i v-else-if="icon" :class="icon" class="icon" :style="{ color: iconWrapperStyleObj.color }" />
+      <i v-else class="fa-solid fa-link icon opacity-50" :style="{ color: iconWrapperStyleObj.color }" />
     </div>
 
     <div class="button-content flex-1 min-w-0">
-      <p class="button-title" style="color: var(--color-text);">{{ text }}</p>
-      <span v-if="subtitle" class="button-subtitle" style="color: var(--color-text);">{{ subtitle }}</span>
+      <p class="button-title" :style="{ color: buttonStyleObj.color }">{{ text }}</p>
+      <span v-if="subtitle" class="button-subtitle" :style="{ color: buttonStyleObj.color }">{{ subtitle }}</span>
     </div>
 
     <div v-if="showArrow" class="arrow-wrapper">
-      <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);" />
+      <i class="fa-solid fa-chevron-right arrow-icon" :style="{ color: activeTheme?.colors?.accent || 'var(--color-accent)' }" />
     </div>
   </a>
 
@@ -188,17 +203,17 @@ function handleClick(e) {
   >
     <div class="icon-wrapper" :style="iconWrapperStyleObj">
       <img v-if="photo" :src="photo" alt="Foto" class="photo" />
-      <i v-else-if="icon" :class="icon" class="icon" style="color: var(--color-accent);" />
-      <i v-else class="fa-solid fa-link icon opacity-50" style="color: var(--color-accent);" />
+      <i v-else-if="icon" :class="icon" class="icon" :style="{ color: iconWrapperStyleObj.color }" />
+      <i v-else class="fa-solid fa-link icon opacity-50" :style="{ color: iconWrapperStyleObj.color }" />
     </div>
 
     <div class="button-content flex-1 min-w-0">
-      <p class="button-title" style="color: var(--color-text);">{{ text }}</p>
-      <span v-if="subtitle" class="button-subtitle" style="color: var(--color-text);">{{ subtitle }}</span>
+      <p class="button-title" :style="{ color: buttonStyleObj.color }">{{ text }}</p>
+      <span v-if="subtitle" class="button-subtitle" :style="{ color: buttonStyleObj.color }">{{ subtitle }}</span>
     </div>
 
     <div v-if="showArrow" class="arrow-wrapper">
-      <i class="fa-solid fa-chevron-right arrow-icon" style="color: var(--color-accent);" />
+      <i class="fa-solid fa-chevron-right arrow-icon" :style="{ color: activeTheme?.colors?.accent || 'var(--color-accent)' }" />
     </div>
   </div>
 </template>
