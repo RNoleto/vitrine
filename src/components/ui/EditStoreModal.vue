@@ -212,11 +212,11 @@ function saveLocal() {
           </div>
 
           <!-- Rodapé de Ações Fixas -->
-          <div class="px-6 py-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-end gap-3 rounded-b-3xl">
-            <Button variant="cancelar" @click="$emit('cancel')" class="px-4 py-2.5 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 rounded-xl text-xs font-bold transition-all">
+          <div class="px-6 py-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-center gap-3 rounded-b-3xl">
+            <Button variant="cancelar" @click="$emit('cancel')" class="w-full px-4 py-2.5">
               Cancelar
             </Button>
-            <Button @click="saveLocal" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-200 transition-all flex items-center gap-2">
+            <Button @click="saveLocal" class="w-full px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-200 transition-all flex items-center gap-2">
               <i class="fa-solid fa-check"></i>
               <span>Salvar Alterações</span>
             </Button>

@@ -1,20 +1,22 @@
 <template>
-  <input
-    :type="type"
-    :name="name"
-    :id="id"
-    :autocomplete="autocomplete"
-    :required="required"
-    :placeholder="placeholder"
-    :class="inputClass"
-    :value="type !== 'checkbox' ? modelValue : null"
-    :checked="type === 'checkbox' ? modelValue : null"
-    @input="onInput"
-    @change="onChange"
-    @blur="$emit('blur', $event)"
-    @focus="$emit('focus', $event)"
-  />
-  <p v-if="errorMessage" class="text-sm text-red-600 mt-1">{{ errorMessage }}</p>
+  <div class="w-full">
+    <input
+      :type="type"
+      :name="name"
+      :id="id"
+      :autocomplete="autocomplete"
+      :required="required"
+      :placeholder="placeholder"
+      :class="inputClass"
+      :value="type !== 'checkbox' ? modelValue : null"
+      :checked="type === 'checkbox' ? modelValue : null"
+      @input="onInput"
+      @change="onChange"
+      @blur="$emit('blur', $event)"
+      @focus="$emit('focus', $event)"
+    />
+    <p v-if="errorMessage" class="text-sm text-red-600 mt-1">{{ errorMessage }}</p>
+  </div>
 </template>
 
 <script setup>

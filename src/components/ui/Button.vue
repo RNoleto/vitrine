@@ -11,12 +11,12 @@ const props = defineProps({
 })
 
 const variantClasses = {
-  acessar: 'bg-blue-600 hover:bg-blue-500 focus-visible:outline-blue-600',
-  detalhe: 'bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600',
-  editar: 'bg-yellow-500 hover:bg-yellow-400 focus-visible:outline-yellow-500',
-  cancelar: 'bg-gray-600 hover:bg-gray-500 focus-visible:outline-gray-600',
-  excluir: 'bg-red-600 hover:bg-red-500 focus-visible:outline-red-600',
-  default: 'bg-gray-600 hover:bg-gray-500 focus-visible:outline-gray-600'
+  acessar: 'bg-blue-600 hover:bg-blue-500 text-white focus-visible:outline-blue-600',
+  detalhe: 'bg-indigo-600 hover:bg-indigo-500 text-white focus-visible:outline-indigo-600',
+  editar: 'bg-amber-500 hover:bg-amber-400 text-white focus-visible:outline-amber-500',
+  cancelar: 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 focus-visible:outline-gray-400',
+  excluir: 'bg-red-600 hover:bg-red-500 text-white focus-visible:outline-red-600',
+  default: 'bg-gray-600 hover:bg-gray-500 text-white focus-visible:outline-gray-600'
 }
 </script>
 
@@ -25,7 +25,7 @@ const variantClasses = {
     :type="props.type"
     :disabled="props.disabled"
     :class="[
-      'cursor-pointer mt-1 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2',
+      'cursor-pointer flex justify-center items-center rounded-xl px-4 py-2 text-xs font-bold transition-all shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-2',
       variantClasses[props.variant] || variantClasses.default,
       props.customClass
     ]"
