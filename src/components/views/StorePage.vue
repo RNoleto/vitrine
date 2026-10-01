@@ -67,7 +67,7 @@
           </div>
           <div v-else-if="contatos.length > 1" class="pt-1">
             <VitrineButton 
-              text="Fale com a nossa equipe de especialistas" 
+              text="Fale com a nossa equipe"
               icon="fa-solid fa-headset" 
               subtitle="Equipe disponível para atendimento"
               :show-arrow="true"
@@ -253,9 +253,8 @@
           </div>
           <div v-else-if="contatos.length > 1" class="pt-1">
             <VitrineButton 
-              text="Fale com a nossa equipe de especialistas" 
-              icon="fa-solid fa-headset" 
-              subtitle="Equipe disponível para atendimento"
+              text="Fale com a nossa equipe" 
+              icon="fa-solid fa-headset"
               :show-arrow="true"
               @click="irParaContatos" 
             />
