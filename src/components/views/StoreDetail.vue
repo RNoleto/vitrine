@@ -594,7 +594,7 @@
         </div>
 
         <!-- RIGHT COLUMN: STICKY LIVE SMARTPHONE MOCKUP (5 Cols) -->
-        <div class="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-4 self-start space-y-2">
+        <div class="lg:col-span-5 xl:col-span-5 sticky top-2 self-start space-y-2">
           
           <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
             <h4 class="text-xs font-bold text-gray-800 flex items-center gap-1.5">

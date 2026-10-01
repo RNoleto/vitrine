@@ -1184,7 +1184,7 @@ onMounted(async () => {
       </div>
 
       <!-- Live Preview Smartphone Mockup Realista (5 Colunas) -->
-      <div class="lg:col-span-5 lg:sticky lg:top-4 self-start bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col items-center justify-center">
+      <div class="lg:col-span-5 sticky top-2 self-start bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col items-center justify-center">
         <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
           <i class="fa-solid fa-mobile-screen-button text-indigo-600"></i>
           Pré-visualização do Celular (Tempo Real)
