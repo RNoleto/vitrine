@@ -81,31 +81,30 @@ const buttonStyleObj = computed(() => {
   if (isOutline) {
     bg = 'transparent'
   } else if (isGlass) {
-    bg = `color-mix(in srgb, ${fg} 45%, transparent)`
+    // Fundo translúcido para dar o efeito de vidro
+    bg = `color-mix(in srgb, ${fg} 25%, transparent)`
   } else if (isGradient) {
     bg = `linear-gradient(135deg, ${fg}, ${bgCol})`
   }
 
   let border = primary
   if (isGlass) {
-    border = `color-mix(in srgb, ${accent} 80%, transparent)`
+    border = `color-mix(in srgb, ${accent} 40%, transparent)`
   } else if (isGradient) {
     border = accent
   } else if (isOutline) {
     border = primary
   }
 
-  let filter = 'none'
-  if (isGlass) {
-    filter = `blur(${resolvedBlur.value > 0 ? resolvedBlur.value : 12}px)`
-  }
+  // Definido diretamente no CSS via classe para evitar conflito com filtros globais
+  const blurValue = resolvedBlur.value > 0 ? resolvedBlur.value : 12
 
   return {
     background: bg,
     borderColor: border,
     color: textCol,
-    backdropFilter: filter,
-    WebkitBackdropFilter: filter
+    backdropFilter: `blur(${blurValue}px)`,
+    WebkitBackdropFilter: `blur(${blurValue}px)`
   }
 })
 
@@ -118,20 +117,19 @@ const iconWrapperStyleObj = computed(() => {
 
   let bg = 'rgba(0, 0, 0, 0.08)'
   let border = 'none'
-  let filter = 'none'
+  const blurValue = resolvedBlur.value > 0 ? resolvedBlur.value : 12
 
   if (isGlass) {
-    bg = `color-mix(in srgb, ${fg} 65%, transparent)`
-    border = `1px solid ${accent}`
-    filter = 'blur(8px)'
+    bg = `color-mix(in srgb, ${fg} 35%, transparent)`
+    border = `1px solid color-mix(in srgb, ${accent} 50%, transparent)`
   }
 
   return {
     background: bg,
     border: border,
     color: accent,
-    backdropFilter: filter,
-    WebkitBackdropFilter: filter
+    backdropFilter: `blur(${blurValue}px)`,
+    WebkitBackdropFilter: `blur(${blurValue}px)`
   }
 })
 
@@ -290,8 +288,6 @@ function handleClick(e) {
 }
 
 .card-style-glass {
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 

@@ -85,7 +85,8 @@ onMounted(async () => {
                   :text="c.name" 
                   subtitle="Atendimento direto via WhatsApp"
                   :show-arrow="true"
-                  class="w-full shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+                  :theme="themeStore.currentThemeObject"
+                  class="w-full transition-all duration-300 cursor-pointer"
                   @click="abrirWhatsapp(c, loja?.name)" 
                 />
               </div>
@@ -109,42 +110,3 @@ onMounted(async () => {
     <Footer />
   </section>
 </template>
-
-<style scoped>
-section {
-  background: var(--color-background);
-  color: var(--color-text);
-  min-height: 100vh;
-}
-
-.custom-loading {
-  min-height: calc(100vh - 200px);
-}
-
-.custom-loading ::v-deep(.loader) {
-  border: 4px solid var(--color-text);
-  border-top: 4px solid var(--color-accent);
-}
-
-.title {
-  color: var(--color-text);
-}
-
-.back {
-  color: var(--color-text);
-  background: var(--color-foreground);
-  border: 1px solid var(--color-accent);
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.back:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--color-accent);
-}
-
-section ::v-deep(footer) {
-  color: var(--color-text);
-}
-</style>

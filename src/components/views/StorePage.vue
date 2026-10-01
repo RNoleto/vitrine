@@ -47,7 +47,8 @@
                 :text="link.texto" 
                 :icon="link.icone" 
                 :show-arrow="true"
-                class="w-full shadow-sm hover:shadow-md transition-all duration-300" 
+                :theme="themeStore.currentThemeObject"
+                class="w-full transition-all duration-300" 
                 @click="handleClickLink(link)"
               />
             </div>
@@ -60,6 +61,7 @@
               :photo="contatos[0].photo" 
               subtitle="Atendimento direto via WhatsApp"
               :show-arrow="true"
+              :theme="themeStore.currentThemeObject"
               @click="handleClickContact(contatos[0])" 
             />
           </div>
@@ -69,6 +71,7 @@
               icon="fa-solid fa-headset" 
               subtitle="Equipe disponível para atendimento"
               :show-arrow="true"
+              :theme="themeStore.currentThemeObject"
               @click="irParaContatos" 
             />
           </div>
@@ -232,7 +235,7 @@
                 :text="link.texto" 
                 :icon="link.icone" 
                 :show-arrow="true"
-                class="w-full shadow-sm hover:shadow-md transition-all duration-300" 
+                class="w-full bg-white/20 dark:bg-black/20 backdrop-blur-md border border-white/30 shadow-sm hover:shadow-md transition-all duration-300"
                 @click="handleClickLink(link)"
               />
             </div>
@@ -550,48 +553,3 @@ function handleClickContact(contato){
   }
 }
 </script>
-
-<style scoped>
-section {
-  color: var(--color-text);
-  min-height: 100vh;
-}
-
-.premium-hero-card {
-  background: linear-gradient(145deg, var(--color-foreground), var(--color-background));
-}
-
-.title {
-  color: var(--color-text);
-}
-
-.custom-loading {
-  min-height: calc(100vh - 200px);
-}
-
-.custom-loading ::v-deep(.loader) {
-  border: 4px solid var(--color-text);
-  border-top: 4px solid var(--color-accent);
-}
-
-.custom-loading ::v-deep(.textLoader) {
-  color: var(--color-accent);
-}
-
-section ::v-deep(footer) {
-  color: var(--color-text);
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-</style>
