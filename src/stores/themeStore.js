@@ -227,14 +227,23 @@ export const useThemeStore = defineStore('theme', {
         }
 
         /* Estilos de fundo aplicados EXCLUSIVAMENTE nas paginas publicas de vitrine */
-        .public-store-page.theme-${theme.id}, body.public-store-body.theme-${theme.id} {
+        .public-store-page.theme-${theme.id} {
+          background-image: ${bgType === 'image' ? bgCss : (bgType === 'animation' || bgType === 'gradient' ? bgCss : 'none')} !important;
+          background-color: ${bgType === 'solid' ? theme.colors.background : '#FAFAFA'} !important;
+          background-attachment: scroll !important;
+          background-size: ${bgType === 'animation' && animType === 'gradient-flow' ? '400% 400%' : (bgType === 'animation' && animType === 'floating-orbs' ? '180% 180%, 180% 180%, 100% 100%' : bgSizeCss)} !important;
+          ${bgType === 'animation' ? '' : `background-position: ${bgPositionCss} !important;`}
+          animation: ${animCss} !important;
+          position: relative;
+        }
+
+        body.public-store-body.theme-${theme.id} {
           background-image: ${bgType === 'image' ? bgCss : (bgType === 'animation' || bgType === 'gradient' ? bgCss : 'none')} !important;
           background-color: ${bgType === 'solid' ? theme.colors.background : '#FAFAFA'} !important;
           background-attachment: ${bgAttachmentCss} !important;
           background-size: ${bgType === 'animation' && animType === 'gradient-flow' ? '400% 400%' : (bgType === 'animation' && animType === 'floating-orbs' ? '180% 180%, 180% 180%, 100% 100%' : bgSizeCss)} !important;
           ${bgType === 'animation' ? '' : `background-position: ${bgPositionCss} !important;`}
           animation: ${animCss} !important;
-          position: relative;
         }\n`
 
         if (overlayEnabled && overlayOpacity > 0) {
