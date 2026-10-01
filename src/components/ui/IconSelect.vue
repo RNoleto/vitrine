@@ -7,7 +7,7 @@
       >
         <span class="flex items-center gap-2">
           <i v-if="modelValue" :class="modelValue"></i>
-          <span>{{ modelValue ? options.find(o => o.value === modelValue).label : placeholder }}</span>
+          <span>{{ selectedOptionLabel }}</span>
         </span>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,15 +32,21 @@
   </template>
   
   <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, computed, watch } from 'vue'
   
   const props = defineProps({
     modelValue: String,
-    options: { type: Array, required: true },  
+    options: { type: Array, default: () => [] },  
     placeholder: { type: String, default: 'Selecione um ícone' }
   })
   const emit = defineEmits(['update:modelValue'])
   const open = ref(false)
+
+  const selectedOptionLabel = computed(() => {
+    if (!props.modelValue) return props.placeholder
+    const found = props.options?.find(o => o.value === props.modelValue)
+    return found?.label || props.modelValue || props.placeholder
+  })
   
   // fecha dropdown ao clicar fora
   function handleClickOutside(e) {
