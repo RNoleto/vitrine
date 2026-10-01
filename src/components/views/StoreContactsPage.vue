@@ -54,7 +54,7 @@ onMounted(async () => {
 
 <template>
   <section :class="[`theme-${themeStore.themeName}`, 'public-store-page flex flex-col min-h-[100vh] flex-1 relative overflow-hidden']">
-    <main class="flex-col w-full relative z-10">
+    <main class="flex-col w-full relative">
       <div class="max-w-[720px] mx-auto w-full px-4 pt-6 pb-10">
         <Loading v-if="lojaStore.carregando" text="Carregando dados da loja" class="custom-loading" />
         <div v-else class="storePage text-center space-y-6">

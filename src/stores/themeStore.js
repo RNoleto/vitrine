@@ -110,7 +110,7 @@ export const useThemeStore = defineStore('theme', {
               bgAnimationType: t.bg_animation_type || 'gradient-flow',
               bgOverlay: t.bg_overlay || { enabled: false, color: '#000000', opacity: 0, blur: 0 },
               colors: t.colors || { background: '#FFFFFF', foreground: '#F8FAFC', primary: '#6366F1', accent: '#4F46E5', text: '#1E293B' },
-              backdropBlur: cardStyleVal === 'glass' ? (blurVal > 0 ? blurVal : 12) : 0
+              backdropBlur: blurVal > 0 ? blurVal : (cardStyleVal === 'glass' ? 12 : 0)
             }
           })
         }

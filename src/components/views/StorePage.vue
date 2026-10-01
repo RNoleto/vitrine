@@ -1,6 +1,6 @@
 <template>
   <section :class="[`theme-${themeStore.themeName}`, 'public-store-page flex flex-col min-h-[100vh] flex-1 relative overflow-hidden']">
-    <main class="flex flex-col flex-1 pb-10 relative z-10">
+    <main class="flex flex-col flex-1 pb-10 relative">
       <div class="max-w-[720px] mx-auto w-full px-4 pt-6">
         <Loading v-if="lojaStore.carregando" text="Carregando vitrine..." class="custom-loading" />
 
