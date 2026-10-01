@@ -1,43 +1,42 @@
 <template>
   <div class="max-w-7xl mx-auto pb-12">
     <Loading v-if="lojaStore.carregando" text="Carregando detalhes da vitrine..." />
-    <div v-else-if="loja" class="space-y-6">
-      
-      <!-- Top Bar & Compact Header -->
-      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-4 text-center sm:text-left">
-          <img 
-            :src="formLogoPreview || loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
-            alt="Logo" 
-            class="w-14 h-14 rounded-xl object-cover shadow-sm ring-2 ring-indigo-50" 
-          />
-          <div>
-            <div class="flex items-center justify-center sm:justify-start gap-2">
-              <h1 class="text-xl font-bold text-gray-900 leading-tight">{{ formName || loja.name }}</h1>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Ativa</span>
-              <span v-if="activeThemeObj?.isPremium" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
-                <i class="fa-solid fa-crown text-[9px]"></i> Premium
-              </span>
-            </div>
-            <p class="text-xs text-gray-500 truncate max-w-sm mt-0.5">{{ formDescription || loja.description || 'Vitrine Digital com Links & Contatos' }}</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <a :href="longUrl" target="_blank" class="flex-1 sm:flex-initial px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Pública
-          </a>
-          <button @click="back" class="flex-1 sm:flex-initial px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-arrow-left"></i> Voltar
-          </button>
-        </div>
-      </div>
-
+    <div v-else-if="loja">
       <!-- MAIN 2-COLUMN GRID (TABS + SIDE STICKY MOCKUP) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         <!-- LEFT COLUMN: TABS NAVIGATION & EDITOR (7 Cols) -->
         <div class="lg:col-span-7 xl:col-span-7 space-y-4">
+          
+          <!-- Top Bar & Compact Header -->
+          <div class="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4 text-center sm:text-left">
+              <img 
+                :src="formLogoPreview || loja.logo_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'" 
+                alt="Logo" 
+                class="w-14 h-14 rounded-xl object-cover shadow-sm ring-2 ring-indigo-50" 
+              />
+              <div>
+                <div class="flex items-center justify-center sm:justify-start gap-2">
+                  <h1 class="text-xl font-bold text-gray-900 leading-tight">{{ formName || loja.name }}</h1>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Ativa</span>
+                  <span v-if="activeThemeObj?.isPremium" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 flex items-center gap-1">
+                    <i class="fa-solid fa-crown text-[9px]"></i> Premium
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 truncate max-w-sm mt-0.5">{{ formDescription || loja.description || 'Vitrine Digital com Links & Contatos' }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <a :href="longUrl" target="_blank" class="flex-1 sm:flex-initial px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Pública
+              </a>
+              <button @click="back" class="flex-1 sm:flex-initial px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-arrow-left"></i> Voltar
+              </button>
+            </div>
+          </div>
           
           <!-- Main Tabs Navigation Bar -->
           <div class="bg-white p-1.5 rounded-2xl border border-gray-200 shadow-sm flex flex-wrap sm:flex-nowrap gap-1">
