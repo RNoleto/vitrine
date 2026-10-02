@@ -561,6 +561,243 @@
             </div>
           </div>
 
+          <!-- TAB ANALYTICS & MÉTRICAS -->
+          <div v-show="activeMainTab === 'analytics'" class="space-y-6 animate-fade-in">
+            <!-- Header da Aba com botão Atualizar -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <i class="fa-solid fa-chart-line text-indigo-600"></i> Painel de Analytics & Desempenho
+                </h3>
+                <p class="text-xs text-gray-500">Acompanhe visitas, engajamento e cliques em tempo real na sua vitrine.</p>
+              </div>
+              <button 
+                @click="carregarAnalytics" 
+                :disabled="carregandoAnalytics"
+                class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-xl font-semibold text-xs transition-all flex items-center gap-1.5 disabled:opacity-50"
+              >
+                <i class="fa-solid fa-rotate-right" :class="{ 'fa-spin': carregandoAnalytics }"></i>
+                Atualizar Dados
+              </button>
+            </div>
+
+            <!-- Loader / Cards KPI -->
+            <div v-if="carregandoAnalytics && !analyticsData" class="bg-white p-12 rounded-2xl border border-gray-200 text-center">
+              <i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-600 mb-3"></i>
+              <p class="text-xs font-semibold text-gray-500">Carregando dados estatísticos...</p>
+            </div>
+
+            <template v-else-if="analyticsData">
+              <!-- KPI Cards Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Visitas Totais -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between relative overflow-hidden group">
+                  <div class="space-y-1">
+                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Visitas Totais</span>
+                    <p class="text-2xl font-black text-gray-900">{{ analyticsData.total_visits || 0 }}</p>
+                    <span class="inline-flex items-center text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                      <i class="fa-solid fa-eye mr-1"></i> Visualizações
+                    </span>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-eye"></i>
+                  </div>
+                </div>
+
+                <!-- Cliques em Links -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between relative overflow-hidden group">
+                  <div class="space-y-1">
+                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Cliques nos Links</span>
+                    <p class="text-2xl font-black text-gray-900">{{ analyticsData.total_link_clicks || 0 }}</p>
+                    <span class="inline-flex items-center text-[10px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                      <i class="fa-solid fa-link mr-1"></i> Interações
+                    </span>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-arrow-pointer"></i>
+                  </div>
+                </div>
+
+                <!-- Contatos WhatsApp -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between relative overflow-hidden group">
+                  <div class="space-y-1">
+                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Cliques WhatsApp</span>
+                    <p class="text-2xl font-black text-gray-900">{{ analyticsData.total_contact_clicks || 0 }}</p>
+                    <span class="inline-flex items-center text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                      <i class="fa-brands fa-whatsapp mr-1"></i> Mensagens
+                    </span>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-whatsapp"></i>
+                  </div>
+                </div>
+
+                <!-- Taxa de Conversão -->
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between relative overflow-hidden group">
+                  <div class="space-y-1">
+                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Taxa de Conversão</span>
+                    <p class="text-2xl font-black text-gray-900">{{ analyticsData.conversion_rate || 0 }}%</p>
+                    <span class="inline-flex items-center text-[10px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                      <i class="fa-solid fa-bolt mr-1"></i> Engajamento
+                    </span>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-chart-pie"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Gráfico de Tráfego 7 Dias -->
+              <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-3 gap-2">
+                  <div>
+                    <h4 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                      <i class="fa-solid fa-chart-column text-indigo-600"></i> Histórico de Tráfego & Engajamento (Últimos 7 Dias)
+                    </h4>
+                    <p class="text-xs text-gray-500">Acompanhamento diário de acessos, cliques em links e contatos no WhatsApp</p>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs font-semibold flex-wrap">
+                    <span class="flex items-center gap-1.5 text-gray-600"><span class="w-3 h-3 rounded-md bg-indigo-500 inline-block"></span> Visitas</span>
+                    <span class="flex items-center gap-1.5 text-gray-600"><span class="w-3 h-3 rounded-md bg-violet-500 inline-block"></span> Links</span>
+                    <span class="flex items-center gap-1.5 text-gray-600"><span class="w-3 h-3 rounded-md bg-emerald-500 inline-block"></span> WhatsApp</span>
+                  </div>
+                </div>
+
+                <!-- Gráfico de Barras CSS Dinâmico (3 Pilares) -->
+                <div class="h-60 flex items-end justify-between gap-1.5 pt-8 pb-2 px-2 bg-slate-50/70 rounded-xl border border-slate-100">
+                  <div 
+                    v-for="(day, idx) in analyticsData.daily_traffic" 
+                    :key="idx"
+                    class="flex-1 flex flex-col items-center h-full justify-end group relative"
+                  >
+                    <!-- Tooltip Hover Rich -->
+                    <div class="absolute -top-14 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] py-1.5 px-3 rounded-xl shadow-xl pointer-events-none whitespace-nowrap z-20 flex flex-col items-center">
+                      <span class="font-bold text-indigo-300">{{ day.day }} ({{ day.date }})</span>
+                      <div class="flex items-center gap-2 mt-0.5">
+                        <span class="text-indigo-200">👁️ Visitas: {{ day.visits }}</span>
+                        <span class="text-violet-200">🔗 Links: {{ day.link_clicks || 0 }}</span>
+                        <span class="text-emerald-300">💬 WhatsApp: {{ day.contact_clicks || 0 }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Colunas Flex 3 Pilares -->
+                    <div class="w-full flex items-end justify-center gap-1 max-w-[56px] h-full">
+                      <!-- Barra Visitas (Indigo) -->
+                      <div 
+                        class="w-1/3 bg-gradient-to-t from-indigo-600 to-indigo-400 rounded-t-md transition-all duration-500 group-hover:brightness-110 shadow-xs"
+                        :style="{ height: (day.visits > 0 ? Math.max((day.visits / maxTrafficValue) * 100, 8) : 4) + '%' }"
+                        :title="`Visitas: ${day.visits}`"
+                      ></div>
+                      <!-- Barra Cliques Links (Violet) -->
+                      <div 
+                        class="w-1/3 bg-gradient-to-t from-violet-600 to-violet-400 rounded-t-md transition-all duration-500 group-hover:brightness-110 shadow-xs"
+                        :style="{ height: ((day.link_clicks || 0) > 0 ? Math.max(((day.link_clicks || 0) / maxTrafficValue) * 100, 8) : 4) + '%' }"
+                        :title="`Cliques em Links: ${day.link_clicks || 0}`"
+                      ></div>
+                      <!-- Barra Cliques Contatos (Emerald) -->
+                      <div 
+                        class="w-1/3 bg-gradient-to-t from-emerald-500 to-emerald-300 rounded-t-md transition-all duration-500 group-hover:brightness-110 shadow-xs"
+                        :style="{ height: ((day.contact_clicks || 0) > 0 ? Math.max(((day.contact_clicks || 0) / maxTrafficValue) * 100, 8) : 4) + '%' }"
+                        :title="`Cliques no WhatsApp: ${day.contact_clicks || 0}`"
+                      ></div>
+                    </div>
+
+                    <!-- Data Label -->
+                    <span class="text-[11px] font-semibold text-gray-500 mt-2 truncate w-full text-center" :class="{ 'text-indigo-600 font-bold': day.day === 'Hoje' }">
+                      {{ day.day }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rankings: Links e Contatos -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Top Links -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                  <div class="border-b pb-3 flex items-center justify-between">
+                    <h4 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                      <i class="fa-solid fa-trophy text-amber-500"></i> Links Mais Clicados
+                    </h4>
+                    <span class="text-xs text-gray-400 font-medium">{{ analyticsData.link_performance?.length || 0 }} cadastrados</span>
+                  </div>
+
+                  <div v-if="analyticsData.link_performance?.length" class="space-y-3">
+                    <div 
+                      v-for="(link, index) in analyticsData.link_performance" 
+                      :key="link.id" 
+                      class="p-3 border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors"
+                    >
+                      <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                          <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                            #{{ index + 1 }}
+                          </span>
+                          <p class="text-xs font-bold text-gray-800 truncate">{{ link.texto || link.title }}</p>
+                        </div>
+                        <span class="text-xs font-black text-indigo-600 ml-2 flex-shrink-0">
+                          {{ link.visits }} cliques
+                        </span>
+                      </div>
+                      <p class="text-[10px] text-gray-400 truncate mb-2">{{ link.url }}</p>
+                      
+                      <!-- Progresso relativo -->
+                      <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          class="bg-indigo-600 h-full rounded-full transition-all duration-500"
+                          :style="{ width: (analyticsData.total_link_clicks > 0 ? Math.min((link.visits / analyticsData.total_link_clicks) * 100, 100) : 0) + '%' }"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center py-8 text-xs text-gray-400 italic">
+                    Nenhum clique registrado nos links ainda.
+                  </div>
+                </div>
+
+                <!-- Top Contatos WhatsApp -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                  <div class="border-b pb-3 flex items-center justify-between">
+                    <h4 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                      <i class="fa-solid fa-users text-emerald-600"></i> Atendimento por Contato
+                    </h4>
+                    <span class="text-xs text-gray-400 font-medium">{{ analyticsData.contact_performance?.length || 0 }} vinculados</span>
+                  </div>
+
+                  <div v-if="analyticsData.contact_performance?.length" class="space-y-3">
+                    <div 
+                      v-for="(contact, index) in analyticsData.contact_performance" 
+                      :key="contact.id" 
+                      class="p-3 border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors flex items-center justify-between gap-3"
+                    >
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <img 
+                          :src="contact.photo || 'https://via.placeholder.com/40'" 
+                          alt="Foto" 
+                          class="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-100" 
+                        />
+                        <div class="min-w-0 flex-1">
+                          <p class="text-xs font-bold text-gray-800 truncate">{{ contact.name }}</p>
+                          <p class="text-[10px] text-gray-400 truncate">
+                            <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i>{{ contact.whatsapp }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="text-right flex-shrink-0">
+                        <span class="inline-flex items-center text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-xl">
+                          <i class="fa-solid fa-comments text-[10px] mr-1"></i> {{ contact.clicks }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center py-8 text-xs text-gray-400 italic">
+                    Nenhum clique registrado nos contatos ainda.
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+
           <!-- TAB 4: COMPARTILHAR & QR CODE -->
           <div v-show="activeMainTab === 'share'" class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5 animate-fade-in">
             <div class="border-b pb-3">
@@ -731,7 +968,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useContactStore } from '../../stores/contactStore'
@@ -749,17 +986,46 @@ const lojaStore = useLojaStore()
 const contactStore = useContactStore()
 const feedbackStore = useFeedbackStore()
 
-const activeMainTab = ref('theme') // 'theme' | 'content' | 'links' | 'share'
+const activeMainTab = ref('theme') // 'theme' | 'content' | 'links' | 'analytics' | 'share'
 const selectedTheme = ref('')
 const previewTheme = ref('')
 const isPreview = ref(false)
 const salvandoTema = ref(false)
 const selectedCategoryTab = ref('all') // 'all' | 'premium' | 'gradient' | 'standard'
 
+const analyticsData = ref(null)
+const carregandoAnalytics = ref(false)
+
+const maxTrafficValue = computed(() => {
+  if (!analyticsData.value?.daily_traffic) return 10
+  const maxVisits = Math.max(...analyticsData.value.daily_traffic.map(d => d.visits), 1)
+  const maxClicks = Math.max(...analyticsData.value.daily_traffic.map(d => d.clicks), 1)
+  return Math.max(maxVisits, maxClicks, 10)
+})
+
+async function carregarAnalytics() {
+  if (!loja.value?.id) return
+  carregandoAnalytics.value = true
+  try {
+    analyticsData.value = await lojaStore.obterAnalytics(loja.value.id)
+  } catch (err) {
+    console.error('Erro ao carregar analytics:', err)
+  } finally {
+    carregandoAnalytics.value = false
+  }
+}
+
+watch(activeMainTab, (newTab) => {
+  if (newTab === 'analytics') {
+    carregarAnalytics()
+  }
+})
+
 const mainNavigationTabs = [
   { id: 'theme', label: 'Temas & Visual', icon: 'fa-solid fa-palette' },
   { id: 'content', label: 'Conteúdo & Dados', icon: 'fa-solid fa-pen-to-square' },
   { id: 'links', label: 'Links & Contatos', icon: 'fa-solid fa-link' },
+  { id: 'analytics', label: 'Analytics & Métricas', icon: 'fa-solid fa-chart-line' },
   { id: 'share', label: 'Compartilhar', icon: 'fa-solid fa-share-nodes' }
 ]
 

@@ -37,6 +37,15 @@ const avatarShapeClass = computed(() => {
 
 const { abrirWhatsapp } = useWhatsapp()
 
+function handleClickContact(contato) {
+  if (contato.id) {
+    lojaStore.registrarCliqueContato(contato.id, loja.value?.id)
+  }
+  if (contato.whatsapp) {
+    abrirWhatsapp(contato, loja.value?.name)
+  }
+}
+
 onMounted(async () => {
   try {
     await lojaStore.obterLojaPublica(slug)
@@ -87,7 +96,7 @@ onMounted(async () => {
                   :show-arrow="true"
                   :theme="themeStore.currentThemeObject"
                   class="w-full transition-all duration-300 cursor-pointer"
-                  @click="abrirWhatsapp(c, loja?.name)" 
+                  @click="handleClickContact(c)" 
                 />
               </div>
             </div>

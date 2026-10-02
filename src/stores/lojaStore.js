@@ -108,6 +108,16 @@ export const useLojaStore = defineStore('loja', {
       }
     },
 
+    async obterAnalytics(storeId) {
+      try {
+        const res = await api.get(`/stores/${storeId}/analytics`)
+        return res.data
+      } catch (e) {
+        console.error('Erro ao buscar analytics da loja:', e)
+        throw e
+      }
+    },
+
     async editarLoja(id, dados) {
       this.carregando = true
       this.erro = null
@@ -298,8 +308,12 @@ export const useLojaStore = defineStore('loja', {
       }
     },
     
-    async registrarCliqueContato(contactId) {
-      const storeId = this.lojaSelecionada.id
+    async registrarCliqueContato(contactId, explicitStoreId = null) {
+      const storeId = explicitStoreId || this.lojaSelecionada?.id || this.lojaPublica?.id
+      if (!storeId) {
+        console.warn('ID da loja não encontrado ao registrar clique no contato.')
+        return
+      }
       try {
         await api.post(`/stores/${storeId}/contacts/${contactId}/click`)
       } catch (error) {

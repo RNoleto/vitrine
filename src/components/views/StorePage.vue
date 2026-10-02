@@ -549,7 +549,7 @@ function handleClickLink(link){
 
 function handleClickContact(contato){
   if(contato.id){
-    lojaStore.registrarCliqueContato(contato.id)
+    lojaStore.registrarCliqueContato(contato.id, loja.value?.id)
   }
 
   if(contato.whatsapp){
