@@ -1164,13 +1164,21 @@ onMounted(async () => {
     }
   }
 
-  // Gera link encurtado
+  // Gera link encurtado (usando API com suporte a CORS)
   try {
     const resp = await fetch(
-      `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl.value)}`
+      `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl.value)}`
     )
-    if (resp.ok) shortUrl.value = await resp.text()
-    else shortUrl.value = longUrl.value
+    if (resp.ok) {
+      const data = await resp.json()
+      if (data && data.shorturl) {
+        shortUrl.value = data.shorturl
+      } else {
+        shortUrl.value = longUrl.value
+      }
+    } else {
+      shortUrl.value = longUrl.value
+    }
   } catch {
     shortUrl.value = longUrl.value
   }
