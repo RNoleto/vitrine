@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useWhatsapp } from '@/composables/useWhatsapp'
+import { useSeo } from '@/composables/useSeo'
 import { useRoute, useRouter } from 'vue-router'
 import { useContactStore } from '../../stores/contactStore'
 import { useLojaStore } from '../../stores/lojaStore'
@@ -16,6 +17,7 @@ const slug = route.params.slug
 const contactStore = useContactStore()
 const lojaStore = useLojaStore()
 const themeStore = useThemeStore()
+const { setStoreSeo, resetSeo } = useSeo()
 
 const loja = ref(null)
 
@@ -53,11 +55,16 @@ onMounted(async () => {
     
     if (loja.value) {
       themeStore.applyTheme(loja.value.ref_cod_theme || loja.value.theme || 'default', loja.value.id, true)
+      setStoreSeo(loja.value)
     }
   } catch (error) {
     console.error('Erro ao carregar contatos:', error)
     router.push('/404')
   }
+})
+
+onUnmounted(() => {
+  resetSeo()
 })
 </script>
 

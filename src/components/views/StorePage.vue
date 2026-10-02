@@ -391,6 +391,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useWhatsapp } from '@/composables/useWhatsapp'
+import { useSeo } from '@/composables/useSeo'
 import { useRoute, useRouter } from 'vue-router'
 import { useLojaStore } from '../../stores/lojaStore'
 import { useThemeStore } from '../../stores/themeStore'
@@ -400,6 +401,7 @@ import Footer from '../Footer.vue'
 
 const themeStore = useThemeStore()
 const { abrirWhatsapp } = useWhatsapp()
+const { setStoreSeo, resetSeo } = useSeo()
 const route = useRoute()
 const router = useRouter()
 const lojaStore = useLojaStore()
@@ -522,6 +524,7 @@ onMounted(async () => {
         activeFaqs.value = []
       }
 
+      setStoreSeo(loja.value)
       await lojaStore.registrarVisita(slug)
     }
   } catch (error) {
@@ -532,6 +535,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  resetSeo()
   themeStore.clearBodyTheme()
 })
 
