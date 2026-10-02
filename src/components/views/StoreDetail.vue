@@ -1136,11 +1136,12 @@ onMounted(async () => {
       bannerInputMode.value = 'file'
       formBannerFileName.value = 'Imagem enviada'
     }
-    formShowBanner.value = loja.value.show_banner !== 0 && loja.value.show_banner !== false
+    const isFlagEnabled = (val) => val !== 0 && val !== '0' && val !== false && val !== 'false'
+    formShowBanner.value = isFlagEnabled(loja.value.show_banner)
     formBio.value = loja.value.bio || ''
-    formShowMetrics.value = loja.value.show_metrics !== 0 && loja.value.show_metrics !== false
+    formShowMetrics.value = isFlagEnabled(loja.value.show_metrics)
     formLinks.value = JSON.parse(JSON.stringify(loja.value.links || []))
-    formShowSocialFooter.value = loja.value.show_social_footer !== 0 && loja.value.show_social_footer !== false
+    formShowSocialFooter.value = isFlagEnabled(loja.value.show_social_footer)
 
     if (loja.value.social_networks && typeof loja.value.social_networks === 'object') {
       formSocialNetworks.value = {

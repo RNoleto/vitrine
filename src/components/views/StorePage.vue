@@ -93,7 +93,7 @@
           </div>
 
           <!-- Social Proof Counter Cards -->
-          <div v-if="loja.show_metrics !== 0 && loja.show_metrics !== false && loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-md text-center">
+          <div v-if="isFlagEnabled(loja.show_metrics) && loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-md text-center">
             <div 
               v-for="(metric, mIdx) in loja.metrics.slice(0, 3)" 
               :key="mIdx"
@@ -277,7 +277,7 @@
           </div>
 
           <!-- Métricas / Prova Social -->
-          <div v-if="loja.show_metrics !== 0 && loja.show_metrics !== false && loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-sm text-center">
+          <div v-if="isFlagEnabled(loja.show_metrics) && loja.metrics && loja.metrics.length" class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-[var(--color-foreground)] border border-[var(--color-accent)] shadow-sm text-center">
             <div 
               v-for="(metric, mIdx) in loja.metrics.slice(0, 3)" 
               :key="mIdx"
@@ -460,6 +460,8 @@ const socialLinks = computed(() => {
 
 const currentTheme = computed(() => themeStore.currentThemeObject)
 
+const isFlagEnabled = (val) => val !== 0 && val !== '0' && val !== false && val !== 'false'
+
 const avatarShapeClass = computed(() => {
   const shape = currentTheme.value?.avatarShape || currentTheme.value?.avatar_shape || 'circle'
   if (shape === 'square') return 'rounded-none'
@@ -468,6 +470,9 @@ const avatarShapeClass = computed(() => {
 })
 
 const socialFooterVisible = computed(() => {
+  if (!isFlagEnabled(loja.value?.show_social_footer)) {
+    return false
+  }
   if (!currentTheme.value) return true
   return currentTheme.value.showSocialFooter !== false && currentTheme.value.show_social_footer !== false
 })
@@ -477,7 +482,7 @@ const socialStyle = computed(() => {
 })
 
 const themeBannerImage = computed(() => {
-  if (loja.value?.show_banner === 0 || loja.value?.show_banner === false) {
+  if (!isFlagEnabled(loja.value?.show_banner)) {
     return null
   }
   return (
