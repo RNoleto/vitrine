@@ -1,6 +1,6 @@
 <template>
-  <div class="max-w-7xl mx-auto pb-12">
-    <Loading v-if="lojaStore.carregando" text="Carregando detalhes da vitrine..." />
+  <div class="max-w-7xl mx-auto pb-12 flex-1 flex flex-col justify-center min-h-[75vh]">
+    <Loading v-if="carregandoLoja || lojaStore.carregando" text="Carregando detalhes da vitrine..." />
     <div v-else-if="loja" class="space-y-6">
       
       <!-- Top Bar & Compact Header -->
@@ -963,7 +963,23 @@
       </div>
 
     </div>
-    <p v-else class="text-center text-red-600 mt-10">Vitrine não encontrada.</p>
+    <div v-else class="bg-white p-12 rounded-3xl border border-gray-200 shadow-sm text-center max-w-md mx-auto my-12 space-y-4">
+      <div class="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-store-slash"></i>
+      </div>
+      <h3 class="text-base font-bold text-gray-900">
+        Vitrine não encontrada ou inativa.
+      </h3>
+      <p class="text-xs text-gray-500">
+        Verifique o endereço digitado ou retorne para a lista de vitrines.
+      </p>
+      <button
+        @click="back"
+        class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
+      >
+        <i class="fa-solid fa-arrow-left"></i> Voltar para Minhas Vitrines
+      </button>
+    </div>
   </div>
 </template>
 
@@ -993,6 +1009,7 @@ const isPreview = ref(false)
 const salvandoTema = ref(false)
 const selectedCategoryTab = ref('all') // 'all' | 'premium' | 'gradient' | 'standard'
 
+const carregandoLoja = ref(true)
 const analyticsData = ref(null)
 const carregandoAnalytics = ref(false)
 
@@ -1382,74 +1399,81 @@ async function buscarLoja() {
 }
 
 onMounted(async () => {
-  await themeStore.carregarTemasDoBanco()
-  await buscarLoja()
+  carregandoLoja.value = true
+  try {
+    await themeStore.carregarTemasDoBanco()
+    await buscarLoja()
 
-  if (loja.value) {
-    selectedTheme.value = loja.value.ref_cod_theme || loja.value.theme || 'default'
-    previewTheme.value = selectedTheme.value
-    themeStore.applyTheme(selectedTheme.value, loja.value.id)
+    if (loja.value) {
+      selectedTheme.value = loja.value.ref_cod_theme || loja.value.theme || 'default'
+      previewTheme.value = selectedTheme.value
+      themeStore.applyTheme(selectedTheme.value, loja.value.id)
 
-    formName.value = loja.value.name || ''
-    formLogoPreview.value = loja.value.logo_url || ''
-    formDescription.value = loja.value.description || ''
-    formSubtitle.value = loja.value.subtitle || ''
-    formBannerImage.value = loja.value.banner_image || ''
-    formBannerPreview.value = loja.value.banner_image || ''
-    if (loja.value.banner_image && loja.value.banner_image.startsWith('http')) {
-      bannerInputMode.value = 'url'
-    } else if (loja.value.banner_image && loja.value.banner_image.startsWith('data:')) {
-      bannerInputMode.value = 'file'
-      formBannerFileName.value = 'Imagem enviada'
-    }
-    const isFlagEnabled = (val) => val !== 0 && val !== '0' && val !== false && val !== 'false'
-    formShowBanner.value = isFlagEnabled(loja.value.show_banner)
-    formBio.value = loja.value.bio || ''
-    formShowMetrics.value = isFlagEnabled(loja.value.show_metrics)
-    formLinks.value = JSON.parse(JSON.stringify(loja.value.links || []))
-    formShowSocialFooter.value = isFlagEnabled(loja.value.show_social_footer)
+      formName.value = loja.value.name || ''
+      formLogoPreview.value = loja.value.logo_url || ''
+      formDescription.value = loja.value.description || ''
+      formSubtitle.value = loja.value.subtitle || ''
+      formBannerImage.value = loja.value.banner_image || ''
+      formBannerPreview.value = loja.value.banner_image || ''
+      if (loja.value.banner_image && loja.value.banner_image.startsWith('http')) {
+        bannerInputMode.value = 'url'
+      } else if (loja.value.banner_image && loja.value.banner_image.startsWith('data:')) {
+        bannerInputMode.value = 'file'
+        formBannerFileName.value = 'Imagem enviada'
+      }
+      const isFlagEnabled = (val) => val !== 0 && val !== '0' && val !== false && val !== 'false'
+      formShowBanner.value = isFlagEnabled(loja.value.show_banner)
+      formBio.value = loja.value.bio || ''
+      formShowMetrics.value = isFlagEnabled(loja.value.show_metrics)
+      formLinks.value = JSON.parse(JSON.stringify(loja.value.links || []))
+      formShowSocialFooter.value = isFlagEnabled(loja.value.show_social_footer)
 
-    if (loja.value.social_networks && typeof loja.value.social_networks === 'object') {
-      formSocialNetworks.value = {
-        instagram: loja.value.social_networks.instagram || '',
-        whatsapp: loja.value.social_networks.whatsapp || '',
-        youtube: loja.value.social_networks.youtube || '',
-        tiktok: loja.value.social_networks.tiktok || '',
-        facebook: loja.value.social_networks.facebook || '',
-        twitter: loja.value.social_networks.twitter || '',
-        linkedin: loja.value.social_networks.linkedin || '',
-        website: loja.value.social_networks.website || ''
+      if (loja.value.social_networks && typeof loja.value.social_networks === 'object') {
+        formSocialNetworks.value = {
+          instagram: loja.value.social_networks.instagram || '',
+          whatsapp: loja.value.social_networks.whatsapp || '',
+          youtube: loja.value.social_networks.youtube || '',
+          tiktok: loja.value.social_networks.tiktok || '',
+          facebook: loja.value.social_networks.facebook || '',
+          twitter: loja.value.social_networks.twitter || '',
+          linkedin: loja.value.social_networks.linkedin || '',
+          website: loja.value.social_networks.website || ''
+        }
+      }
+
+      if (loja.value.metrics && Array.isArray(loja.value.metrics) && loja.value.metrics.length > 0) {
+        formMetrics.value = JSON.parse(JSON.stringify(loja.value.metrics))
+      }
+      if (loja.value.faqs && Array.isArray(loja.value.faqs) && loja.value.faqs.length > 0) {
+        formFaqs.value = JSON.parse(JSON.stringify(loja.value.faqs))
       }
     }
 
-    if (loja.value.metrics && Array.isArray(loja.value.metrics) && loja.value.metrics.length > 0) {
-      formMetrics.value = JSON.parse(JSON.stringify(loja.value.metrics))
-    }
-    if (loja.value.faqs && Array.isArray(loja.value.faqs) && loja.value.faqs.length > 0) {
-      formFaqs.value = JSON.parse(JSON.stringify(loja.value.faqs))
-    }
-  }
-
-  // Gera link encurtado (usando API com suporte a CORS)
-  try {
-    const resp = await fetch(
-      `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl.value)}`
-    )
-    if (resp.ok) {
-      const data = await resp.json()
-      if (data && data.shorturl) {
-        shortUrl.value = data.shorturl
+    // Gera link encurtado (usando API com suporte a CORS)
+    try {
+      const resp = await fetch(
+        `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl.value)}`
+      )
+      if (resp.ok) {
+        const data = await resp.json()
+        if (data && data.shorturl) {
+          shortUrl.value = data.shorturl
+        } else {
+          shortUrl.value = longUrl.value
+        }
       } else {
         shortUrl.value = longUrl.value
       }
-    } else {
+    } catch {
       shortUrl.value = longUrl.value
     }
-  } catch {
-    shortUrl.value = longUrl.value
-  }
 
-  await contactStore.listarContatos()
+    await contactStore.listarContatos()
+  } catch (error) {
+    console.error('Erro ao carregar vitrine:', error)
+  } finally {
+    carregandoLoja.value = false
+  }
 })
 
 function copyLink() {

@@ -124,7 +124,7 @@
           </div>
 
           <!-- Loading State -->
-          <Loading v-if="lojaStore.carregando" text="Carregando vitrines..." />
+          <Loading v-if="lojaStore.carregando" text="Carregando vitrines..." :compact="true" />
 
           <!-- Erro -->
           <div v-else-if="lojaStore.erro" class="p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-semibold">
